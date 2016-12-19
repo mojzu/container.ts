@@ -1,4 +1,4 @@
-# Node Application
+# Node.js Application Template
 
 ```Shell
 $ yarn install
@@ -9,7 +9,7 @@ $ yarn install
 -   `src/main.ts` - Application entry point.
 -   `src/test.ts` - Test runner using [Jasmine](https://jasmine.github.io/) and [Istanbul](http://gotwarlost.github.io/istanbul/).
 -   `.editorconfig` - <http://editorconfig.org>
--   `.gitignore` - <http://help.github.com/ignore-files/>
+-   `.gitignore` - <https://help.github.com/articles/ignoring-files/>
 -   `.gitmessage` - <https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration>
 -   `package.json` - <https://docs.npmjs.com/files/package.json>
 -   `tsconfig.json` - <https://www.typescriptlang.org/docs/handbook/tsconfig-json.html>
