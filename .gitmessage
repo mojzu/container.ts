@@ -1,0 +1,10 @@
+# Commit message format
+# ```
+# [<category>][<audience>] <subject>
+#
+# <body>
+#
+# <footer>
+# ```
+# Categories: added, changed, removed, fixed
+# Audiences: user, developer

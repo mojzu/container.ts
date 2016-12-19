@@ -1,0 +1,26 @@
+{
+  "name": "server",
+  "version": "0.0.0-DEVELOPMENT",
+  "private": true,
+  "scripts": {
+    "debug": "tsc && node --debug dist/main.js",
+    "inspect": "tsc && node --inspect dist/main.js",
+    "test": "tsc && node dist/test.js",
+    "coverage": "tsc && istanbul cover dist/test.js -x \"**/*.spec.js\"",
+    "lint": "tslint \"src/**/*.ts\"",
+    "webpack": "webpack",
+    "tsc": "tsc"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^2.5.38",
+    "@types/node": "^6.0.52",
+    "awesome-typescript-loader": "^3.0.0-beta.17",
+    "istanbul": "^0.4.5",
+    "jasmine": "^2.5.2",
+    "source-map-loader": "^0.1.5",
+    "source-map-support": "^0.4.6",
+    "tslint": "^4.1.1",
+    "typescript": "^2.1.4",
+    "webpack": "^1.14.0"
+  }
+}
