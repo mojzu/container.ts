@@ -1,4 +1,4 @@
-# Node.js Application Template
+# TypeScript Application Template
 
 ```Shell
 # Install dependencies.
