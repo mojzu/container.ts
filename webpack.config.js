@@ -1,52 +1,49 @@
 // Webpack configuration file.
-// https://webpack.github.io/docs/configuration.html
-// http://jlongster.com/Backend-Apps-with-Webpack--Part-I
+// <https://webpack.github.io/docs/configuration.html>
+// <http://jlongster.com/Backend-Apps-with-Webpack--Part-I>
 var webpack = require("webpack");
 var path = require("path");
 var fs = require("fs");
 
-// Retrieves module list from `node_modules` directory.
-function get_node_modules(data) {
-    fs.readdirSync("node_modules").filter(function(value) {
-        return [".bin"].indexOf(value) === -1;
-    }).forEach(function(mod) {
-        data[mod] = "commonjs " + mod;
-    });
-    return data;
+/**
+ * Use `package.json` file for external dependencies.
+ */
+function externalDependencies() {
+  var packageJson = require("./package.json");
+  var dependencies = packageJson["dependencies"];
+  var externals = {};
+  if (dependencies != null) {
+    for (var key in dependencies) {
+      externals[key] = "commonjs " + key;
+    }
+  }
+  return externals;
 }
 
 module.exports = {
-    entry: {
-        main: "./src/main.ts",
-    },
-    target: "node",
-    output: {
-        path: path.join(__dirname, "dist"),
-        filename: "[name].bundle.js",
-    },
-    resolve: {
-        extensions: ["", ".js", ".ts"],
-    },
-    // Generate source map for bundle.
-    devtool: "source-map",
-    // Load TypeScript and source map files.
-    module: {
-        preLoaders: [{
-            test: /\.js$/,
-            loader: "source-map-loader"
-        }],
-        loaders: [{
-            test: /\.tsx?$/,
-            loader: "awesome-typescript-loader"
-        }],
-    },
-    plugins: [
-        // Make error stack traces refer to TypeScript files.
-        new webpack.BannerPlugin("require('source-map-support').install();", {
-            raw: true,
-            entryOnly: false
-        }),
-    ],
-    // Do not bundle Node modules.
-    externals: get_node_modules({}),
+  entry: {
+    main: path.resolve("./src/main.ts"),
+  },
+  output: {
+    path: path.resolve("./dist"),
+    filename: "[name].bundle.js",
+  },
+  // Load TypeScript and source map files.
+  module: {
+    rules: [{
+      test: /\.ts?$/,
+      loader: "ts-loader",
+      exclude: path.resolve("./node_modules/"),
+    }],
+  },
+  resolve: {
+    extensions: [".ts"],
+  },
+  target: "node",
+  // Generate source map for bundle.
+  devtool: "source-map",
+  // Do not bundle Node modules.
+  externals: [externalDependencies(), {
+    // Additional dependencies...
+  }],
 };

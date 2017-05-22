@@ -1,10 +1,10 @@
-# Commit message format
+# Commit message format.
+# <http://karma-runner.github.io/1.0/dev/git-commit-msg.html>
 # ```
-# [<category>][<audience>] <subject>
+# <type>(<scope>): <subject>
 #
 # <body>
 #
 # <footer>
 # ```
-# Categories: added, changed, removed, fixed
-# Audiences: user, developer
+# types: feat, fix, docs, style, refactor, test, chore

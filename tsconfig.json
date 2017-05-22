@@ -1,31 +1,37 @@
 {
-    "compilerOptions": {
-        "alwaysStrict": true,
-        "declaration": false,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "forceConsistentCasingInFileNames": true,
-        "lib": ["ES2015", "DOM"],
-        "module": "CommonJS",
-        "moduleResolution": "Node",
-        "newLine": "lf",
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
-        "outDir": "dist",
-        "preserveConstEnums": true,
-        "removeComments": true,
-        "sourceMap": true,
-        "strictNullChecks": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "target": "ES5",
-        "typeRoots": [
-            "node_modules/@types"
-        ]
-    },
-    "include": [
-        "src/**/*.ts"
+  "compilerOptions": {
+    /* Basic Options */
+    /* https://www.typescriptlang.org/docs/handbook/compiler-options.html */
+    "target": "es5",
+    "module": "commonjs",
+    "lib": [
+      "es2015",
+      "dom"
     ],
-    "exclude": [
-        "node_modules"
-    ]
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "removeComments": false,
+    /* Strict Type-Checking Options */
+    "strict": true,
+    /* Additional Checks */
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": false,
+    /* Module Resolution Options */
+    "moduleResolution": "node",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    /* Experimental Options */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

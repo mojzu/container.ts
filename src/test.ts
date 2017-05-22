@@ -1,15 +1,19 @@
 // Workaround for `@types/jasmine/index.d.ts` is not a module error.
-const jasmine_module = require("jasmine");
-const jasmine_test = new jasmine_module();
+const Jasmine = require("jasmine");
+const jasmineTest = new Jasmine();
 
 // Run tests for `*.spec.js` files
-jasmine_test.loadConfig({
-    spec_dir: "dist",
-    spec_files: [
-        "**/*[sSpec].js"
-    ],
+jasmineTest.loadConfig({
+  spec_dir: "dist",
+  spec_files: [
+    // // Run individual tests by specifying file paths here.
+    // "**/*.spec.ts",
+
+    // Run all tests.
+    "**/*[sSpec].js",
+  ],
 });
-jasmine_test.configureDefaultReporter({
-    showColors: true
+jasmineTest.configureDefaultReporter({
+  showColors: true,
 });
-jasmine_test.execute();
+jasmineTest.execute();

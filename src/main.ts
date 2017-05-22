@@ -1,1 +1,1 @@
-/// <reference types="@types/node" />
+/// <reference types="node" />

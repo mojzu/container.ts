@@ -1,9 +1,9 @@
-/// <reference types="@types/jasmine" />
+/// <reference types="jasmine" />
 
 describe("Main", () => {
 
-    it("test", () => {
-        expect(true).toBeTruthy();
-    });
+  it("test", () => {
+    expect(true).toBeTruthy();
+  });
 
 });
