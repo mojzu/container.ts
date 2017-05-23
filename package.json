@@ -1,7 +1,7 @@
 {
   "name": "template.ts",
   "version": "0.0.0-development",
-  "description": "Template TypeScript Application",
+  "description": "TypeScript application template",
   "license": "Unlicense",
   "author": "mojzu <mail@mojzu.net>",
   "repository": "https://github.com/mojzu/template.ts.git",

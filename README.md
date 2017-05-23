@@ -1,4 +1,6 @@
-# TypeScript Application Template
+# Template.ts
+
+TypeScript application template.
 
 ```Shell
 # Install dependencies.
