@@ -23,6 +23,9 @@
     "scripts": "scripts/**/*.js",
     "assets": "assets/**/*"
   },
+  "dependencies": {
+    "rxjs": "^5.4.1"
+  },
   "devDependencies": {
     "@types/jasmine": "^2.5.53",
     "@types/node": "^6.0.78",
