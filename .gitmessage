@@ -1,5 +1,5 @@
-# Commit message format.
-# <http://karma-runner.github.io/1.0/dev/git-commit-msg.html>
+# Git commit message template.
+# <https://git-scm.com/docs/git-commit>
 # ```
 # <type>(<scope>): <subject>
 #
