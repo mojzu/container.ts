@@ -35,11 +35,12 @@ $ yarn run build
 
 ## Links
 
+-   [Yarn](https://yarnpkg.com/en/docs/cli/)
 -   [package.json](https://docs.npmjs.com/files/package.json)
 -   [Jasmine](https://jasmine.github.io/)
 -   [Istanbul](http://gotwarlost.github.io/istanbul/)
--   [tsconfig.json](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
+-   [TypeDoc](https://github.com/TypeStrong/typedoc)
 -   [TSLint](https://palantir.github.io/tslint/)
+-   [tsconfig.json](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
 -   [webpack](https://webpack.js.org/configuration/)
 -   [pkg](https://github.com/zeit/pkg)
--   [Yarn](https://yarnpkg.com/en/docs/cli/)

@@ -18,7 +18,7 @@ function externalDependencies() {
 }
 
 module.exports = {
-  // Generate main binary bundle.
+  // Main script for binary.
   entry: {
     main: path.resolve("./src/main.ts"),
   },
@@ -39,6 +39,7 @@ module.exports = {
     extensions: [".ts"],
   },
   // Target Node environment.
+  // Disable filename/dirname polyfills.
   target: "node",
   node: {
     __filename: false,
