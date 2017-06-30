@@ -8,16 +8,14 @@
   "private": true,
   "bin": "./dist/main.js",
   "scripts": {
-    "clean": "rimraf build coverage dist",
-    "distclean": "npm run clean && rimraf node_modules docs",
-    "test": "npm run tsc && istanbul cover test.js -x \"**/*.spec.js\"",
-    "lint": "tslint -p tsconfig.json --type-check",
-    "docs": "typedoc --out docs .",
-    "start": "npm run tsc && node dist/main.js",
-    "inspect": "npm run tsc && node --inspect dist/main.js",
-    "build": "npm run webpack && pkg --targets node6 --out-path build .",
-    "tsc": "npm run clean && tsc",
-    "webpack": "npm run clean && webpack"
+    "clean": "gulp clean",
+    "distclean": "gulp distclean",
+    "test": "gulp test",
+    "lint": "gulp lint",
+    "docs": "gulp docs",
+    "start": "gulp start",
+    "inspect": "gulp inspect",
+    "build": "gulp build"
   },
   "pkg": {
     "assets": "assets/**/*"
@@ -32,10 +30,12 @@
     "babel-loader": "^7.1.1",
     "babel-preset-env": "^1.5.2",
     "babel-preset-es2015": "^6.24.1",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-util": "^3.0.8",
     "istanbul": "^0.4.5",
     "jasmine": "^2.6.0",
     "pkg": "^4.1.1",
-    "rimraf": "^2.6.1",
     "ts-loader": "^2.2.1",
     "tslint": "^5.4.3",
     "tslint-eslint-rules": "^4.1.1",

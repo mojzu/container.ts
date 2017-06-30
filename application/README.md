@@ -8,35 +8,18 @@ TypeScript application template.
 # Install dependencies.
 $ yarn install
 
-# Clean distribution directory.
-$ yarn run clean
+# Run tasks defined in `gulpfile.js`.
+$ yarn run clean|distclean|test|lint|docs|start|inspect|build
 
-# Clean Node modules directory.
-$ yarn run distclean
-
-# Run tests with coverage.
-$ yarn run test
-
-# Run linter.
-$ yarn run lint
-
-# Build documentation.
-$ yarn run docs
-
-# Start application.
-$ yarn run start
-
-# Start application with Chrome V8 inspector.
-$ yarn run inspect
-
-# Build application binary.
-$ yarn run build
+# Use production flag for release builds.
+$ yarn run build -- -p
 ```
 
 ## Links
 
 -   [Yarn](https://yarnpkg.com/en/docs/cli/)
 -   [package.json](https://docs.npmjs.com/files/package.json)
+-   [Gulp](http://gulpjs.com/)
 -   [Jasmine](https://jasmine.github.io/)
 -   [Istanbul](http://gotwarlost.github.io/istanbul/)
 -   [TypeDoc](https://github.com/TypeStrong/typedoc)
