@@ -43,4 +43,5 @@ $ yarn run build
 -   [TSLint](https://palantir.github.io/tslint/)
 -   [tsconfig.json](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
 -   [webpack](https://webpack.js.org/configuration/)
+-   [Babel](https://babeljs.io/)
 -   [pkg](https://github.com/zeit/pkg)

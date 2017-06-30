@@ -26,13 +26,21 @@ module.exports = {
     path: path.resolve("./dist"),
     filename: "[name].js",
   },
-  // Load TypeScript and source map files.
-  // Exclude Node modules.
+  // TypeScript sources compiled by ts-loader to ES2016.
+  // Passed to Babel for transpiling to ES2015 for minification.
   module: {
-    rules: [{
-      test: /\.ts?$/,
-      loader: "ts-loader",
-      exclude: path.resolve("./node_modules/"),
+    loaders: [{
+      test: /\.ts$/,
+      exclude: /node_modules/,
+      use: [
+        {
+          loader: "babel-loader",
+          options: { presets: ["es2015"] },
+        },
+        {
+          loader: "ts-loader",
+        },
+      ],
     }],
   },
   resolve: {
