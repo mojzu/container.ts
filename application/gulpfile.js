@@ -11,6 +11,11 @@ const configuration = {
   production: !!(gutil.env.p || gutil.env.production),
 };
 
+/** Native module file paths. */
+const nativeModules = [
+  "./node_modules/scrypt/build/Release/scrypt.node",
+];
+
 /** Determine `webpack` command using configuration. */
 function webpackCommand() {
   const command = ["webpack"];
@@ -66,5 +71,5 @@ gulp.task("inspect", ["tsc"], (done) => {
 
 // Build application binary.
 gulp.task("build", ["webpack"], (done) => {
-  pkg.run(configuration, __dirname, done);
+  pkg.run(configuration, nativeModules, __dirname, done);
 });

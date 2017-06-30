@@ -1,5 +1,6 @@
 "use strict";
 const process = require("process");
+const gulp = require("gulp");
 const gutil = require("gulp-util");
 const shell = require("./shell");
 
@@ -36,11 +37,16 @@ module.exports = {
   /**
    * Package application into binary for host platform.
    * TODO: Improve version/platform/arch support.
-   * TODO: Copy native modules to build where available.
+   * TODO: Improve native module support.
    */
-  run: (configuration, root, done) => {
+  run: (configuration, nativeModules, root, done) => {
     const hostTarget = [hostVersion(), hostPlatform(), hostArch()].join("-");
     gutil.log("[pkg]", hostTarget);
+
+    for (const path of nativeModules) {
+      gutil.log("[pkg]", "[module]", path);
+      gulp.src(path).pipe(gulp.dest("./build"));
+    }
 
     const command = ["pkg", "--targets", hostTarget, "--out-path", "build", "."];
     shell.run(command.join(" "), root, done);
