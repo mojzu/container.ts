@@ -45,7 +45,6 @@ export class Container {
 
   // TODO: Implement this.
   public up() {
-    console.log("UP");
     this._modules.map((name) => {
       const mod = this._container.resolve<ContainerModule>(name);
       mod.up();
