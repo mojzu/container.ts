@@ -33,6 +33,7 @@ export function ping(callback: any) {
   console.log(`env = ${process.env.NODE_ENV}`);
 
   console.log(`dirname/ = ${fs.readdirSync(`${__dirname}`)}`);
+  console.log(`dirname/scripts/ = ${fs.readdirSync(`${__dirname}/scripts`)}`);
   console.log(`dirname/../ = ${fs.readdirSync(`${__dirname}/../`)}`);
   console.log(`dirname/../assets/ = ${fs.readdirSync(`${__dirname}/../assets`)}`);
 

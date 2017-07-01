@@ -19,11 +19,13 @@ function externalDependencies() {
 
 module.exports = {
   // Main script for binary.
+  // Additional scripts bundled with application.
   entry: {
-    main: path.resolve("./src/main.ts"),
+    "dist/main": path.resolve("./src/main.ts"),
+    "dist/scripts/subprocess": path.resolve("./src/scripts/subprocess.ts"),
   },
   output: {
-    path: path.resolve("./dist"),
+    path: path.resolve("./"),
     filename: "[name].js",
   },
   // TypeScript sources compiled by ts-loader to ES2016.
@@ -33,13 +35,8 @@ module.exports = {
       test: /\.ts$/,
       exclude: /node_modules/,
       use: [
-        {
-          loader: "babel-loader",
-          options: { presets: ["es2015"] },
-        },
-        {
-          loader: "ts-loader",
-        },
+        { loader: "babel-loader", options: { presets: ["es2015"] } },
+        { loader: "ts-loader" },
       ],
     }],
   },

@@ -18,6 +18,7 @@
     "build": "gulp build"
   },
   "pkg": {
+    "scripts": "dist/scripts/**/*.js",
     "assets": "assets/**/*"
   },
   "dependencies": {
