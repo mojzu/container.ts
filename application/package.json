@@ -22,9 +22,12 @@
     "assets": "assets/**/*"
   },
   "dependencies": {
-    "rxjs": "^5.4.1",
+    "awilix": "^2.5.0",
+    "debug": "^2.6.8",
+    "rxjs": "^5.4.1"
   },
   "devDependencies": {
+    "@types/debug": "^0.0.29",
     "@types/jasmine": "^2.5.53",
     "@types/node": "^6.0.79",
     "babel-core": "^6.25.0",
