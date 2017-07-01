@@ -12,9 +12,7 @@ const configuration = {
 };
 
 /** Native module file paths. */
-const nativeModules = [
-  "./node_modules/scrypt/build/Release/scrypt.node",
-];
+const nativeModules = [];
 
 /** Determine `webpack` command using configuration. */
 function webpackCommand() {

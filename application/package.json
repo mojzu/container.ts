@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "rxjs": "^5.4.1",
-    "scrypt": "^6.0.3"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.53",
