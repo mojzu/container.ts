@@ -6,5 +6,10 @@
     "tslint:recommended",
     "tslint-eslint-rules"
   ],
-  "rules": {}
+  "rules": {
+    "no-empty": false,
+    "max-classes-per-file": [
+      false
+    ]
+  }
 }
