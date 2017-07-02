@@ -15,46 +15,46 @@ export enum LogLevel {
 export abstract class Logger {
 
   /** System is unusable. */
-  public emergency(message: string, ...args: any[]): void {
-    return this.log(LogLevel.Emergency, message, args);
+  public emergency(...args: any[]): void {
+    return this.log(LogLevel.Emergency, args);
   }
 
   /** Action must be taken immediately. */
-  public alert(message: string, ...args: any[]): void {
-    return this.log(LogLevel.Alert, message, args);
+  public alert(...args: any[]): void {
+    return this.log(LogLevel.Alert, args);
   }
 
   /** Critical conditions. */
-  public critical(message: string, ...args: any[]): void {
-    return this.log(LogLevel.Critical, message, args);
+  public critical(...args: any[]): void {
+    return this.log(LogLevel.Critical, args);
   }
 
   /** Error conditions. */
-  public error(message: string, ...args: any[]): void {
-    return this.log(LogLevel.Error, message, args);
+  public error(...args: any[]): void {
+    return this.log(LogLevel.Error, args);
   }
 
   /** Warning conditions. */
-  public warn(message: string, ...args: any[]): void {
-    return this.log(LogLevel.Warning, message, args);
+  public warn(...args: any[]): void {
+    return this.log(LogLevel.Warning, args);
   }
 
   /** Normal but significant condition. */
-  public notice(message: string, ...args: any[]): void {
-    return this.log(LogLevel.Notice, message, args);
+  public notice(...args: any[]): void {
+    return this.log(LogLevel.Notice, args);
   }
 
   /** Informational messages */
-  public info(message: string, ...args: any[]): void {
-    return this.log(LogLevel.Informational, message, args);
+  public info(...args: any[]): void {
+    return this.log(LogLevel.Informational, args);
   }
 
   /** Debug level messages. */
-  public debug(message: string, ...args: any[]): void {
-    return this.log(LogLevel.Debug, message, args);
+  public debug(...args: any[]): void {
+    return this.log(LogLevel.Debug, args);
   }
 
   /** Log method provided by implementor. */
-  protected abstract log(level: LogLevel, message: string, args: any[]): void;
+  protected abstract log(level: LogLevel, args: any[]): void;
 
 }

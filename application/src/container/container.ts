@@ -23,18 +23,13 @@ export class ContainerLogMessage {
 
   public constructor(
     public level: LogLevel,
-    public message: string,
     public moduleName: string,
     public args: any[],
   ) { }
 
   /** Basic string representation for console logging. */
   public toString(): string {
-    let output = `[${this.level}][${this.moduleName}] ${this.message}`;
-    if (this.args.length > 0) {
-      output += ` [${this.args.join(", ")}]`;
-    }
-    return output;
+    return `[${this.level}][${this.moduleName}][${this.args.join(", ")}]`;
   }
 
 }
@@ -76,8 +71,8 @@ export class Container {
   }
 
   /** Send log message of level for module. */
-  public sendLog(level: LogLevel, message: string, moduleName: string, args: any[]): void {
-    this._bus.next(new ContainerLogMessage(level, message, moduleName, args));
+  public sendLog(level: LogLevel, moduleName: string, args: any[]): void {
+    this._bus.next(new ContainerLogMessage(level, moduleName, args));
   }
 
   /** Observable stream of module logs, optional level filter. */
@@ -110,8 +105,8 @@ export class ContainerModuleLogger extends Logger {
   ) { super(); }
 
   /** Sends log message to container bus for consumption by module. */
-  protected log(level: LogLevel, message: string, args: any[]): void {
-    this._container.sendLog(level, message, this._name, args);
+  protected log(level: LogLevel, args: any[]): void {
+    this._container.sendLog(level, this._name, args);
   }
 
 }

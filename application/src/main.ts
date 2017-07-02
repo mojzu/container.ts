@@ -3,9 +3,9 @@ import * as process from "process";
 import * as path from "path";
 import * as constants from "./constants";
 import { Container, Environment } from "./container";
-import { Assets, Scripts, RollbarLog } from "./modules";
+import { Assets, Scripts, Log, RollbarLog } from "./modules";
 
-// TODO: Command line argument support.
+// TODO: Command line argument support (minimist, argv).
 // TODO: Variable log/data directories.
 // TODO: Process signal handling.
 
@@ -22,8 +22,11 @@ environment
 container
   .registerValue(constants.ENVIRONMENT, environment)
   .registerModule(constants.SCRIPTS, Scripts)
-  .registerModule(constants.ASSETS, Assets)
-  .registerModule(constants.LOG, RollbarLog);
+  .registerModule(constants.ASSETS, Assets);
+
+// Register different modules based on environment.
+const rollbarAccessToken = !!environment.get(constants.ENV_ROLLBAR_ACCESS_TOKEN);
+container.registerModule(constants.LOG, rollbarAccessToken ? RollbarLog : Log);
 
 // Run following section only if this is the main script.
 // Signals container modules to start.
