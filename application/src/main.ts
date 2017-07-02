@@ -3,7 +3,7 @@ import * as process from "process";
 import * as path from "path";
 import * as constants from "./constants";
 import { Container, Environment } from "./container";
-import { Assets, Scripts, Log } from "./modules";
+import { Assets, Scripts, RollbarLog } from "./modules";
 
 // TODO: Command line argument support.
 // TODO: Variable log/data directories.
@@ -23,7 +23,7 @@ container
   .registerValue(constants.ENVIRONMENT, environment)
   .registerModule(constants.SCRIPTS, Scripts)
   .registerModule(constants.ASSETS, Assets)
-  .registerModule(constants.LOG, Log);
+  .registerModule(constants.LOG, RollbarLog);
 
 // Run following section only if this is the main script.
 // Signals container modules to start.

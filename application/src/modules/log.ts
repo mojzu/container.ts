@@ -7,8 +7,8 @@ export class Log extends ContainerModule {
   private _environment: Environment;
   private _level: LogLevel;
 
-  /** Log level configured by environment. */
-  public get level(): LogLevel { return this._level; }
+  protected get environment(): Environment { return this._environment; }
+  protected get level(): LogLevel { return this._level; }
 
   public constructor(opts: IContainerOpts) {
     super(opts, constants.LOG, {
