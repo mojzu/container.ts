@@ -17,6 +17,20 @@ function externalDependencies() {
   return externals;
 }
 
+/** Partial RxJS imports must be mapped to module. */
+function rxJsDependencies() {
+  var externals = {};
+  var dependencies = [
+    "rxjs/Observable",
+    "rxjs/Subject",
+    "rxjs/add/operator/filter",
+  ];
+  for (var key of dependencies) {
+    externals[key] = "commonjs rxjs";
+  }
+  return externals;
+}
+
 module.exports = {
   // Main script for binary.
   // Additional scripts bundled with application.
@@ -53,7 +67,7 @@ module.exports = {
   // Generate source map for bundle.
   devtool: "source-map",
   // Do not bundle Node modules.
-  externals: [externalDependencies(), {
+  externals: [externalDependencies(), rxJsDependencies(), {
     // Additional external dependencies added here.
   }],
 };

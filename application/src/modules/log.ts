@@ -26,7 +26,7 @@ export class Log extends ContainerModule {
 
   /** Default handler for incoming log messages. */
   protected handleLog(log: ContainerLogMessage): void {
-    process.stdout.write(log.toString());
+    process.stdout.write(`${log.toString()}\n`);
   }
 
   /** Convert environment log level string to level index, defaults to warning. */
