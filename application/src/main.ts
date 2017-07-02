@@ -2,13 +2,11 @@
 import * as process from "process";
 import * as path from "path";
 import * as constants from "./constants";
-import { Container } from "./container";
-import { Environment } from "./environment";
-import { Assets, Scripts } from "./modules";
+import { Container, Environment } from "./container";
+import { Assets, Scripts, Log } from "./modules";
 
 // TODO: Command line argument support.
 // TODO: Variable log/data directories.
-// TODO: Container logging/error handling.
 // TODO: Process signal handling.
 
 // Create container and environment instances.
@@ -24,7 +22,8 @@ environment
 container
   .registerValue(constants.ENVIRONMENT, environment)
   .registerModule(constants.SCRIPTS, Scripts)
-  .registerModule(constants.ASSETS, Assets);
+  .registerModule(constants.ASSETS, Assets)
+  .registerModule(constants.LOG, Log);
 
 // Run following section only if this is the main script.
 // Signals container modules to start.

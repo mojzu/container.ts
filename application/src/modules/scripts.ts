@@ -2,8 +2,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import * as constants from "../constants";
-import { IContainerOpts, ContainerModule } from "../container";
-import { Environment } from "../environment";
+import { IContainerOpts, ContainerModule, Environment } from "../container";
 
 export class Scripts extends ContainerModule {
 

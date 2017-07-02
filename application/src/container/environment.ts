@@ -7,15 +7,16 @@ export interface IEnvironmentVariables {
 /** Environment variables class. */
 export class Environment {
 
+  /** Environment variables object. */
   public get variables(): IEnvironmentVariables { return this._variables; }
 
   public constructor(
     private _variables: IEnvironmentVariables = {},
   ) { }
 
-  /** Get an environment variable value or null. */
-  public get(name: string): string | null {
-    return this._variables[name] || null;
+  /** Get an environment variable value or undefined. */
+  public get(name: string): string | undefined {
+    return this._variables[name];
   }
 
   /** Set an environment variable value. */
