@@ -12,6 +12,9 @@ export interface IContainerDepends {
   [key: string]: string;
 }
 
+/** Container reference name used internally by modules. */
+export const CONTAINER_NAME = "_container";
+
 /** Wrapper around awilix library. */
 export class Container {
 
@@ -21,6 +24,7 @@ export class Container {
   /** Creates a new container in proxy resolution mode. */
   public constructor() {
     this._container = createContainer({ resolutionMode: ResolutionMode.PROXY });
+    this._container.registerValue(CONTAINER_NAME, this);
   }
 
   /** Register a module in container, has singleton lifetime by default. */
@@ -58,15 +62,17 @@ export class Container {
 /** Base class for container class modules with dependency injection. */
 export class ContainerModule {
 
+  private _container: Container;
   private _debug: debug.IDebugger;
 
+  public get container(): Container { return this._container; }
   public get debug(): debug.IDebugger { return this._debug; }
 
   public constructor(opts: IContainerOpts, name: string, depends: IContainerDepends = {}) {
-    // Construct debug instance.
+    this._container = opts[CONTAINER_NAME];
     this._debug = debug(name);
 
-    // Inject dependencyvalues into instance.
+    // Inject dependency values into instance.
     // Error is thrown by awilix if resolution failed.
     Object.keys(depends).map((key) => {
       const target = depends[key];
