@@ -11,7 +11,7 @@ export class RollbarLog extends Log {
   private _rollbar: any;
 
   public constructor(opts: IContainerOpts) {
-    super(opts);
+    super(opts, constants.ROLLBAR_LOG);
 
     // Get Node environment value.
     const environment = this.environment.getDefault(constants.ENV_NODE_ENV, constants.DEFAULT_NODE_ENV);
@@ -42,8 +42,9 @@ export class RollbarLog extends Log {
 
   /** Rollbar handler for incoming log messages. */
   protected handleLog(log: ContainerLogMessage): void {
-    // Map log level to rollbar log methods.
     const callback = this.logCallback.bind(this);
+
+    // Map log level to rollbar log methods.
     switch (log.level) {
       case LogLevel.Emergency:
       case LogLevel.Alert:

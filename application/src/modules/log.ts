@@ -1,8 +1,7 @@
-import * as process from "process";
 import * as constants from "../constants";
 import { IContainerOpts, ContainerModule, ContainerLogMessage, Environment, LogLevel } from "../container";
 
-export class Log extends ContainerModule {
+export abstract class Log extends ContainerModule {
 
   private _environment: Environment;
   private _level: LogLevel;
@@ -10,8 +9,8 @@ export class Log extends ContainerModule {
   protected get environment(): Environment { return this._environment; }
   protected get level(): LogLevel { return this._level; }
 
-  public constructor(opts: IContainerOpts) {
-    super(opts, constants.LOG, {
+  public constructor(opts: IContainerOpts, name: string) {
+    super(opts, name, {
       _environment: constants.ENVIRONMENT,
     });
 
@@ -24,10 +23,8 @@ export class Log extends ContainerModule {
       .subscribe((log) => this.handleLog(log));
   }
 
-  /** Default handler for incoming log messages. */
-  protected handleLog(log: ContainerLogMessage): void {
-    process.stdout.write(`${log.toString()}\n`);
-  }
+  /** Abstract handler for incoming log messages. */
+  protected abstract handleLog(log: ContainerLogMessage): void;
 
   /** Convert environment log level string to level index, defaults to warning. */
   protected parseLogLevel(level?: string): LogLevel {

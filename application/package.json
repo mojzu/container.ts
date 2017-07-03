@@ -25,12 +25,14 @@
     "awilix": "^2.5.0",
     "debug": "^2.6.8",
     "rollbar": "^2.0.4",
-    "rxjs": "^5.4.1"
+    "rxjs": "^5.4.1",
+    "winston": "^2.3.1"
   },
   "devDependencies": {
     "@types/debug": "^0.0.29",
     "@types/jasmine": "^2.5.53",
     "@types/node": "^6.0.79",
+    "@types/winston": "^2.3.3",
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.1",
     "babel-preset-env": "^1.5.2",

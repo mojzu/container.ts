@@ -3,7 +3,7 @@ import * as process from "process";
 import * as Debug from "debug";
 import * as constants from "./constants";
 import { Container, Environment } from "./container";
-import { Assets, Scripts, RollbarLog } from "./modules";
+import { Assets, Scripts, RollbarLog, WinstonLog } from "./modules";
 
 // TODO: Command line argument support (minimist, argv).
 // TODO: Variable log/data directories.
@@ -32,11 +32,12 @@ const CONTAINER = new Container(NAME);
 CONTAINER
   .registerValue(constants.ENVIRONMENT, ENVIRONMENT)
   .registerModule(constants.SCRIPTS, Scripts)
-  .registerModule(constants.ASSETS, Assets);
+  .registerModule(constants.ASSETS, Assets)
+  .registerModule(constants.WINSTON_LOG, WinstonLog);
 
 // Register additional modules based on environment definitions.
 if (!!ENVIRONMENT.get(constants.ENV_ROLLBAR_ACCESS_TOKEN)) {
-  CONTAINER.registerModule(constants.LOG, RollbarLog);
+  CONTAINER.registerModule(constants.ROLLBAR_LOG, RollbarLog);
 }
 
 // Run following section only if this is the main script.
