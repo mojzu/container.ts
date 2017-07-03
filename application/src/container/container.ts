@@ -3,7 +3,7 @@ import { AwilixContainer, createContainer, ResolutionMode, Lifetime } from "awil
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import "rxjs/add/operator/filter";
-import { LogLevel, Logger } from "./log";
+import { LogLevel, ILogMessage, ILogMetadata, Logger } from "./log";
 
 /** Container options injected by awilix library. */
 export interface IContainerOpts {
@@ -23,13 +23,14 @@ export class ContainerLogMessage {
 
   public constructor(
     public level: LogLevel,
-    public moduleName: string,
+    public message: ILogMessage,
+    public metadata: ILogMetadata,
     public args: any[],
   ) { }
 
   /** Basic string representation for console logging. */
   public toString(): string {
-    return `[${this.level}][${this.moduleName}][${this.args.join(", ")}]`;
+    return `[${this.level}] ${this.message}`;
   }
 
 }
@@ -75,8 +76,8 @@ export class Container {
   }
 
   /** Send log message of level for module. */
-  public sendLog(level: LogLevel, moduleName: string, args: any[]): void {
-    this._bus.next(new ContainerLogMessage(level, moduleName, args));
+  public sendLog(level: LogLevel, message: ILogMessage, metadata: ILogMetadata, args: any[]): void {
+    this._bus.next(new ContainerLogMessage(level, message, metadata, args));
   }
 
   /** Observable stream of module logs, optional level filter. */
@@ -109,8 +110,11 @@ export class ContainerModuleLogger extends Logger {
   ) { super(); }
 
   /** Sends log message to container bus for consumption by module. */
-  protected log(level: LogLevel, args: any[]): void {
-    this._container.sendLog(level, this._name, args);
+  protected log(level: LogLevel, message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
+    // Add module name metadata by default.
+    metadata = metadata || {};
+    metadata.moduleName = this._name;
+    this._container.sendLog(level, message, metadata, args);
   }
 
 }

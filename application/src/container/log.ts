@@ -11,50 +11,58 @@ export enum LogLevel {
   Debug,
 }
 
+/** Log message types. */
+export type ILogMessage = string | Error;
+
+/** Log metadata type. */
+export interface ILogMetadata extends Object {
+  [key: string]: any;
+}
+
 /** Abstract logger class. */
 export abstract class Logger {
 
   /** System is unusable. */
-  public emergency(...args: any[]): void {
-    return this.log(LogLevel.Emergency, args);
+  public emergency(message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
+    return this.log(LogLevel.Emergency, message, metadata, ...args);
   }
 
   /** Action must be taken immediately. */
-  public alert(...args: any[]): void {
-    return this.log(LogLevel.Alert, args);
+  public alert(message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
+    return this.log(LogLevel.Alert, message, metadata, ...args);
   }
 
   /** Critical conditions. */
-  public critical(...args: any[]): void {
-    return this.log(LogLevel.Critical, args);
+  public critical(message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
+    return this.log(LogLevel.Critical, message, metadata, ...args);
   }
 
   /** Error conditions. */
-  public error(...args: any[]): void {
-    return this.log(LogLevel.Error, args);
+  public error(message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
+    return this.log(LogLevel.Error, message, metadata, ...args);
   }
 
   /** Warning conditions. */
-  public warn(...args: any[]): void {
-    return this.log(LogLevel.Warning, args);
+  public warn(message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
+    return this.log(LogLevel.Warning, message, metadata, ...args);
   }
 
   /** Normal but significant condition. */
-  public notice(...args: any[]): void {
-    return this.log(LogLevel.Notice, args);
+  public notice(message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
+    return this.log(LogLevel.Notice, message, metadata, ...args);
   }
 
   /** Informational messages */
-  public info(...args: any[]): void {
-    return this.log(LogLevel.Informational, args);
+  public info(message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
+    return this.log(LogLevel.Informational, message, metadata, ...args);
   }
 
   /** Debug level messages. */
-  public debug(...args: any[]): void {
-    return this.log(LogLevel.Debug, args);
+  public debug(message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
+    return this.log(LogLevel.Debug, message, metadata, ...args);
   }
 
   /** Log method provided by implementor. */
-  protected abstract log(level: LogLevel, args: any[]): void;
+  protected abstract log(level: LogLevel, message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void;
 
 }

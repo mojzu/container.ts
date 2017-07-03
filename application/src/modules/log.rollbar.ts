@@ -10,9 +10,84 @@ export class RollbarLog extends Log {
 
   private _rollbar: any;
 
-  /** Convert internal log level to rollbar report level. */
-  protected get reportLevel(): string {
-    switch (this.level) {
+  public constructor(opts: IContainerOpts) {
+    super(opts);
+
+    // Get Node environment value.
+    const environment = this.environment.getDefault(constants.ENV_NODE_ENV, constants.DEFAULT_NODE_ENV);
+    this.debug(`environment '${environment}'`);
+
+    // Get access token from environment.
+    const accessToken = this.environment.get(constants.ENV_ROLLBAR_ACCESS_TOKEN);
+    assert(accessToken != undefined, "Rollbar access token is undefined");
+
+    // Get report level from environment or fall back on log level.
+    const rawReportLevel = this.environment.get(constants.ENV_ROLLBAR_REPORT_LEVEL);
+    const reportLevel = this.reportLevel(rawReportLevel);
+    this.debug(`reportLevel '${reportLevel}'`);
+
+    // Create Rollbar instance.
+    // Report level determined by module log level.
+    // Handle uncaught exceptions and unhandled rejections by default.
+    // Uncaught errors have 'critical' level by default.
+    this._rollbar = new Rollbar({
+      environment,
+      accessToken,
+      reportLevel,
+      handleUncaughtExceptions: true,
+      handleUnhandledRejections: true,
+      uncaughtErrorLevel: "critical",
+    });
+  }
+
+  /** Rollbar handler for incoming log messages. */
+  protected handleLog(log: ContainerLogMessage): void {
+    // Map log level to rollbar log methods.
+    const callback = this.logCallback.bind(this);
+    switch (log.level) {
+      case LogLevel.Emergency:
+      case LogLevel.Alert:
+      case LogLevel.Critical: {
+        this._rollbar.critical(log.message, log.metadata, ...log.args, callback);
+        break;
+      }
+      case LogLevel.Error: {
+        this._rollbar.error(log.message, log.metadata, ...log.args, callback);
+        break;
+      }
+      case LogLevel.Warning: {
+        this._rollbar.warning(log.message, log.metadata, ...log.args, callback);
+        break;
+      }
+      case LogLevel.Notice:
+      case LogLevel.Informational: {
+        this._rollbar.info(log.message, log.metadata, ...log.args, callback);
+        break;
+      }
+      case LogLevel.Debug: {
+        this._rollbar.debug(log.message, log.metadata, ...log.args, callback);
+        break;
+      }
+    }
+  }
+
+  /** Rollbar log callback. */
+  protected logCallback(error?: Error): void {
+    if (error != undefined) {
+      this.debug(error);
+    }
+  }
+
+  /** Return rollbar report level. */
+  protected reportLevel(value?: string): string {
+    let level: LogLevel;
+    if (value != undefined) {
+      level = this.parseLogLevel(value);
+    } else {
+      level = this.level;
+    }
+
+    switch (level) {
       case LogLevel.Emergency:
       case LogLevel.Alert:
       case LogLevel.Critical: {
@@ -34,74 +109,6 @@ export class RollbarLog extends Log {
       default: {
         return "error";
       }
-    }
-  }
-
-  public constructor(opts: IContainerOpts) {
-    super(opts);
-
-    // Get access token from environment.
-    const accessToken = this.environment.get(constants.ENV_ROLLBAR_ACCESS_TOKEN);
-    assert(accessToken != undefined, "Rollbar access token is undefined");
-
-    // Get Node environment.
-    // TODO: Validate environment value.
-    const environment = this.environment.get(constants.ENV_NODE_ENV) || "development";
-    this.debug(`environment '${environment}'`);
-
-    // Create Rollbar instance.
-    // Report level determined by module log level.
-    // Handle uncaught exceptions and unhandled rejections by default.
-    // Uncaugh errors have 'critical' level by default.
-    this._rollbar = new Rollbar({
-      accessToken,
-      reportLevel: this.reportLevel,
-      handleUncaughtExceptions: true,
-      handleUnhandledRejections: true,
-      uncaughtErrorLevel: "critical",
-      payload: {
-        environment,
-      },
-    });
-  }
-
-  protected handleLog(log: ContainerLogMessage): void {
-    // Add module name to payload data.
-    this._rollbar.configure({ payload: { moduleName: log.moduleName } });
-
-    // Map log level to rollbar log methods.
-    const callback = this.logCallback.bind(this);
-    switch (log.level) {
-      case LogLevel.Emergency:
-      case LogLevel.Alert:
-      case LogLevel.Critical: {
-        this._rollbar.critical(...log.args, callback);
-        break;
-      }
-      case LogLevel.Error: {
-        this._rollbar.error(...log.args, callback);
-        break;
-      }
-      case LogLevel.Warning: {
-        this._rollbar.warning(...log.args, callback);
-        break;
-      }
-      case LogLevel.Notice:
-      case LogLevel.Informational: {
-        this._rollbar.info(...log.args, callback);
-        break;
-      }
-      case LogLevel.Debug: {
-        this._rollbar.debug(...log.args, callback);
-        break;
-      }
-    }
-  }
-
-  protected logCallback(error?: Error): void {
-    // TODO: Improve error handling.
-    if (error != undefined) {
-      this.debug(error);
     }
   }
 

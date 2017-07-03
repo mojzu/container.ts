@@ -15,8 +15,8 @@ export class Log extends ContainerModule {
       _environment: constants.ENVIRONMENT,
     });
 
-    // Get log level from environment.
-    this._level = this.parseLogLevel(this._environment.get(constants.ENV_LOG_LEVEL));
+    // Get log level from environment or fall back on default.
+    this._level = this.parseLogLevel(this._environment.getDefault(constants.ENV_LOG_LEVEL, constants.DEFAULT_LOG_LEVEL));
     this.debug(`level '${LogLevel[this.level]}'`);
 
     // Subscribe to container log messages filtered by level.

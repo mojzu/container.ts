@@ -22,7 +22,7 @@ export class Environment {
   /** Get an environment variable value if defined, or return default value. */
   public getDefault(name: string, value: string): string {
     const override = this.get(name);
-    if (override != null) {
+    if (override != undefined) {
       value = override;
     }
     return value;
