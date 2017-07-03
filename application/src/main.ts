@@ -45,7 +45,15 @@ if (!!ENVIRONMENT.get(constants.ENV_ROLLBAR_ACCESS_TOKEN)) {
 if (require.main === module) {
   // Create debug instance for script.
   const debug = Debug(NAME);
-  debug("up");
 
-  CONTAINER.up();
+  // Container start up.
+  CONTAINER.up()
+    .subscribe({
+      next: () => {
+        debug("up");
+      },
+      error: (error) => {
+        debug(error);
+      },
+    });
 }

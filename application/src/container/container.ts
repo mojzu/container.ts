@@ -2,7 +2,10 @@ import * as Debug from "debug";
 import { AwilixContainer, createContainer, ResolutionMode, Lifetime } from "awilix";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
+import "rxjs/add/observable/of";
+import "rxjs/add/observable/forkJoin";
 import "rxjs/add/operator/filter";
+import "rxjs/add/operator/switchMap";
 import { LogLevel, ILogMessage, ILogMetadata, Logger } from "./log";
 
 /** Container options injected by awilix library. */
@@ -20,19 +23,12 @@ export const CONTAINER_NAME = "_container";
 
 /** Log message class for stream of module logs. */
 export class ContainerLogMessage {
-
   public constructor(
     public level: LogLevel,
     public message: ILogMessage,
     public metadata: ILogMetadata,
     public args: any[],
   ) { }
-
-  /** Basic string representation for console logging. */
-  public toString(): string {
-    return `[${this.level}] ${this.message}`;
-  }
-
 }
 
 /** Container bus message types. */
@@ -89,15 +85,30 @@ export class Container {
     return filterLogs;
   }
 
-  // TODO: Implement this.
-  public up() {
-    this._modules.map((name) => {
-      const mod = this._container.resolve<ContainerModule>(name);
-      mod.up();
-    });
+  /** Signal modules to enter operational state. */
+  public up(): Observable<void> {
+    const modules = this._modules.map((name) => this._container.resolve<ContainerModule>(name));
+    const observables = modules.map((mod) => mod.up());
+
+    // Wait for each module to signal operational state.
+    // TODO: Add startup timeout.
+    return Observable.forkJoin(...observables)
+      .switchMap(() => {
+        return Observable.of(undefined);
+      });
   }
 
-  public down() { }
+  /** Signal modules to leave operational state. */
+  public down(): Observable<void> {
+    const modules = this._modules.map((name) => this._container.resolve<ContainerModule>(name));
+    const observables = modules.map((mod) => mod.down());
+
+    // Wait for each module to signal non-operational state.
+    return Observable.forkJoin(...observables)
+      .switchMap(() => {
+        return Observable.of(undefined);
+      });
+  }
 
 }
 
@@ -145,7 +156,14 @@ export class ContainerModule {
     });
   }
 
-  // TODO: State callbacks.
-  public up() { }
+  /** Module operational state. */
+  public up(): Observable<void> {
+    return Observable.of(undefined);
+  }
+
+  /** Module non-operational state. */
+  public down(): Observable<void> {
+    return Observable.of(undefined);
+  }
 
 }
