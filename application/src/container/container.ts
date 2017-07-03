@@ -1,4 +1,4 @@
-import * as debug from "debug";
+import * as Debug from "debug";
 import { AwilixContainer, createContainer, ResolutionMode, Lifetime } from "awilix";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
@@ -44,8 +44,12 @@ export class Container {
   private _modules: string[] = [];
   private _bus = new Subject<ContainerMessageTypes>();
 
+  public get name(): string { return this._name; }
+  public get modules(): string[] { return this._modules; }
+  public get bus(): Subject<ContainerMessageTypes> { return this._bus; }
+
   /** Creates a new container in proxy resolution mode. */
-  public constructor() {
+  public constructor(private _name: string) {
     this._container = createContainer({ resolutionMode: ResolutionMode.PROXY });
     this._container.registerValue(CONTAINER_NAME, this);
   }
@@ -116,17 +120,18 @@ export class ContainerModule {
 
   private _container: Container;
   private _log: ContainerModuleLogger;
-  private _debug: debug.IDebugger;
+  private _debug: Debug.IDebugger;
 
   public get container(): Container { return this._container; }
   public get log(): ContainerModuleLogger { return this._log; }
-  public get debug(): debug.IDebugger { return this._debug; }
+  public get debug(): Debug.IDebugger { return this._debug; }
 
   public constructor(opts: IContainerOpts, name: string, depends: IContainerDepends = {}) {
     // Resolve container instance, construct log and debug instances.
     this._container = opts[CONTAINER_NAME];
-    this._log = new ContainerModuleLogger(this._container, name);
-    this._debug = debug(name);
+    const namespace = `${this.container.name}:${name}`;
+    this._log = new ContainerModuleLogger(this._container, namespace);
+    this._debug = Debug(namespace);
 
     // Inject dependency values into instance.
     // Error is thrown by awilix if resolution failed.

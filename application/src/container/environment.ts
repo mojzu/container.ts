@@ -19,6 +19,15 @@ export class Environment {
     return this._variables[name];
   }
 
+  /** Get an environment variable value if defined, or return default value. */
+  public getDefault(name: string, value: string): string {
+    const override = this.get(name);
+    if (override != null) {
+      value = override;
+    }
+    return value;
+  }
+
   /** Set an environment variable value. */
   public set(name: string, value: string): Environment {
     this._variables[name] = value;
