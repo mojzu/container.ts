@@ -1,6 +1,6 @@
 import * as winston from "winston";
-import * as constants from "../constants";
-import { IContainerOpts, ContainerLogMessage, LogLevel } from "../container";
+import * as constants from "../../constants";
+import { IContainerOpts, ContainerLogMessage, LogLevel } from "../../container";
 import { Log } from "./log";
 
 export class WinstonLog extends Log {

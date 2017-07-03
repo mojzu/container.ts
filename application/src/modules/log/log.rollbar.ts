@@ -1,6 +1,6 @@
 import * as assert from "assert";
-import * as constants from "../constants";
-import { IContainerOpts, ContainerLogMessage, LogLevel } from "../container";
+import * as constants from "../../constants";
+import { IContainerOpts, ContainerLogMessage, LogLevel } from "../../container";
 import { Log } from "./log";
 
 // Rollbar does not have defined types.
