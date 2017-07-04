@@ -79,14 +79,14 @@ export class Container {
   /** Observable stream of module logs, optional level filter. */
   public getLogs(level?: LogLevel): Observable<ContainerLogMessage> {
     let filterLogs = this._bus.filter((message) => message instanceof ContainerLogMessage);
-    if (level != undefined) {
+    if (level != null) {
       filterLogs = filterLogs.filter((log) => log.level <= level);
     }
     return filterLogs;
   }
 
   /** Signal modules to enter operational state. */
-  public up(): Observable<void> {
+  public start(): Observable<void> {
     const modules = this._modules.map((name) => this._container.resolve<ContainerModule>(name));
     const observables = modules.map((mod) => mod.up());
 
@@ -99,7 +99,7 @@ export class Container {
   }
 
   /** Signal modules to leave operational state. */
-  public down(): Observable<void> {
+  public stop(): Observable<void> {
     const modules = this._modules.map((name) => this._container.resolve<ContainerModule>(name));
     const observables = modules.map((mod) => mod.down());
 
@@ -134,19 +134,22 @@ export class ContainerModuleLogger extends Logger {
 export class ContainerModule {
 
   private _container: Container;
+  private _name: string;
   private _log: ContainerModuleLogger;
   private _debug: Debug.IDebugger;
 
   public get container(): Container { return this._container; }
+  public get name(): string { return this._name; }
+  public get namespace(): string { return `${this.container.name}:${this.name}`; }
   public get log(): ContainerModuleLogger { return this._log; }
   public get debug(): Debug.IDebugger { return this._debug; }
 
   public constructor(opts: IContainerOpts, name: string, depends: IContainerDepends = {}) {
-    // Resolve container instance, construct log and debug instances.
+    // Resolve container instance, set name and construct log, debug instances.
     this._container = opts[CONTAINER_NAME];
-    const namespace = `${this.container.name}:${name}`;
-    this._log = new ContainerModuleLogger(this._container, namespace);
-    this._debug = Debug(namespace);
+    this._name = name;
+    this._log = new ContainerModuleLogger(this._container, this.namespace);
+    this._debug = Debug(this.namespace);
 
     // Inject dependency values into instance.
     // Error is thrown by awilix if resolution failed.
@@ -157,12 +160,12 @@ export class ContainerModule {
   }
 
   /** Module operational state. */
-  public up(): Observable<void> {
+  public start(): Observable<void> {
     return Observable.of(undefined);
   }
 
   /** Module non-operational state. */
-  public down(): Observable<void> {
+  public stop(): Observable<void> {
     return Observable.of(undefined);
   }
 

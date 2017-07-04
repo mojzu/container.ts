@@ -12,10 +12,10 @@ import { Assets, Scripts, RollbarLog, WinstonLog } from "./modules";
 // Create environment instance using process.
 const ENVIRONMENT = new Environment(process.env);
 
-// Get application environment, name and log level from environment or defaults.
-const NODE_ENV = ENVIRONMENT.getDefault(constants.ENV_NODE_ENV, constants.DEFAULT_NODE_ENV);
-const NAME = ENVIRONMENT.getDefault(constants.ENV_NAME, constants.DEFAULT_NAME);
-const LOG_LEVEL = ENVIRONMENT.getDefault(constants.ENV_LOG_LEVEL, constants.DEFAULT_LOG_LEVEL);
+// Get application environment, name and log level from environment or use defaults.
+const NODE_ENV = ENVIRONMENT.get(constants.ENV_NODE_ENV) || constants.DEFAULT_NODE_ENV;
+const NAME = ENVIRONMENT.get(constants.ENV_NAME) || constants.DEFAULT_NAME;
+const LOG_LEVEL = ENVIRONMENT.get(constants.ENV_LOG_LEVEL) || constants.DEFAULT_LOG_LEVEL;
 
 // Set application values in environment.
 ENVIRONMENT
@@ -46,11 +46,11 @@ if (require.main === module) {
   // Create debug instance for script.
   const debug = Debug(NAME);
 
-  // Container start up.
-  CONTAINER.up()
+  // Start container modules.
+  CONTAINER.start()
     .subscribe({
       next: () => {
-        debug("up");
+        debug("started");
       },
       error: (error) => {
         debug(error);

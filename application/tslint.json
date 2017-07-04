@@ -7,9 +7,18 @@
     "tslint-eslint-rules"
   ],
   "rules": {
-    "no-empty": false,
     "max-classes-per-file": [
       false
+    ],
+    "no-empty": false,
+    "no-var-requires": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": [
+      false
+    ],
+    "variable-name": [
+      "ban-keywords",
+      true
     ]
   }
 }

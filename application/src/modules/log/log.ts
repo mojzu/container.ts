@@ -15,7 +15,8 @@ export abstract class Log extends ContainerModule {
     });
 
     // Get log level from environment or fall back on default.
-    this._level = this.parseLogLevel(this._environment.getDefault(constants.ENV_LOG_LEVEL, constants.DEFAULT_LOG_LEVEL));
+    const rawLevel = this._environment.get(constants.ENV_LOG_LEVEL) || constants.DEFAULT_LOG_LEVEL;
+    this._level = this.parseLevel(rawLevel);
     this.debug(`level '${LogLevel[this.level]}'`);
 
     // Subscribe to container log messages filtered by level.
@@ -27,7 +28,7 @@ export abstract class Log extends ContainerModule {
   protected abstract handleLog(log: ContainerLogMessage): void;
 
   /** Convert environment log level string to level index, defaults to warning. */
-  protected parseLogLevel(level?: string): LogLevel {
+  protected parseLevel(level?: string): LogLevel {
     switch ((level || "").toLowerCase()) {
       case "emerg":
       case "emergency": {

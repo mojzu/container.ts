@@ -74,7 +74,7 @@ export class WinstonLog extends Log {
 
   /** Winston log callback. */
   protected logCallback(error?: Error): void {
-    if (error != undefined) {
+    if (error != null) {
       this.debug(error);
     }
   }

@@ -14,12 +14,12 @@ export class RollbarLog extends Log {
     super(opts, constants.ROLLBAR_LOG);
 
     // Get Node environment value.
-    const environment = this.environment.getDefault(constants.ENV_NODE_ENV, constants.DEFAULT_NODE_ENV);
+    const environment = this.environment.get(constants.ENV_NODE_ENV) || constants.DEFAULT_NODE_ENV;
     this.debug(`environment '${environment}'`);
 
     // Get access token from environment.
     const accessToken = this.environment.get(constants.ENV_ROLLBAR_ACCESS_TOKEN);
-    assert(accessToken != undefined, "Rollbar access token is undefined");
+    assert(accessToken != null, "Rollbar access token is undefined");
 
     // Get report level from environment or fall back on log level.
     const rawReportLevel = this.environment.get(constants.ENV_ROLLBAR_REPORT_LEVEL);
@@ -74,7 +74,7 @@ export class RollbarLog extends Log {
 
   /** Rollbar log callback. */
   protected logCallback(error?: Error): void {
-    if (error != undefined) {
+    if (error != null) {
       this.debug(error);
     }
   }
@@ -82,8 +82,9 @@ export class RollbarLog extends Log {
   /** Return rollbar report level. */
   protected reportLevel(value?: string): string {
     let level: LogLevel;
-    if (value != undefined) {
-      level = this.parseLogLevel(value);
+
+    if (value != null) {
+      level = this.parseLevel(value);
     } else {
       level = this.level;
     }
