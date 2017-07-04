@@ -23,7 +23,13 @@ function rxJsDependencies() {
   var dependencies = [
     "rxjs/Observable",
     "rxjs/Subject",
+    "rxjs/BehaviorSubject",
+    "rxjs/add/observable/of",
+    "rxjs/add/observable/forkJoin",
     "rxjs/add/operator/filter",
+    "rxjs/add/operator/switchMap",
+    "rxjs/add/operator/take",
+    "rxjs/add/operator/timeout",
   ];
   for (var key of dependencies) {
     externals[key] = "commonjs rxjs";

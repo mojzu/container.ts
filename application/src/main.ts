@@ -53,6 +53,7 @@ if (require.main === module) {
         debug("started");
       },
       error: (error) => {
+        debug("start error");
         debug(error);
       },
     });

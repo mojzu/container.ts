@@ -2,10 +2,13 @@ import * as Debug from "debug";
 import { AwilixContainer, createContainer, ResolutionMode, Lifetime } from "awilix";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
+import { BehaviorSubject } from "rxjs/BehaviorSubject";
 import "rxjs/add/observable/of";
 import "rxjs/add/observable/forkJoin";
 import "rxjs/add/operator/filter";
 import "rxjs/add/operator/switchMap";
+import "rxjs/add/operator/take";
+import "rxjs/add/operator/timeout";
 import { LogLevel, ILogMessage, ILogMetadata, Logger } from "./log";
 
 /** Container options injected by awilix library. */
@@ -20,6 +23,11 @@ export interface IContainerDepends {
 
 /** Container reference name used internally by modules. */
 export const CONTAINER_NAME = "_container";
+
+/** Module state interface. */
+export interface IContainerModuleState {
+  [key: string]: boolean;
+}
 
 /** Log message class for stream of module logs. */
 export class ContainerLogMessage {
@@ -38,11 +46,11 @@ export type ContainerMessageTypes = ContainerLogMessage;
 export class Container {
 
   private _container: AwilixContainer;
-  private _modules: string[] = [];
+  private _modules = new BehaviorSubject<IContainerModuleState>({});
   private _bus = new Subject<ContainerMessageTypes>();
 
   public get name(): string { return this._name; }
-  public get modules(): string[] { return this._modules; }
+  public get modules(): string[] { return Object.keys(this._modules.value); }
   public get bus(): Subject<ContainerMessageTypes> { return this._bus; }
 
   /** Creates a new container in proxy resolution mode. */
@@ -56,7 +64,7 @@ export class Container {
     const options = {};
     options[name] = [instance, { lifetime }];
     this._container.registerClass(options);
-    this._modules.push(name);
+    this.reportModuleState(name, false);
     return this;
   }
 
@@ -86,28 +94,61 @@ export class Container {
   }
 
   /** Signal modules to enter operational state. */
-  public start(): Observable<void> {
-    const modules = this._modules.map((name) => this._container.resolve<ContainerModule>(name));
-    const observables = modules.map((mod) => mod.up());
+  public start(timeout?: number): Observable<void> {
+    return this.setModulesState(true, timeout);
+  }
 
-    // Wait for each module to signal operational state.
-    // TODO: Add startup timeout.
+  /** Signal modules to leave operational state. */
+  public stop(timeout?: number): Observable<void> {
+    return this.setModulesState(false, timeout);
+  }
+
+  /** Wait for modules to start before calling next. */
+  public waitStarted(...modules: string[]): Observable<void> {
+    return this._modules
+      .filter((states) => {
+        return modules.reduce((previous, current) => {
+          return previous && states[current];
+        }, true);
+      })
+      .switchMap(() => Observable.of(undefined))
+      .take(1);
+  }
+
+  /** Wait for modules to stop before calling next. */
+  public waitStopped(...modules: string[]): Observable<void> {
+    return this._modules
+      .filter((states) => {
+        return modules.reduce((previous, current) => {
+          return previous || states[current];
+        }, false);
+      })
+      .switchMap(() => Observable.of(undefined))
+      .take(1);
+  }
+
+  /** Set modules state by calling start/stop methods. */
+  protected setModulesState(state: boolean, timeout = 10000): Observable<void> {
+    // Map module methods and report states.
+    const modules = this.modules.map((name) => this._container.resolve<ContainerModule>(name));
+    const observables = modules.map((mod) => {
+      const method: () => Observable<void> = mod[state ? "start" : "stop"].bind(mod);
+      return method().switchMap(() => this.reportModuleState(mod.name, state));
+    });
+
+    // Wait for modules to signal state.
     return Observable.forkJoin(...observables)
+      .timeout(timeout)
       .switchMap(() => {
         return Observable.of(undefined);
       });
   }
 
-  /** Signal modules to leave operational state. */
-  public stop(): Observable<void> {
-    const modules = this._modules.map((name) => this._container.resolve<ContainerModule>(name));
-    const observables = modules.map((mod) => mod.down());
-
-    // Wait for each module to signal non-operational state.
-    return Observable.forkJoin(...observables)
-      .switchMap(() => {
-        return Observable.of(undefined);
-      });
+  /** Update and report module state via internal subject. */
+  protected reportModuleState(name: string, state: boolean): Observable<void> {
+    this._modules.value[name] = state;
+    this._modules.next(this._modules.value);
+    return Observable.of(undefined);
   }
 
 }
