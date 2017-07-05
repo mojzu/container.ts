@@ -11,10 +11,8 @@ export class Assets extends ContainerModule {
 
   public get path(): string { return this._path; }
 
-  public constructor(opts: IContainerOpts) {
-    super(opts, constants.ASSETS, {
-      _environment: constants.ENVIRONMENT,
-    });
+  public constructor(opts: IContainerOpts, name: string) {
+    super(opts, name, { _environment: constants.ENVIRONMENT });
 
     // Get assets directory path from environment.
     this._path = path.resolve(this._environment.get(constants.ENV_ASSETS));

@@ -18,6 +18,11 @@ export interface IContainerOpts {
   [key: string]: any;
 }
 
+/** Container module constructor interface. */
+export interface IContainerModuleConstructor {
+  new(opts: IContainerOpts, name: string): ContainerModule;
+}
+
 /** Container module dependencies. */
 export interface IContainerDepends {
   [key: string]: string;
@@ -72,10 +77,10 @@ export class Container {
   }
 
   /** Register a module in container, has singleton lifetime by default. */
-  public registerModule<T>(name: string, instance: T, lifetime = Lifetime.SINGLETON): Container {
+  public registerModule<T extends IContainerModuleConstructor>(name: string, instance: T, lifetime = Lifetime.SINGLETON): Container {
     const options = {};
-    options[name] = [instance, { lifetime }];
-    this._container.registerClass(options);
+    options[name] = [this.makeModule.bind(this, name, instance), { lifetime }];
+    this._container.registerFunction(options);
     this.reportModuleState(name, false);
     return this;
   }
@@ -137,6 +142,11 @@ export class Container {
       })
       .switchMap(() => Observable.of(undefined))
       .take(1);
+  }
+
+  /** Factory functions for modules. */
+  protected makeModule<T extends IContainerModuleConstructor>(name: string, instance: T, opts: IContainerOpts): ContainerModule {
+    return new instance(opts, name);
   }
 
   /** Set modules state by calling start/stop methods. */

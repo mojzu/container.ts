@@ -10,8 +10,8 @@ export class RollbarLog extends Log {
 
   private _rollbar: any;
 
-  public constructor(opts: IContainerOpts) {
-    super(opts, constants.ROLLBAR_LOG);
+  public constructor(opts: IContainerOpts, name: string) {
+    super(opts, name);
 
     // Get Node environment value.
     const environment = this.environment.get(constants.ENV_NODE_ENV) || constants.DEFAULT_NODE_ENV;

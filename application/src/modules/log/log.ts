@@ -10,9 +10,7 @@ export abstract class Log extends ContainerModule {
   protected get level(): LogLevel { return this._level; }
 
   public constructor(opts: IContainerOpts, name: string) {
-    super(opts, name, {
-      _environment: constants.ENVIRONMENT,
-    });
+    super(opts, name, { _environment: constants.ENVIRONMENT });
 
     // Get log level from environment or fall back on default.
     const rawLevel = this._environment.get(constants.ENV_LOG_LEVEL) || constants.DEFAULT_LOG_LEVEL;
