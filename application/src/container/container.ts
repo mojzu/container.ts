@@ -4,7 +4,9 @@ import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import { BehaviorSubject } from "rxjs/BehaviorSubject";
 import "rxjs/add/observable/of";
+import "rxjs/add/observable/throw";
 import "rxjs/add/observable/forkJoin";
+import "rxjs/add/operator/catch";
 import "rxjs/add/operator/filter";
 import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
@@ -21,12 +23,19 @@ export interface IContainerDepends {
   [key: string]: string;
 }
 
-/** Container reference name used internally by modules. */
-export const CONTAINER_NAME = "_container";
-
 /** Module state interface. */
 export interface IContainerModuleState {
   [key: string]: boolean;
+}
+
+/** Container error class. */
+export class ContainerError extends Error {
+  public constructor(message: string) {
+    const error: any = super(message);
+    this.name = error.name = "ContainerError";
+    this.stack = error.stack;
+    this.message = error.message;
+  }
 }
 
 /** Log message class for stream of module logs. */
@@ -40,18 +49,21 @@ export class ContainerLogMessage {
 }
 
 /** Container bus message types. */
-export type ContainerMessageTypes = ContainerLogMessage;
+export type IContainerMessageTypes = ContainerLogMessage;
+
+/** Container reference name used internally by modules. */
+export const CONTAINER_NAME = "_container";
 
 /** Wrapper around awilix library. */
 export class Container {
 
   private _container: AwilixContainer;
   private _modules = new BehaviorSubject<IContainerModuleState>({});
-  private _bus = new Subject<ContainerMessageTypes>();
+  private _bus = new Subject<IContainerMessageTypes>();
 
   public get name(): string { return this._name; }
   public get modules(): string[] { return Object.keys(this._modules.value); }
-  public get bus(): Subject<ContainerMessageTypes> { return this._bus; }
+  public get bus(): Subject<IContainerMessageTypes> { return this._bus; }
 
   /** Creates a new container in proxy resolution mode. */
   public constructor(private _name: string) {
@@ -137,8 +149,10 @@ export class Container {
     });
 
     // Wait for modules to signal state.
+    // Map TimeoutError to ContainerError.
     return Observable.forkJoin(...observables)
       .timeout(timeout)
+      .catch((error: Error) => Observable.throw(new ContainerError(error.message)))
       .switchMap(() => {
         return Observable.of(undefined);
       });
