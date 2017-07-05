@@ -11,6 +11,7 @@ import "rxjs/add/operator/filter";
 import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/timeout";
+import { Environment } from "./environment";
 import { LogLevel, ILogMessage, ILogMetadata, Logger } from "./log";
 
 /** Container options injected by awilix library. */
@@ -20,7 +21,7 @@ export interface IContainerOpts {
 
 /** Container module constructor interface. */
 export interface IContainerModuleConstructor {
-  new(opts: IContainerOpts, name: string): ContainerModule;
+  new (opts: IContainerOpts, name: string): ContainerModule;
 }
 
 /** Container module dependencies. */
@@ -62,22 +63,36 @@ export const CONTAINER_NAME = "_container";
 /** Wrapper around awilix library. */
 export class Container {
 
+  private _environment: Environment;
   private _container: AwilixContainer;
   private _modules = new BehaviorSubject<IContainerModuleState>({});
   private _bus = new Subject<IContainerMessageTypes>();
 
+  /** Container name, used to namespace modules. */
   public get name(): string { return this._name; }
+
+  /** Container environment reference available to modules. */
+  public get environment(): Environment { return this._environment; }
+
+  /** Array of registered module names. */
   public get modules(): string[] { return Object.keys(this._modules.value); }
+
+  /** Container message bus. */
   public get bus(): Subject<IContainerMessageTypes> { return this._bus; }
 
   /** Creates a new container in proxy resolution mode. */
-  public constructor(private _name: string) {
+  public constructor(private _name: string, environment = new Environment()) {
+    this._environment = environment;
     this._container = createContainer({ resolutionMode: ResolutionMode.PROXY });
     this._container.registerValue(CONTAINER_NAME, this);
   }
 
   /** Register a module in container, has singleton lifetime by default. */
-  public registerModule<T extends IContainerModuleConstructor>(name: string, instance: T, lifetime = Lifetime.SINGLETON): Container {
+  public registerModule<T extends IContainerModuleConstructor>(
+    name: string,
+    instance: T,
+    lifetime = Lifetime.SINGLETON,
+  ): Container {
     const options = {};
     options[name] = [this.makeModule.bind(this, name, instance), { lifetime }];
     this._container.registerFunction(options);
@@ -145,7 +160,11 @@ export class Container {
   }
 
   /** Factory functions for modules. */
-  protected makeModule<T extends IContainerModuleConstructor>(name: string, instance: T, opts: IContainerOpts): ContainerModule {
+  protected makeModule<T extends IContainerModuleConstructor>(
+    name: string,
+    instance: T,
+    opts: IContainerOpts,
+  ): ContainerModule {
     return new instance(opts, name);
   }
 
@@ -187,7 +206,7 @@ export class ContainerModuleLogger extends Logger {
 
   /** Sends log message to container bus for consumption by module. */
   protected log(level: LogLevel, message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
-    // Add module name metadata by default.
+    // Add module name to metadata.
     metadata = metadata || {};
     metadata.moduleName = this._name;
     this._container.sendLog(level, message, metadata, args);
@@ -203,10 +222,22 @@ export class ContainerModule {
   private _log: ContainerModuleLogger;
   private _debug: Debug.IDebugger;
 
+  /** Module container reference. */
   public get container(): Container { return this._container; }
+
+  /** Module container environment reference. */
+  public get environment(): Environment { return this._container.environment; }
+
+  /** Module name. */
   public get name(): string { return this._name; }
+
+  /** Module container and module names. */
   public get namespace(): string { return `${this.container.name}:${this.name}`; }
+
+  /** Module log interface. */
   public get log(): ContainerModuleLogger { return this._log; }
+
+  /** Module debug interface. */
   public get debug(): Debug.IDebugger { return this._debug; }
 
   public constructor(opts: IContainerOpts, name: string, depends: IContainerDepends = {}) {

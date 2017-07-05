@@ -9,7 +9,7 @@ import { Assets, Scripts, RollbarLog, WinstonLog } from "./modules";
 // TODO: Variable log/data directories.
 // TODO: Process signal handling.
 
-// Create environment instance using process.
+// Create environment instance using process environment.
 const ENVIRONMENT = new Environment(process.env);
 
 // Get application environment, name and log level from environment or use defaults.
@@ -25,12 +25,11 @@ ENVIRONMENT
   .set(constants.ENV_SCRIPTS, constants.DEFAULT_SCRIPTS)
   .set(constants.ENV_ASSETS, constants.DEFAULT_ASSETS);
 
-// Create container instance with name.
-const CONTAINER = new Container(NAME);
+// Create container instance with name and environment.
+const CONTAINER = new Container(NAME, ENVIRONMENT);
 
 // Populate container for dependency injection.
 CONTAINER
-  .registerValue(constants.ENVIRONMENT, ENVIRONMENT)
   .registerModule(constants.SCRIPTS, Scripts)
   .registerModule(constants.ASSETS, Assets)
   .registerModule(constants.WINSTON_LOG, WinstonLog);
