@@ -1,5 +1,11 @@
 import * as constants from "../../constants";
-import { IContainerModuleOpts, IContainerModuleDepends, ContainerModule, ContainerLogMessage, LogLevel } from "../../container";
+import {
+  IContainerModuleOpts,
+  IContainerModuleDepends,
+  ContainerModule,
+  ContainerLogMessage,
+  LogLevel,
+} from "../../container";
 
 export abstract class Log extends ContainerModule {
 

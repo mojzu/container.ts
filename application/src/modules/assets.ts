@@ -12,7 +12,7 @@ import { IContainerModuleOpts, ContainerModule } from "../container";
 
 /** Assets files cached when read. */
 export interface IAssetsCache {
-  [key: string]: Buffer | string | Object;
+  [key: string]: Buffer | string | object;
 }
 
 /** Assets read only files interface. */
@@ -42,11 +42,11 @@ export class Assets extends ContainerModule {
       .do((data) => {
         // Save to cache.
         this.cache[target] = data;
-      })
+      });
   }
 
   /** Read assets file contents and parse JSON object. */
-  public readJson(target: string, encoding = "utf8"): Observable<Object> {
+  public readJson(target: string, encoding = "utf8"): Observable<object> {
     return this.read<string>(target, encoding)
       .map((data) => {
         try {
@@ -64,12 +64,14 @@ export class Assets extends ContainerModule {
   protected read<T>(target: string, encoding?: string): Observable<T> {
     // Assets are read only, if contents defined in cache, return now.
     if (this.cache[target] != null) {
-      return Observable.of(this.cache[target]);
+      const value: T = this.cache[target] as any;
+      return Observable.of(value);
     }
 
     // Read file contents asynchronously.
     const filePath = path.resolve(this._path, target);
-    const readFile = Observable.bindNodeCallback(fs.readFile.bind(this, filePath, encoding));
+    const readFileCallback = fs.readFile.bind(this, filePath, encoding);
+    const readFile: () => Observable<T> = Observable.bindNodeCallback(readFileCallback);
     return readFile();
   }
 
