@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import * as constants from "../../constants";
-import { IContainerOpts, ContainerLogMessage, LogLevel } from "../../container";
+import { IContainerModuleOpts, ContainerLogMessage, LogLevel } from "../../container";
 import { Log } from "./log";
 
 // Rollbar does not have defined types.
@@ -10,8 +10,8 @@ export class RollbarLog extends Log {
 
   private _rollbar: any;
 
-  public constructor(opts: IContainerOpts, name: string) {
-    super(opts, name);
+  public constructor(name: string, opts: IContainerModuleOpts) {
+    super(name, opts);
 
     // Get Node environment value.
     const environment = this.environment.get(constants.ENV_NODE_ENV) || constants.DEFAULT_NODE_ENV;

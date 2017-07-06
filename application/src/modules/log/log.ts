@@ -1,5 +1,5 @@
 import * as constants from "../../constants";
-import { IContainerOpts, IContainerDepends, ContainerModule, ContainerLogMessage, LogLevel } from "../../container";
+import { IContainerModuleOpts, IContainerModuleDepends, ContainerModule, ContainerLogMessage, LogLevel } from "../../container";
 
 export abstract class Log extends ContainerModule {
 
@@ -7,8 +7,8 @@ export abstract class Log extends ContainerModule {
 
   protected get level(): LogLevel { return this._level; }
 
-  public constructor(opts: IContainerOpts, name: string, depends?: IContainerDepends) {
-    super(opts, name, depends);
+  public constructor(name: string, opts: IContainerModuleOpts, depends?: IContainerModuleDepends) {
+    super(name, opts, depends);
 
     // Get log level from environment or fall back on default.
     const rawLevel = this.environment.get(constants.ENV_LOG_LEVEL) || constants.DEFAULT_LOG_LEVEL;

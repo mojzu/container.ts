@@ -15,17 +15,17 @@ import { Environment } from "./environment";
 import { LogLevel, ILogMessage, ILogMetadata, Logger } from "./log";
 
 /** Container options injected by awilix library. */
-export interface IContainerOpts {
+export interface IContainerModuleOpts {
   [key: string]: any;
 }
 
 /** Container module constructor interface. */
 export interface IContainerModuleConstructor {
-  new (opts: IContainerOpts, name: string): ContainerModule;
+  new (name: string, opts: IContainerModuleOpts): ContainerModule;
 }
 
 /** Container module dependencies. */
-export interface IContainerDepends {
+export interface IContainerModuleDepends {
   [key: string]: string;
 }
 
@@ -163,9 +163,9 @@ export class Container {
   protected makeModule<T extends IContainerModuleConstructor>(
     name: string,
     instance: T,
-    opts: IContainerOpts,
+    opts: IContainerModuleOpts,
   ): ContainerModule {
-    return new instance(opts, name);
+    return new instance(name, opts);
   }
 
   /** Set modules state by calling start/stop methods. */
@@ -204,7 +204,7 @@ export class ContainerModuleLogger extends Logger {
     private _name: string,
   ) { super(); }
 
-  /** Sends log message to container bus for consumption by module. */
+  /** Sends log message to container bus for consumption by modules. */
   protected log(level: LogLevel, message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
     // Add module name to metadata.
     metadata = metadata || {};
@@ -240,10 +240,10 @@ export class ContainerModule {
   /** Module debug interface. */
   public get debug(): Debug.IDebugger { return this._debug; }
 
-  public constructor(opts: IContainerOpts, name: string, depends: IContainerDepends = {}) {
-    // Resolve container instance, set name and construct log, debug instances.
-    this._container = opts[CONTAINER_NAME];
+  public constructor(name: string, opts: IContainerModuleOpts, depends: IContainerModuleDepends = {}) {
+    // Set name, resolve container instance and construct log, debug instances.
     this._name = name;
+    this._container = opts[CONTAINER_NAME];
     this._log = new ContainerModuleLogger(this._container, this.namespace);
     this._debug = Debug(this.namespace);
 

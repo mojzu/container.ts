@@ -1,13 +1,13 @@
 import * as winston from "winston";
-import { IContainerOpts, ContainerLogMessage, LogLevel } from "../../container";
+import { IContainerModuleOpts, ContainerLogMessage, LogLevel } from "../../container";
 import { Log } from "./log";
 
 export class WinstonLog extends Log {
 
   private _logger: winston.LoggerInstance;
 
-  public constructor(opts: IContainerOpts, name: string) {
-    super(opts, name);
+  public constructor(name: string, opts: IContainerModuleOpts) {
+    super(name, opts);
 
     // Construct Winston logger with console transport.
     // TODO: Optional file transport.
