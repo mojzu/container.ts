@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import * as process from "process";
 import * as Debug from "debug";
 import * as constants from "./constants";
