@@ -84,7 +84,7 @@ export class Container {
   public constructor(private _name: string, environment = new Environment()) {
     this._environment = environment;
     this._container = createContainer({ resolutionMode: ResolutionMode.PROXY });
-    this._container.registerValue(CONTAINER_NAME, this);
+    this.registerValue<Container>(CONTAINER_NAME, this);
   }
 
   /** Register a module in container, has singleton lifetime by default. */

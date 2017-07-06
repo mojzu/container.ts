@@ -1,7 +1,7 @@
 /// <reference types="jasmine" />
 import { Subject } from "rxjs/Subject";
 import { Environment } from "./environment";
-import { ContainerError, Container } from "./container";
+import { ContainerError, Container, ContainerModule, ContainerModuleLogger } from "./container";
 
 describe("Container", () => {
 
@@ -18,6 +18,21 @@ describe("Container", () => {
     expect(container.environment instanceof Environment).toEqual(true);
     expect(container.modules).toEqual([]);
     expect(container.bus instanceof Subject).toEqual(true);
+  });
+
+  it("#Container#registerModule", () => {
+    const name = "test";
+    const container = new Container(name);
+    const moduleName = "testModule";
+    expect(container.registerModule(moduleName, ContainerModule) instanceof Container).toEqual(true);
+    const testModule = container.resolve<ContainerModule>(moduleName);
+    expect(testModule instanceof ContainerModule);
+    expect(testModule.container).toEqual(container);
+    expect(testModule.environment).toEqual(container.environment);
+    expect(testModule.name).toEqual(moduleName);
+    expect(testModule.namespace).toEqual(`${name}:${moduleName}`);
+    expect(testModule.log instanceof ContainerModuleLogger).toEqual(true);
+    expect(testModule.debug).toBeDefined();
   });
 
 });
