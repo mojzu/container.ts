@@ -72,7 +72,7 @@ export class Assets extends ContainerModule {
     }
 
     // Read file contents asynchronously.
-    const filePath = path.resolve(this._path, target);
+    const filePath = path.resolve(this.path, target);
     const readFileCallback = fs.readFile.bind(this, filePath, encoding);
     const readFile: () => Observable<T> = Observable.bindNodeCallback(readFileCallback);
     return readFile();

@@ -36,8 +36,7 @@ if (!!ENVIRONMENT.get(constants.ENV_ROLLBAR_ACCESS_TOKEN)) {
   CONTAINER.registerModule(constants.ROLLBAR_LOG, RollbarLog);
 }
 
-// Run following section only if this is the main script.
-// Signals container modules to start.
+// Run following section if this is the main script.
 if (require.main === module) {
   // Create debug instance for script.
   const debug = Debug(NAME);
