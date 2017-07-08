@@ -1,6 +1,6 @@
 {
   "name": "application.ts",
-  "version": "0.0.0-development",
+  "version": "0.0.0",
   "description": "TypeScript application template",
   "license": "Unlicense",
   "author": "mojzu <mail@mojzu.net>",

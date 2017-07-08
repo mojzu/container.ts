@@ -24,3 +24,6 @@ export const SCRIPTS = "scripts";
 export const ASSETS = "assets";
 export const ROLLBAR_LOG = "rollbar";
 export const WINSTON_LOG = "winston";
+
+// Assets files.
+export const ASSET_PROCESS_JSON = "process.json";

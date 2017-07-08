@@ -47,7 +47,7 @@ module.exports = {
   // Additional scripts bundled with application.
   entry: {
     "dist/main": path.resolve("./src/main.ts"),
-    "dist/scripts/subprocess": path.resolve("./src/scripts/subprocess.ts"),
+    "dist/scripts/worker": path.resolve("./src/scripts/worker.ts"),
   },
   output: {
     path: path.resolve("./"),
