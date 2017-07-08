@@ -9,6 +9,17 @@ describe("Environment", () => {
     expect(environment.variables).toEqual(variables);
   });
 
+  it("#Environment#copy", () => {
+    const variables = { value: "1" };
+    const environment = new Environment(variables);
+    const environmentCopy = environment.copy();
+    expect(environmentCopy.set("value", "2") instanceof Environment).toEqual(true);
+    const value = environment.get("value");
+    const copyValue = environmentCopy.get("value");
+    expect(value).toEqual("1");
+    expect(copyValue).toEqual("2");
+  });
+
   it("#Environment#get", () => {
     const value = "1";
     const variables = { value };

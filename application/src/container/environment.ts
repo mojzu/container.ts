@@ -14,6 +14,11 @@ export class Environment {
     private _variables: IEnvironmentVariables = {},
   ) { }
 
+  /** Returns a copy of environment. */
+  public copy(): Environment {
+    return new Environment(Object.assign({}, this.variables));
+  }
+
   /** Get an environment variable value or undefined. */
   public get(name: string): string | undefined {
     return this._variables[name];
