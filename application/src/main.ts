@@ -27,8 +27,8 @@ ENVIRONMENT
 // Create container instance with name and environment.
 // Populate container for dependency injection.
 const CONTAINER = new Container(NAME, ENVIRONMENT)
-  .registerModule(constants.SCRIPTS, Scripts)
   .registerModule(constants.ASSETS, Assets)
+  .registerModule(constants.SCRIPTS, Scripts)
   .registerModule(constants.WINSTON_LOG, WinstonLog);
 
 // Register additional modules based on environment definitions.

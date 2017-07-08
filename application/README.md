@@ -15,6 +15,25 @@ $ yarn run clean|distclean|test|lint|docs|start|inspect|build
 $ yarn run build -- -p
 ```
 
+### Modules
+
+Application functionality is split into interdependent modules, dependency injection is handled by the `Container` class.
+
+#### Assets
+
+Read only files packaged with application binary.
+
+#### Scripts
+
+Node.js scripts packaged with application binary.
+
+#### Log
+
+Application log and error handling.
+
+-   [Rollbar](https://rollbar.com/)
+-   [winston](https://github.com/winstonjs/winston)
+
 ## Links
 
 -   [Yarn](https://yarnpkg.com/en/docs/cli/)
