@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
-import * as constants from "../constants";
-import { IContainerModuleOpts, ContainerModule } from "../container";
+import * as constants from "../../constants";
+import { IContainerModuleOpts, ContainerModule } from "../../container";
 
 export class Scripts extends ContainerModule {
 
