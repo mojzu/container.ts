@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import * as assert from "assert";
 import * as path from "path";
 import * as fs from "fs";
 import { Observable } from "rxjs/Observable";
@@ -7,8 +8,8 @@ import "rxjs/add/observable/throw";
 import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/operator/do";
 import "rxjs/add/operator/map";
-import * as constants from "../constants";
-import { IContainerModuleOpts, ContainerModule } from "../container";
+import * as constants from "../../constants";
+import { IContainerModuleOpts, ContainerModule } from "../../container";
 
 /** Assets files cached when read. */
 export interface IAssetsCache {
@@ -28,7 +29,9 @@ export class Assets extends ContainerModule {
     super(name, opts);
 
     // Get assets directory path from environment.
-    this._path = path.resolve(this.environment.get(constants.ENV_ASSETS));
+    const assetsPath = this.environment.get(constants.ENV_ASSETS);
+    assert(assetsPath != null, "Assets path is undefined");
+    this._path = path.resolve(assetsPath);
     this.debug(`path '${this.path}'`);
   }
 

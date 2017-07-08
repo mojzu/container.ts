@@ -13,12 +13,12 @@ class TestLogger extends Logger {
 
 describe("Log", () => {
 
-  const logger = new TestLogger();
+  const LOGGER = new TestLogger();
 
   it("#Logger#emergency", () => {
     const error = new Error("Emergency");
     const metadata = { value: 1 };
-    logger.emergency(error, metadata, (level: LogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
+    LOGGER.emergency(error, metadata, (level: LogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
       expect(level).toEqual(LogLevel.Emergency);
       expect(logError).toEqual(error);
       expect(metadata).toBeDefined();
@@ -29,7 +29,7 @@ describe("Log", () => {
   it("#Logger#alert", () => {
     const error = new Error("Alert");
     const metadata = { value: 1 };
-    logger.alert(error, metadata, (level: LogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
+    LOGGER.alert(error, metadata, (level: LogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
       expect(level).toEqual(LogLevel.Alert);
       expect(logError).toEqual(error);
       expect(metadata).toBeDefined();
@@ -40,7 +40,7 @@ describe("Log", () => {
   it("#Logger#critical", () => {
     const error = new Error("Critical");
     const metadata = { value: 1 };
-    logger.critical(error, metadata, (level: LogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
+    LOGGER.critical(error, metadata, (level: LogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
       expect(level).toEqual(LogLevel.Critical);
       expect(logError).toEqual(error);
       expect(metadata).toBeDefined();
@@ -51,7 +51,7 @@ describe("Log", () => {
   it("#Logger#error", () => {
     const error = new Error("Error");
     const metadata = { value: 1 };
-    logger.error(error, metadata, (level: LogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
+    LOGGER.error(error, metadata, (level: LogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
       expect(level).toEqual(LogLevel.Error);
       expect(logError).toEqual(error);
       expect(metadata).toBeDefined();
@@ -62,7 +62,7 @@ describe("Log", () => {
   it("#Logger#warn", () => {
     const message = "Warning";
     const metadata = { value: 1 };
-    logger.warn(message, metadata, (level: LogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
+    LOGGER.warn(message, metadata, (level: LogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
       expect(level).toEqual(LogLevel.Warning);
       expect(logMessage).toEqual(message);
       expect(metadata).toBeDefined();
@@ -73,7 +73,7 @@ describe("Log", () => {
   it("#Logger#notice", () => {
     const message = "Notice";
     const metadata = { value: 1 };
-    logger.notice(message, metadata, (level: LogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
+    LOGGER.notice(message, metadata, (level: LogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
       expect(level).toEqual(LogLevel.Notice);
       expect(logMessage).toEqual(message);
       expect(metadata).toBeDefined();
@@ -84,7 +84,7 @@ describe("Log", () => {
   it("#Logger#info", () => {
     const message = "Informational";
     const metadata = { value: 1 };
-    logger.info(message, metadata, (level: LogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
+    LOGGER.info(message, metadata, (level: LogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
       expect(level).toEqual(LogLevel.Informational);
       expect(logMessage).toEqual(message);
       expect(metadata).toBeDefined();
@@ -95,7 +95,7 @@ describe("Log", () => {
   it("#Logger#debug", () => {
     const message = "Debug";
     const metadata = { value: 1 };
-    logger.debug(message, metadata, (level: LogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
+    LOGGER.debug(message, metadata, (level: LogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
       expect(level).toEqual(LogLevel.Debug);
       expect(logMessage).toEqual(message);
       expect(metadata).toBeDefined();

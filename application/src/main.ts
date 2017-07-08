@@ -25,10 +25,8 @@ ENVIRONMENT
   .set(constants.ENV_ASSETS, constants.DEFAULT_ASSETS);
 
 // Create container instance with name and environment.
-const CONTAINER = new Container(NAME, ENVIRONMENT);
-
 // Populate container for dependency injection.
-CONTAINER
+const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(constants.SCRIPTS, Scripts)
   .registerModule(constants.ASSETS, Assets)
   .registerModule(constants.WINSTON_LOG, WinstonLog);
