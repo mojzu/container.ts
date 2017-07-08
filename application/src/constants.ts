@@ -22,5 +22,5 @@ export const DEFAULT_ASSETS = path.resolve(`${__dirname}/../assets`);
 export const ENVIRONMENT = "environment";
 export const SCRIPTS = "scripts";
 export const ASSETS = "assets";
-export const ROLLBAR_LOG = "rollbarLog";
-export const WINSTON_LOG = "winstonLog";
+export const ROLLBAR_LOG = "rollbar";
+export const WINSTON_LOG = "winston";
