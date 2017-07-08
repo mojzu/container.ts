@@ -22,5 +22,4 @@ if (require.main === module) {
     .subscribe({
       error: (error) => process.stderr.write(error),
     });
-    });
 }
