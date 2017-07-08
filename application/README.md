@@ -23,6 +23,10 @@ Application functionality is split into interdependent modules, dependency injec
 
 Read only files packaged with application binary.
 
+#### Process
+
+Node.js process interface, reads `process.json` file asset to get package name and version.
+
 #### Scripts
 
 Node.js scripts packaged with application binary.

@@ -2,7 +2,7 @@ import * as process from "process";
 import * as Debug from "debug";
 import * as constants from "./constants";
 import { Container, Environment } from "./container";
-import { Assets, Scripts, RollbarLog, WinstonLog } from "./modules";
+import { Assets, Process, Scripts, RollbarLog, WinstonLog } from "./modules";
 
 // TODO: Command line argument support (minimist, argv).
 // TODO: Variable log/data directories.
@@ -28,6 +28,7 @@ ENVIRONMENT
 // Populate container for dependency injection.
 const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(constants.ASSETS, Assets)
+  .registerModule(constants.PROCESS, Process)
   .registerModule(constants.SCRIPTS, Scripts)
   .registerModule(constants.WINSTON_LOG, WinstonLog);
 
