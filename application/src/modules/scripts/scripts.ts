@@ -4,7 +4,6 @@ import * as path from "path";
 import * as childProcess from "child_process";
 import * as constants from "../../constants";
 import { IContainerModuleOpts, ContainerModule } from "../../container";
-import { Process } from "../process";
 
 /** Script process options. */
 export interface IScriptOptions {
@@ -55,11 +54,9 @@ export class Scripts extends ContainerModule {
     const forkEnv = this.environment.copy();
 
     // Use container environment when spawning processes.
-    // Set process title and override name value to prepend namespace.
+    // Override name value to prepend application namespace.
     const name = `${this.namespace}:${target}:${this.counter}`;
-    forkEnv
-      .set(constants.ENV_TITLE, Process.title)
-      .set(constants.ENV_NAME, name);
+    forkEnv.set(constants.ENV_NAME, name);
 
     const forkOptions: childProcess.ForkOptions = {
       env: forkEnv.variables,

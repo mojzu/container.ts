@@ -40,7 +40,7 @@ export class Process extends ContainerModule {
     this._version = "0.0.0-unknown";
   }
 
-  /** Read process information assets file. */
+  /** Read process information assets file, handle process events. */
   public start(): Observable<void> {
     return this.container.waitStarted(constants.ASSETS)
       .switchMap(() => this._assets.readJson(constants.ASSET_PROCESS_JSON))
@@ -54,7 +54,27 @@ export class Process extends ContainerModule {
         this._version = data.version || this._version;
         this.debug(`version '${this.version}'`);
 
+        // Process stop event handlers.
+        process.on("SIGTERM", this.handleStop.bind(this, "SIGTERM"));
+        process.on("SIGINT", this.handleStop.bind(this, "SIGINT"));
+
         return Observable.of(undefined);
+      });
+  }
+
+  /** Stop container when process termination event received. */
+  protected handleStop(event: string): void {
+    this.debug(`stop '${event}'`);
+
+    this.container.stop()
+      .subscribe({
+        next: () => process.exit(0),
+        error: (error) => {
+          // Try to log error and exit with error code.
+          this.log.error(error);
+          process.stderr.write(error);
+          process.exit(1);
+        },
       });
   }
 

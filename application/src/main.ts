@@ -1,12 +1,10 @@
 import * as process from "process";
-import * as Debug from "debug";
 import * as constants from "./constants";
 import { Container, Environment } from "./container";
 import { Assets, Process, Scripts, RollbarLog, WinstonLog } from "./modules";
 
 // TODO: Command line argument support (minimist, argv).
 // TODO: Variable log/data directories.
-// TODO: Process signal handling.
 
 // Create environment instance using process environment.
 const ENVIRONMENT = new Environment(process.env);
@@ -39,18 +37,9 @@ if (!!ENVIRONMENT.get(constants.ENV_ROLLBAR_ACCESS_TOKEN)) {
 
 // Run following section if this is the main script.
 if (require.main === module) {
-  // Create debug instance for script.
-  const debug = Debug(NAME);
-
   // Start container modules.
   CONTAINER.start()
     .subscribe({
-      next: () => {
-        debug("started");
-      },
-      error: (error) => {
-        debug("start error");
-        debug(error);
-      },
+      error: (error) => process.stderr.write(error),
     });
 }

@@ -1,20 +1,26 @@
 import * as process from "process";
-import * as Debug from "debug";
 import * as constants from "../constants";
-import { Environment } from "../container";
-import { Process } from "../modules";
+import { Container, Environment } from "../container";
+import { Assets, Process } from "../modules";
 
 // Create environment instance using process environment.
 const ENVIRONMENT = new Environment(process.env);
 
-// Get script title and name from environment.
-const TITLE = ENVIRONMENT.get(constants.ENV_TITLE) || constants.DEFAULT_TITLE;
+// Get script name from environment or use default.
 const NAME = ENVIRONMENT.get(constants.ENV_NAME) || constants.DEFAULT_NAME;
+
+// Create container instance with name and environment.
+// Populate container for dependency injection.
+const CONTAINER = new Container(NAME, ENVIRONMENT)
+  .registerModule(constants.ASSETS, Assets)
+  .registerModule(constants.PROCESS, Process);
 
 // Run following section if this is the main script.
 if (require.main === module) {
-  // Set process title, create debug instance for script.
-  Process.setTitle(TITLE);
-  const debug = Debug(NAME);
-  debug("worker process");
+  // Start container modules.
+  CONTAINER.start()
+    .subscribe({
+      error: (error) => process.stderr.write(error),
+    });
+    });
 }
