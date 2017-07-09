@@ -28,12 +28,14 @@ function rxJsDependencies() {
     "rxjs/add/observable/throw",
     "rxjs/add/observable/forkJoin",
     "rxjs/add/observable/bindNodeCallback",
+    "rxjs/add/observable/fromEvent",
     "rxjs/add/operator/do",
     "rxjs/add/operator/map",
     "rxjs/add/operator/catch",
     "rxjs/add/operator/filter",
     "rxjs/add/operator/switchMap",
     "rxjs/add/operator/take",
+    "rxjs/add/operator/takeUntil",
     "rxjs/add/operator/timeout",
   ];
   for (var key of dependencies) {

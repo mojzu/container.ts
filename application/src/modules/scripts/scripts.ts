@@ -48,7 +48,8 @@ export class ScriptProcess {
       .take(1)
       .switchMap((args: [number | null, string | null]) => {
         const [code, signal] = args;
-        return Observable.of(signal || code);
+        const value = (typeof code === "number") ? code : signal;
+        return Observable.of(value || 1);
       });
 
     this._exit.subscribe((code) => this.scripts.debug(`exit '${_target}:${_id}' '${code}'`));
@@ -60,7 +61,7 @@ export class ScriptProcess {
       .subscribe((error: Error) => this.scripts.log.error(error));
 
     // Listen for and handle process messages.
-    this._message = Observable.fromEvent(_process, "message")
+    this._message = Observable.fromEvent<IProcessMessage>(_process, "message")
       .takeUntil(this._exit);
 
     this._message
