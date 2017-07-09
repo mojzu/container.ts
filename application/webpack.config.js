@@ -34,8 +34,10 @@ function rxJsDependencies() {
     "rxjs/add/operator/catch",
     "rxjs/add/operator/filter",
     "rxjs/add/operator/switchMap",
+    "rxjs/add/operator/mergeMap",
     "rxjs/add/operator/take",
     "rxjs/add/operator/takeUntil",
+    "rxjs/add/operator/takeWhile",
     "rxjs/add/operator/timeout",
   ];
   for (var key of dependencies) {

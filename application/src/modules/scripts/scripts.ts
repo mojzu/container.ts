@@ -5,11 +5,19 @@ import * as childProcess from "child_process";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import "rxjs/add/observable/fromEvent";
+import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/takeUntil";
 import * as constants from "../../constants";
 import { IContainerLogMessage, IContainerModuleOpts, ContainerModule } from "../../container";
-import { EProcessMessageType, IProcessMessage } from "../process";
+import {
+  EProcessMessageType,
+  IProcessCallOptions,
+  IProcessCallRequestData,
+  IProcessMessage,
+  IProcessSend,
+  ChildProcess,
+} from "../process";
 
 /** Script process options. */
 export interface IScriptOptions {
@@ -17,10 +25,11 @@ export interface IScriptOptions {
 }
 
 /** Spawned script process interface. */
-export class ScriptProcess {
+export class ScriptProcess implements IProcessSend {
 
   private _exit: Observable<number | string>;
   private _message: Observable<IProcessMessage>;
+  private _identifier = 0;
 
   public get scripts(): Scripts { return this._scripts; }
   public get target(): string { return this._target; }
@@ -30,6 +39,9 @@ export class ScriptProcess {
 
   public get exit(): Observable<number | string> { return this._exit; }
   public get message(): Observable<IProcessMessage> { return this._message; }
+
+  /** Incrementing counter for unique identifiers. */
+  protected get identifier(): number { return ++this._identifier; }
 
   public constructor(
     private _scripts: Scripts,
@@ -55,7 +67,6 @@ export class ScriptProcess {
     this._exit.subscribe((code) => this.scripts.debug(`exit '${_target}:${_id}' '${code}'`));
 
     // Listen for process error, forward to scripts logger.
-    // TODO: Add script metadata.
     Observable.fromEvent(_process, "error")
       .takeUntil(this._exit)
       .subscribe((error: Error) => this.scripts.log.error(error));
@@ -68,6 +79,26 @@ export class ScriptProcess {
       .subscribe((message) => this.handleMessage(message));
   }
 
+  /** Send message to child process. */
+  public send(type: EProcessMessageType, data: any): void {
+    this.process.send({ type, data });
+  }
+
+  /** Make call to module.method in child process. */
+  public call<T>(target: string, method: string, options: IProcessCallOptions = {}): Observable<T> {
+    const timeout = options.timeout || ChildProcess.DEFAULT_TIMEOUT;
+    const args = options.args || [];
+    const id = this.identifier;
+
+    this.scripts.debug(`call '${this.target}:${this.id}:${target}:${method}' '${id}'`);
+
+    // Send call request to child process.
+    const sendData: IProcessCallRequestData = { id, target, method, args };
+    this.send(EProcessMessageType.CallRequest, sendData);
+
+    return ChildProcess.handleCallResponse(this.message, id, args, timeout);
+  }
+
   /** Handle messages received from child process. */
   protected handleMessage(message: IProcessMessage): void {
     switch (message.type) {
@@ -75,6 +106,11 @@ export class ScriptProcess {
       case EProcessMessageType.Log: {
         const data: IContainerLogMessage = message.data;
         this.scripts.container.sendLog(data.level, data.message, data.metadata, data.args);
+        break;
+      }
+      // Call request received from child.
+      case EProcessMessageType.CallRequest: {
+        ChildProcess.handleCallRequest(this, this.scripts.container, message.data);
         break;
       }
     }
@@ -86,12 +122,8 @@ export class ScriptProcess {
 export class Scripts extends ContainerModule {
 
   private _path: string;
-  private _counter = 0;
 
   public get path(): string { return this._path; }
-
-  /** Incrementing counter for script namespaces. */
-  protected get counter(): number { return ++this._counter; }
 
   public constructor(name: string, opts: IContainerModuleOpts) {
     super(name, opts);
@@ -108,11 +140,11 @@ export class Scripts extends ContainerModule {
     const filePath = path.resolve(this.path, target);
     const forkArgs = options.args || [];
     const forkEnv = this.environment.copy();
-    const counter = this.counter;
+    const identifier = this.identifier;
 
     // Use container environment when spawning processes.
     // Override name value to prepend application namespace.
-    const name = `${this.namespace}:${target}:${counter}`;
+    const name = `${this.namespace}:${target}:${identifier}`;
     forkEnv.set(constants.ENV_NAME, name);
 
     const forkOptions: childProcess.ForkOptions = {
@@ -120,7 +152,7 @@ export class Scripts extends ContainerModule {
     };
 
     const process = childProcess.fork(filePath, forkArgs, forkOptions);
-    return new ScriptProcess(this, target, counter, process, options);
+    return new ScriptProcess(this, target, identifier, process, options);
   }
 
 }

@@ -2,6 +2,7 @@
 import * as process from "process";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/of";
+import "rxjs/add/operator/switchMap";
 import * as constants from "../../constants";
 import { IContainerModuleOpts, ContainerModule } from "../../container";
 import { Assets } from "../assets";

@@ -39,8 +39,8 @@ export class ContainerError extends Error {
   public constructor(message: string) {
     const error: any = super(message);
     this.name = error.name = "ContainerError";
-    this.stack = error.stack;
     this.message = error.message;
+    this.stack = error.stack;
   }
 }
 
@@ -229,6 +229,7 @@ export class ContainerModule {
   private _name: string;
   private _log: ContainerModuleLogger;
   private _debug: Debug.IDebugger;
+  private _identifier = 0;
 
   /** Module container reference. */
   public get container(): Container { return this._container; }
@@ -247,6 +248,9 @@ export class ContainerModule {
 
   /** Module debug interface. */
   public get debug(): Debug.IDebugger { return this._debug; }
+
+  /** Incrementing counter for unique identifiers. */
+  protected get identifier(): number { return ++this._identifier; }
 
   public constructor(name: string, opts: IContainerModuleOpts, depends: IContainerModuleDepends = {}) {
     // Set name, resolve container instance and construct log, debug instances.
