@@ -44,8 +44,16 @@ export class ContainerError extends Error {
   }
 }
 
+/** Container log message interface. */
+export interface IContainerLogMessage {
+  level: LogLevel;
+  message: ILogMessage;
+  metadata: ILogMetadata;
+  args: any[];
+}
+
 /** Log message class for stream of module logs. */
-export class ContainerLogMessage {
+export class ContainerLogMessage implements IContainerLogMessage {
   public constructor(
     public level: LogLevel,
     public message: ILogMessage,

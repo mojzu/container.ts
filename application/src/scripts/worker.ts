@@ -1,7 +1,7 @@
 import * as process from "process";
 import * as constants from "../constants";
 import { Container, Environment } from "../container";
-import { Assets, Process } from "../modules";
+import { Assets, ChildProcess } from "../modules";
 
 // Create environment instance using process environment.
 const ENVIRONMENT = new Environment(process.env);
@@ -13,7 +13,7 @@ const NAME = ENVIRONMENT.get(constants.ENV_NAME) || constants.DEFAULT_NAME;
 // Populate container for dependency injection.
 const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(constants.ASSETS, Assets)
-  .registerModule(constants.PROCESS, Process);
+  .registerModule(constants.PROCESS, ChildProcess);
 
 // Run following section if this is the main script.
 if (require.main === module) {

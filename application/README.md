@@ -25,7 +25,7 @@ Read only files packaged with application binary.
 
 #### Process
 
-Node.js process interface, reads `process.json` file asset to get package name and version.
+Node.js process interface, reads `process.json` file asset to get package name and version. A `ChildProcess` module is also included for use by scripts, to support interprocess communication and forwarding logs to parent process.
 
 #### Scripts
 
