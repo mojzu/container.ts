@@ -1,7 +1,7 @@
 /// <reference types="jasmine" />
 import { Subject } from "rxjs/Subject";
 import { Environment } from "./environment";
-import { ContainerError, Container, ContainerModule, ContainerModuleLogger } from "./container";
+import { ContainerError, Container, ContainerModule, ContainerModuleLog } from "./container";
 
 describe("Container", () => {
 
@@ -31,7 +31,7 @@ describe("Container", () => {
     expect(testModule.environment).toEqual(container.environment);
     expect(testModule.name).toEqual(moduleName);
     expect(testModule.namespace).toEqual(`${name}:${moduleName}`);
-    expect(testModule.log instanceof ContainerModuleLogger).toEqual(true);
+    expect(testModule.log instanceof ContainerModuleLog).toEqual(true);
     expect(testModule.debug).toBeDefined();
   });
 

@@ -19,8 +19,8 @@ export interface ILogMetadata extends Object {
   [key: string]: any;
 }
 
-/** Abstract logger class. */
-export abstract class Logger {
+/** Abstract log class. */
+export abstract class Log {
 
   /** System is unusable. */
   public emergency(message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {

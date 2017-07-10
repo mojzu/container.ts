@@ -12,7 +12,7 @@ import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/timeout";
 import { Environment } from "./environment";
-import { LogLevel, ILogMessage, ILogMetadata, Logger } from "./log";
+import { LogLevel, ILogMessage, ILogMetadata, Log } from "./log";
 
 /** Container options injected by awilix library. */
 export interface IContainerModuleOpts {
@@ -204,8 +204,8 @@ export class Container {
 
 }
 
-/** Container module logger class. */
-export class ContainerModuleLogger extends Logger {
+/** Container module log class. */
+export class ContainerModuleLog extends Log {
 
   public constructor(
     private _container: Container,
@@ -227,7 +227,7 @@ export class ContainerModule {
 
   private _container: Container;
   private _name: string;
-  private _log: ContainerModuleLogger;
+  private _log: ContainerModuleLog;
   private _debug: Debug.IDebugger;
   private _identifier = 0;
 
@@ -244,7 +244,7 @@ export class ContainerModule {
   public get namespace(): string { return `${this.container.name}:${this.name}`; }
 
   /** Module log interface. */
-  public get log(): ContainerModuleLogger { return this._log; }
+  public get log(): ContainerModuleLog { return this._log; }
 
   /** Module debug interface. */
   public get debug(): Debug.IDebugger { return this._debug; }
@@ -256,7 +256,7 @@ export class ContainerModule {
     // Set name, resolve container instance and construct log, debug instances.
     this._name = name;
     this._container = opts[CONTAINER_NAME];
-    this._log = new ContainerModuleLogger(this._container, this.namespace);
+    this._log = new ContainerModuleLog(this._container, this.namespace);
     this._debug = Debug(this.namespace);
 
     // Inject dependency values into instance.
