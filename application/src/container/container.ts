@@ -12,7 +12,7 @@ import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/timeout";
 import { Environment } from "./environment";
-import { LogLevel, ILogMessage, ILogMetadata, Log } from "./log";
+import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./log";
 
 /** Container options injected by awilix library. */
 export interface IContainerModuleOpts {
@@ -46,7 +46,7 @@ export class ContainerError extends Error {
 
 /** Container log message interface. */
 export interface IContainerLogMessage {
-  level: LogLevel;
+  level: ELogLevel;
   message: ILogMessage;
   metadata: ILogMetadata;
   args: any[];
@@ -55,7 +55,7 @@ export interface IContainerLogMessage {
 /** Log message class for stream of module logs. */
 export class ContainerLogMessage implements IContainerLogMessage {
   public constructor(
-    public level: LogLevel,
+    public level: ELogLevel,
     public message: ILogMessage,
     public metadata: ILogMetadata,
     public args: any[],
@@ -120,12 +120,12 @@ export class Container {
   }
 
   /** Send log message of level for module. */
-  public sendLog(level: LogLevel, message: ILogMessage, metadata: ILogMetadata, args: any[]): void {
+  public sendLog(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, args: any[]): void {
     this._bus.next(new ContainerLogMessage(level, message, metadata, args));
   }
 
   /** Observable stream of module logs, optional level filter. */
-  public getLogs(level?: LogLevel): Observable<ContainerLogMessage> {
+  public getLogs(level?: ELogLevel): Observable<ContainerLogMessage> {
     let filterLogs = this._bus.filter((message) => message instanceof ContainerLogMessage);
     if (level != null) {
       filterLogs = filterLogs.filter((log) => log.level <= level);
@@ -213,7 +213,7 @@ export class ContainerModuleLog extends Log {
   ) { super(); }
 
   /** Sends log message to container bus for consumption by modules. */
-  protected log(level: LogLevel, message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
+  protected log(level: ELogLevel, message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
     // Add module name to metadata.
     metadata = metadata || {};
     metadata.moduleName = this._name;

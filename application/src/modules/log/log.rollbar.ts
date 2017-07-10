@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import * as constants from "../../constants";
-import { IContainerModuleOpts, ContainerLogMessage, LogLevel } from "../../container";
+import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "../../container";
 import { Log } from "./log";
 
 // Rollbar does not have defined types.
@@ -46,26 +46,26 @@ export class RollbarLog extends Log {
 
     // Map log level to rollbar log methods.
     switch (log.level) {
-      case LogLevel.Emergency:
-      case LogLevel.Alert:
-      case LogLevel.Critical: {
+      case ELogLevel.Emergency:
+      case ELogLevel.Alert:
+      case ELogLevel.Critical: {
         this._rollbar.critical(log.message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Error: {
+      case ELogLevel.Error: {
         this._rollbar.error(log.message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Warning: {
+      case ELogLevel.Warning: {
         this._rollbar.warning(log.message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Notice:
-      case LogLevel.Informational: {
+      case ELogLevel.Notice:
+      case ELogLevel.Informational: {
         this._rollbar.info(log.message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Debug: {
+      case ELogLevel.Debug: {
         this._rollbar.debug(log.message, log.metadata, ...log.args, callback);
         break;
       }
@@ -81,7 +81,7 @@ export class RollbarLog extends Log {
 
   /** Return rollbar report level. */
   protected reportLevel(value?: string): string {
-    let level: LogLevel;
+    let level: ELogLevel;
 
     if (value != null) {
       level = this.parseLevel(value);
@@ -90,22 +90,22 @@ export class RollbarLog extends Log {
     }
 
     switch (level) {
-      case LogLevel.Emergency:
-      case LogLevel.Alert:
-      case LogLevel.Critical: {
+      case ELogLevel.Emergency:
+      case ELogLevel.Alert:
+      case ELogLevel.Critical: {
         return "critical";
       }
-      case LogLevel.Error: {
+      case ELogLevel.Error: {
         return "error";
       }
-      case LogLevel.Warning: {
+      case ELogLevel.Warning: {
         return "warning";
       }
-      case LogLevel.Notice:
-      case LogLevel.Informational: {
+      case ELogLevel.Notice:
+      case ELogLevel.Informational: {
         return "info";
       }
-      case LogLevel.Debug: {
+      case ELogLevel.Debug: {
         return "debug";
       }
       default: {

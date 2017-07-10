@@ -1,5 +1,5 @@
 import * as winston from "winston";
-import { IContainerModuleOpts, ContainerLogMessage, LogLevel } from "../../container";
+import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "../../container";
 import { Log } from "./log";
 
 export class WinstonLog extends Log {
@@ -36,35 +36,35 @@ export class WinstonLog extends Log {
 
     // Map log level to winston log methods.
     switch (log.level) {
-      case LogLevel.Emergency: {
+      case ELogLevel.Emergency: {
         this._logger.emerg(message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Alert: {
+      case ELogLevel.Alert: {
         this._logger.alert(message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Critical: {
+      case ELogLevel.Critical: {
         this._logger.crit(message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Error: {
+      case ELogLevel.Error: {
         this._logger.error(message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Warning: {
+      case ELogLevel.Warning: {
         this._logger.warning(message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Notice: {
+      case ELogLevel.Notice: {
         this._logger.notice(message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Informational: {
+      case ELogLevel.Informational: {
         this._logger.info(message, log.metadata, ...log.args, callback);
         break;
       }
-      case LogLevel.Debug: {
+      case ELogLevel.Debug: {
         this._logger.debug(message, log.metadata, ...log.args, callback);
         break;
       }

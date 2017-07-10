@@ -4,14 +4,14 @@ import {
   IContainerModuleDepends,
   ContainerModule,
   ContainerLogMessage,
-  LogLevel,
+  ELogLevel,
 } from "../../container";
 
 export abstract class Log extends ContainerModule {
 
-  private _level: LogLevel;
+  private _level: ELogLevel;
 
-  protected get level(): LogLevel { return this._level; }
+  protected get level(): ELogLevel { return this._level; }
 
   public constructor(name: string, opts: IContainerModuleOpts, depends?: IContainerModuleDepends) {
     super(name, opts, depends);
@@ -19,7 +19,7 @@ export abstract class Log extends ContainerModule {
     // Get log level from environment or fall back on default.
     const rawLevel = this.environment.get(constants.ENV_LOG_LEVEL) || constants.DEFAULT_LOG_LEVEL;
     this._level = this.parseLevel(rawLevel);
-    this.debug(`level '${LogLevel[this.level]}'`);
+    this.debug(`level '${ELogLevel[this.level]}'`);
 
     // Subscribe to container log messages filtered by level.
     this.container.getLogs(this.level)
@@ -30,40 +30,40 @@ export abstract class Log extends ContainerModule {
   protected abstract handleLog(log: ContainerLogMessage): void;
 
   /** Convert environment log level string to level index, defaults to warning. */
-  protected parseLevel(level?: string): LogLevel {
+  protected parseLevel(level?: string): ELogLevel {
     switch ((level || "").toLowerCase()) {
       case "emerg":
       case "emergency": {
-        return LogLevel.Emergency;
+        return ELogLevel.Emergency;
       }
       case "alert": {
-        return LogLevel.Alert;
+        return ELogLevel.Alert;
       }
       case "crit":
       case "critical": {
-        return LogLevel.Critical;
+        return ELogLevel.Critical;
       }
       case "err":
       case "error": {
-        return LogLevel.Error;
+        return ELogLevel.Error;
       }
       case "warn":
       case "warning": {
-        return LogLevel.Warning;
+        return ELogLevel.Warning;
       }
       case "notice": {
-        return LogLevel.Notice;
+        return ELogLevel.Notice;
       }
       case "info":
       case "information":
       case "informational": {
-        return LogLevel.Informational;
+        return ELogLevel.Informational;
       }
       case "debug": {
-        return LogLevel.Debug;
+        return ELogLevel.Debug;
       }
       default: {
-        return LogLevel.Warning;
+        return ELogLevel.Warning;
       }
     }
   }

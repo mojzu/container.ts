@@ -1,5 +1,5 @@
 /// <reference types="jasmine" />
-import { ContainerLogMessage, Container, LogLevel } from "../../container";
+import { ContainerLogMessage, Container, ELogLevel } from "../../container";
 import { Log } from "./log";
 
 type ITestLogCallback = (log: ContainerLogMessage) => void;
@@ -48,7 +48,7 @@ describe("Log", () => {
     const error = new Error("Emergency");
     const metadata = { value: 1 };
     LOG.log.emergency(error, metadata, (log: ContainerLogMessage) => {
-      expect(log.level).toEqual(LogLevel.Emergency);
+      expect(log.level).toEqual(ELogLevel.Emergency);
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
@@ -61,7 +61,7 @@ describe("Log", () => {
     const error = new Error("Critical");
     const metadata = { value: 1 };
     LOG.log.critical(error, metadata, (log: ContainerLogMessage) => {
-      expect(log.level).toEqual(LogLevel.Critical);
+      expect(log.level).toEqual(ELogLevel.Critical);
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
