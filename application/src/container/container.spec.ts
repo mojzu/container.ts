@@ -30,7 +30,7 @@ describe("Container", () => {
     expect(testModule.container).toEqual(container);
     expect(testModule.environment).toEqual(container.environment);
     expect(testModule.name).toEqual(moduleName);
-    expect(testModule.namespace).toEqual(`${name}:${moduleName}`);
+    expect(testModule.namespace).toEqual(`${name}.${moduleName}`);
     expect(testModule.log instanceof ContainerModuleLog).toEqual(true);
     expect(testModule.debug).toBeDefined();
   });

@@ -50,7 +50,7 @@ export class ScriptProcess implements IProcessSend {
     private _process: childProcess.ChildProcess,
     private _options: IScriptOptions = {},
   ) {
-    this.scripts.debug(`fork '${_target}:${_id}'`);
+    this.scripts.debug(`fork '${_target}.${_id}'`);
 
     // Accumulate multiple callback arguments into array.
     const accumulator = (...args: any[]) => args;
@@ -64,7 +64,7 @@ export class ScriptProcess implements IProcessSend {
         return Observable.of(value || 1);
       });
 
-    this._exit.subscribe((code) => this.scripts.debug(`exit '${_target}:${_id}' '${code}'`));
+    this._exit.subscribe((code) => this.scripts.debug(`exit '${_target}.${_id}' '${code}'`));
 
     // Listen for process error, forward to scripts logger.
     Observable.fromEvent(_process, "error")
@@ -90,7 +90,7 @@ export class ScriptProcess implements IProcessSend {
     const args = options.args || [];
     const id = this.identifier;
 
-    this.scripts.debug(`call '${this.target}:${this.id}:${target}:${method}' '${id}'`);
+    this.scripts.debug(`call '${this.target}.${this.id}.${target}.${method}' '${id}'`);
 
     // Send call request to child process.
     const sendData: IProcessCallRequestData = { id, target, method, args };
@@ -144,7 +144,7 @@ export class Scripts extends ContainerModule {
 
     // Use container environment when spawning processes.
     // Override name value to prepend application namespace.
-    const name = `${this.namespace}:${target}:${identifier}`;
+    const name = `${this.namespace}.${target}.${identifier}`;
     forkEnv.set(constants.ENV_NAME, name);
 
     const forkOptions: childProcess.ForkOptions = {

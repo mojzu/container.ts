@@ -241,7 +241,7 @@ export class ContainerModule {
   public get name(): string { return this._name; }
 
   /** Module container and module names. */
-  public get namespace(): string { return `${this.container.name}:${this.name}`; }
+  public get namespace(): string { return `${this.container.name}.${this.name}`; }
 
   /** Module log interface. */
   public get log(): ContainerModuleLog { return this._log; }

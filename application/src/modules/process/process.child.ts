@@ -207,7 +207,7 @@ export class ChildProcess extends Process implements IProcessSend {
     const args = options.args || [];
     const id = this.identifier;
 
-    this.debug(`call '${target}:${method}' '${id}'`);
+    this.debug(`call '${target}.${method}' '${id}'`);
 
     // Send call request to parent process.
     const sendData: IProcessCallRequestData = { id, target, method, args };

@@ -52,7 +52,7 @@ describe("Log", () => {
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
-      expect(log.metadata.moduleName).toEqual(`${NAME}:${MODULE_NAME}`);
+      expect(log.metadata.moduleName).toEqual(`${NAME}.${MODULE_NAME}`);
       done();
     });
   });
@@ -65,7 +65,7 @@ describe("Log", () => {
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
-      expect(log.metadata.moduleName).toEqual(`${NAME}:${MODULE_NAME}`);
+      expect(log.metadata.moduleName).toEqual(`${NAME}.${MODULE_NAME}`);
       done();
     });
   });
