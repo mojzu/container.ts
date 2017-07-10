@@ -13,6 +13,7 @@ import "rxjs/add/operator/take";
 import "rxjs/add/operator/timeout";
 import { Environment } from "./environment";
 import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./log";
+import { EMetricType, IMetricOptions, Metric } from "./metric";
 
 /** Container options injected by awilix library. */
 export interface IContainerModuleOpts {
@@ -62,8 +63,27 @@ export class ContainerLogMessage implements IContainerLogMessage {
   ) { }
 }
 
+/** Container metric message interface. */
+export interface IContainerMetricMessage {
+  type: EMetricType;
+  name: string;
+  value?: any;
+  options?: IMetricOptions;
+}
+
+/** Metric message class for stream of module metrics. */
+export class ContainerMetricMessage implements IContainerMetricMessage {
+  public constructor(
+    public type: EMetricType,
+    public name: string,
+    public value?: any,
+    public options?: IMetricOptions,
+  ) { }
+}
+
 /** Container bus message types. */
-export type IContainerMessageTypes = ContainerLogMessage;
+export type ContainerMessageTypes = ContainerLogMessage
+  | ContainerMetricMessage;
 
 /** Container reference name used internally by modules. */
 export const CONTAINER_NAME = "_container";
@@ -74,7 +94,7 @@ export class Container {
   private _environment: Environment;
   private _container: AwilixContainer;
   private _modules = new BehaviorSubject<IContainerModuleState>({});
-  private _bus = new Subject<IContainerMessageTypes>();
+  private _bus = new Subject<ContainerMessageTypes>();
 
   /** Container name, used to namespace modules. */
   public get name(): string { return this._name; }
@@ -86,7 +106,7 @@ export class Container {
   public get modules(): string[] { return Object.keys(this._modules.value); }
 
   /** Container message bus. */
-  public get bus(): Subject<IContainerMessageTypes> { return this._bus; }
+  public get bus(): Subject<ContainerMessageTypes> { return this._bus; }
 
   /** Creates a new container in proxy resolution mode. */
   public constructor(private _name: string, environment = new Environment()) {
@@ -124,13 +144,25 @@ export class Container {
     this._bus.next(new ContainerLogMessage(level, message, metadata, args));
   }
 
+  // TODO: Fix observable types.
+
   /** Observable stream of module logs, optional level filter. */
   public getLogs(level?: ELogLevel): Observable<ContainerLogMessage> {
-    let filterLogs = this._bus.filter((message) => message instanceof ContainerLogMessage);
+    let filterLogs = this._bus.filter((m) => m instanceof ContainerLogMessage);
     if (level != null) {
-      filterLogs = filterLogs.filter((log) => log.level <= level);
+      filterLogs = filterLogs.filter((log: ContainerLogMessage) => log.level <= level);
     }
-    return filterLogs;
+    return filterLogs as any;
+  }
+
+  /** Send metric message of type for module. */
+  public sendMetric(type: EMetricType, name: string, value?: any, options?: IMetricOptions): void {
+    this._bus.next(new ContainerMetricMessage(type, name, value, options));
+  }
+
+  /** Observable stream of module metrics. */
+  public getMetrics(): Observable<ContainerMetricMessage> {
+    return this._bus.filter((m) => m instanceof ContainerMetricMessage) as any;
   }
 
   /** Signal modules to enter operational state. */
@@ -222,12 +254,29 @@ export class ContainerModuleLog extends Log {
 
 }
 
+/** Container module metric class. */
+export class ContainerModuleMetric extends Metric {
+
+  public constructor(
+    private _container: Container,
+    private _name: string,
+  ) { super(); }
+
+  /** Sends metric message to container bus for consumption by modules. */
+  protected metric(type: EMetricType, name: string, value?: any, options?: IMetricOptions): void {
+    name = `${this._name}.${name}`;
+    this._container.sendMetric(type, name, value, options);
+  }
+
+}
+
 /** Base class for container class modules with dependency injection. */
 export class ContainerModule {
 
   private _container: Container;
   private _name: string;
   private _log: ContainerModuleLog;
+  private _metric: ContainerModuleMetric;
   private _debug: Debug.IDebugger;
   private _identifier = 0;
 
@@ -246,6 +295,9 @@ export class ContainerModule {
   /** Module log interface. */
   public get log(): ContainerModuleLog { return this._log; }
 
+  /** Module metric interface. */
+  public get metric(): ContainerModuleMetric { return this._metric; }
+
   /** Module debug interface. */
   public get debug(): Debug.IDebugger { return this._debug; }
 
@@ -257,6 +309,7 @@ export class ContainerModule {
     this._name = name;
     this._container = opts[CONTAINER_NAME];
     this._log = new ContainerModuleLog(this._container, this.namespace);
+    this._metric = new ContainerModuleMetric(this._container, this.namespace);
     this._debug = Debug(this.namespace);
 
     // Inject dependency values into instance.
