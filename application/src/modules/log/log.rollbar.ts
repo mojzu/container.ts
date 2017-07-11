@@ -42,7 +42,7 @@ export class RollbarLog extends Log {
 
   /** Rollbar handler for incoming log messages. */
   protected handleLog(log: ContainerLogMessage): void {
-    const callback = this.logCallback.bind(this);
+    const callback = this.handlerError.bind(this);
 
     // Map log level to rollbar log methods.
     switch (log.level) {
@@ -72,10 +72,10 @@ export class RollbarLog extends Log {
     }
   }
 
-  /** Rollbar log callback. */
-  protected logCallback(error?: Error): void {
+  /** Rollbar error handler callback. */
+  protected handlerError(error?: any): void {
     if (error != null) {
-      this.debug(error);
+      process.stderr.write(String(error));
     }
   }
 

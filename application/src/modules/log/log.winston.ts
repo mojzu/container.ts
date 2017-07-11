@@ -22,7 +22,7 @@ export class WinstonLog extends Log {
 
   /** Winston handler for incoming log messages. */
   protected handleLog(log: ContainerLogMessage): void {
-    const callback = this.logCallback.bind(this);
+    const callback = this.handleError.bind(this);
     let message: string;
 
     // If log message is an Error instance, use message string
@@ -71,10 +71,10 @@ export class WinstonLog extends Log {
     }
   }
 
-  /** Winston log callback. */
-  protected logCallback(error?: Error): void {
+  /** Winston error handler callback. */
+  protected handleError(error?: any): void {
     if (error != null) {
-      this.debug(error);
+      process.stderr.write(String(error));
     }
   }
 

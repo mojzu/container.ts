@@ -73,7 +73,7 @@ export class Process extends ContainerModule {
         error: (error) => {
           // Try to log error and exit with error code.
           this.log.error(error);
-          process.stderr.write(error);
+          process.stderr.write(String(error));
           process.exit(1);
         },
       });
