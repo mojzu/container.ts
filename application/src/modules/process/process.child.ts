@@ -190,7 +190,7 @@ export class ChildProcess extends Process implements IProcessSend {
       .subscribe((message) => this.handleMessage(message));
 
     // Forward log messages to parent process.
-    this.container.getLogs()
+    this.container.logs
       .subscribe((log) => this.send(EProcessMessageType.Log, log));
   }
 

@@ -81,10 +81,6 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
   ) { }
 }
 
-/** Container bus message types. */
-export type ContainerMessageTypes = ContainerLogMessage
-  | ContainerMetricMessage;
-
 /** Container reference name used internally by modules. */
 export const CONTAINER_NAME = "_container";
 
@@ -94,7 +90,8 @@ export class Container {
   private _environment: Environment;
   private _container: AwilixContainer;
   private _modules = new BehaviorSubject<IContainerModuleState>({});
-  private _bus = new Subject<ContainerMessageTypes>();
+  private _logs = new Subject<ContainerLogMessage>();
+  private _metrics = new Subject<ContainerMetricMessage>();
 
   /** Container name, used to namespace modules. */
   public get name(): string { return this._name; }
@@ -105,8 +102,11 @@ export class Container {
   /** Array of registered module names. */
   public get modules(): string[] { return Object.keys(this._modules.value); }
 
-  /** Container message bus. */
-  public get bus(): Subject<ContainerMessageTypes> { return this._bus; }
+  /** Container logs. */
+  public get logs(): Observable<ContainerLogMessage> { return this._logs; }
+
+  /** Container metrics. */
+  public get metrics(): Observable<ContainerMetricMessage> { return this._metrics; }
 
   /** Creates a new container in proxy resolution mode. */
   public constructor(private _name: string, environment = new Environment()) {
@@ -141,28 +141,17 @@ export class Container {
 
   /** Send log message of level for module. */
   public sendLog(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, args: any[]): void {
-    this._bus.next(new ContainerLogMessage(level, message, metadata, args));
-  }
-
-  // TODO: Fix observable types.
-
-  /** Observable stream of module logs, optional level filter. */
-  public getLogs(level?: ELogLevel): Observable<ContainerLogMessage> {
-    let filterLogs = this._bus.filter((m) => m instanceof ContainerLogMessage);
-    if (level != null) {
-      filterLogs = filterLogs.filter((log: ContainerLogMessage) => log.level <= level);
-    }
-    return filterLogs as any;
+    this._logs.next(new ContainerLogMessage(level, message, metadata, args));
   }
 
   /** Send metric message of type for module. */
   public sendMetric(type: EMetricType, name: string, value?: any, options?: IMetricOptions): void {
-    this._bus.next(new ContainerMetricMessage(type, name, value, options));
+    this._metrics.next(new ContainerMetricMessage(type, name, value, options));
   }
 
-  /** Observable stream of module metrics. */
-  public getMetrics(): Observable<ContainerMetricMessage> {
-    return this._bus.filter((m) => m instanceof ContainerMetricMessage) as any;
+  /** Observable stream of logs filtered by level. */
+  public filterLogs(level: ELogLevel): Observable<ContainerLogMessage> {
+    return this.logs.filter((m) => m.level <= level);
   }
 
   /** Signal modules to enter operational state. */
@@ -244,7 +233,10 @@ export class ContainerModuleLog extends Log {
     private _name: string,
   ) { super(); }
 
-  /** Sends log message to container bus for consumption by modules. */
+  /**
+   * Sends log message to container bus for consumption by modules.
+   * Adds module name to metadata object by default.
+   */
   protected log(level: ELogLevel, message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
     // Add module name to metadata.
     metadata = metadata || {};
@@ -262,7 +254,10 @@ export class ContainerModuleMetric extends Metric {
     private _name: string,
   ) { super(); }
 
-  /** Sends metric message to container bus for consumption by modules. */
+  /**
+   * Sends metric message to container bus for consumption by modules.
+   * Prefixes metric name with module name by default
+   */
   protected metric(type: EMetricType, name: string, value?: any, options?: IMetricOptions): void {
     name = `${this._name}.${name}`;
     this._container.sendMetric(type, name, value, options);

@@ -22,7 +22,7 @@ export abstract class Log extends ContainerModule {
     this.debug(`level '${ELogLevel[this.level]}'`);
 
     // Subscribe to container log messages filtered by level.
-    this.container.getLogs(this.level)
+    this.container.filterLogs(this.level)
       .subscribe((log) => this.handleLog(log));
   }
 
