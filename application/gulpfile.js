@@ -84,6 +84,6 @@ gulp.task("inspect", ["assets", "tsc"], (done) => {
 });
 
 // Build application binary.
-gulp.task("build", ["assets", "webpack"], (done) => {
+gulp.task("build", ["assets", "webpack", "lint"], (done) => {
   pkg.run(configuration, nativeModules, __dirname, done);
 });
