@@ -11,6 +11,10 @@ export const ENV_ASSETS = "APP_ASSETS";
 export const ENV_ROLLBAR_ACCESS_TOKEN = "APP_ROLLBAR_ACCESS_TOKEN";
 export const ENV_ROLLBAR_REPORT_LEVEL = "APP_ROLLBAR_REPORT_LEVEL";
 
+// Telegraf environment variables.
+export const ENV_TELEGRAF_HOST = "APP_TELEGRAF_HOST";
+export const ENV_TELEGRAF_PORT = "APP_TELEGRAF_PORT";
+
 // Default environment variable values.
 export const DEFAULT_NODE_ENV = "production";
 export const DEFAULT_NAME = "main";
@@ -25,6 +29,7 @@ export const PROCESS = "process";
 export const SCRIPTS = "scripts";
 export const ROLLBAR_LOG = "rollbar";
 export const WINSTON_LOG = "winston";
+export const TELEGRAF_METRIC = "telegraf";
 
 // Assets files.
 export const ASSET_PROCESS_JSON = "process.json";

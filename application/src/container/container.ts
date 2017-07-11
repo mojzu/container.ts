@@ -67,8 +67,8 @@ export class ContainerLogMessage implements IContainerLogMessage {
 export interface IContainerMetricMessage {
   type: EMetricType;
   name: string;
-  value?: any;
-  options?: IMetricOptions;
+  value: any;
+  options: IMetricOptions;
 }
 
 /** Metric message class for stream of module metrics. */
@@ -76,8 +76,8 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
   public constructor(
     public type: EMetricType,
     public name: string,
-    public value?: any,
-    public options?: IMetricOptions,
+    public value: any = null,
+    public options: IMetricOptions = {},
   ) { }
 }
 

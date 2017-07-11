@@ -1,7 +1,14 @@
 import * as process from "process";
 import * as constants from "./constants";
 import { Container, Environment } from "./container";
-import { Assets, Process, Scripts, RollbarLog, WinstonLog } from "./modules";
+import {
+  Assets,
+  Process,
+  Scripts,
+  WinstonLog,
+  RollbarLog,
+  TelegrafMetric,
+} from "./modules";
 
 // TODO: Command line argument support (minimist, argv).
 // TODO: Variable log/data directories.
@@ -33,6 +40,9 @@ const CONTAINER = new Container(NAME, ENVIRONMENT)
 // Register additional modules based on environment definitions.
 if (!!ENVIRONMENT.get(constants.ENV_ROLLBAR_ACCESS_TOKEN)) {
   CONTAINER.registerModule(constants.ROLLBAR_LOG, RollbarLog);
+}
+if (!!ENVIRONMENT.get(constants.ENV_TELEGRAF_HOST)) {
+  CONTAINER.registerModule(constants.TELEGRAF_METRIC, TelegrafMetric);
 }
 
 // Run following section if this is the main script.
