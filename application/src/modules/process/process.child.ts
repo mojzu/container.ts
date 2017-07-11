@@ -13,6 +13,7 @@ import { Process } from "./process";
 /** Process message types. */
 export enum EProcessMessageType {
   Log,
+  Metric,
   CallRequest,
   CallResponse,
   User,
@@ -189,9 +190,11 @@ export class ChildProcess extends Process implements IProcessSend {
     this._message
       .subscribe((message) => this.handleMessage(message));
 
-    // Forward log messages to parent process.
+    // Forward log and metric messages to parent process.
     this.container.logs
       .subscribe((log) => this.send(EProcessMessageType.Log, log));
+    this.container.metrics
+      .subscribe((metric) => this.send(EProcessMessageType.Metric, metric));
   }
 
   /** Send message to parent process. */

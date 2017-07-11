@@ -9,7 +9,12 @@ import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/takeUntil";
 import * as constants from "../../constants";
-import { IContainerLogMessage, IContainerModuleOpts, ContainerModule } from "../../container";
+import {
+  IContainerLogMessage,
+  IContainerMetricMessage,
+  IContainerModuleOpts,
+  ContainerModule,
+} from "../../container";
 import {
   EProcessMessageType,
   IProcessCallOptions,
@@ -102,10 +107,15 @@ export class ScriptProcess implements IProcessSend {
   /** Handle messages received from child process. */
   protected handleMessage(message: IProcessMessage): void {
     switch (message.type) {
-      // Send received log message on container bus.
+      // Send received log and metric messages to container.
       case EProcessMessageType.Log: {
         const data: IContainerLogMessage = message.data;
         this.scripts.container.sendLog(data.level, data.message, data.metadata, data.args);
+        break;
+      }
+      case EProcessMessageType.Metric: {
+        const data: IContainerMetricMessage = message.data;
+        this.scripts.container.sendMetric(data.type, data.name, data.value, data.options);
         break;
       }
       // Call request received from child.
