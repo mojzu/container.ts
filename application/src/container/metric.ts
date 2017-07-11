@@ -4,10 +4,14 @@ export enum EMetricType {
   Timing,
 }
 
+/** Metric callback option type. */
+export type IMetricCallback = (type: EMetricType, name: string, value?: any, options?: IMetricOptions) => void;
+
 /** Metric send options. */
 export interface IMetricOptions {
   sampleRate?: number;
   tags?: string[];
+  callback?: IMetricCallback;
 }
 
 /** Abstract metric class. */
