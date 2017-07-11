@@ -15,8 +15,8 @@ export class Environment {
   ) { }
 
   /** Returns a copy of environment. */
-  public copy(): Environment {
-    return new Environment(Object.assign({}, this.variables));
+  public copy(variables: IEnvironmentVariables = {}): Environment {
+    return new Environment(Object.assign(variables, this.variables));
   }
 
   /** Get an environment variable value or undefined. */

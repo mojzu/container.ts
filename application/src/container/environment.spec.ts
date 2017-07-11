@@ -12,12 +12,14 @@ describe("Environment", () => {
   it("#Environment#copy", () => {
     const variables = { value: "1" };
     const environment = new Environment(variables);
-    const environmentCopy = environment.copy();
+    const environmentCopy = environment.copy({ test: "3" });
     expect(environmentCopy.set("value", "2") instanceof Environment).toEqual(true);
     const value = environment.get("value");
     const copyValue = environmentCopy.get("value");
+    const testValue = environmentCopy.get("test");
     expect(value).toEqual("1");
     expect(copyValue).toEqual("2");
+    expect(testValue).toEqual("3");
   });
 
   it("#Environment#get", () => {
