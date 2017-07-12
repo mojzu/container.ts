@@ -22,14 +22,5 @@ export const DEFAULT_LOG_LEVEL = "info";
 export const DEFAULT_SCRIPTS = path.resolve(`${__dirname}/scripts`);
 export const DEFAULT_ASSETS = path.resolve(`${__dirname}/../assets`);
 
-// Module names.
-export const ENVIRONMENT = "environment";
-export const ASSETS = "assets";
-export const PROCESS = "process";
-export const SCRIPTS = "scripts";
-export const ROLLBAR_LOG = "rollbar";
-export const WINSTON_LOG = "winston";
-export const TELEGRAF_METRIC = "telegraf";
-
-// Assets files.
+// Asset file targets.
 export const ASSET_PROCESS_JSON = "process.json";

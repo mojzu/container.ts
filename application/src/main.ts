@@ -32,17 +32,17 @@ ENVIRONMENT
 // Create container instance with name and environment.
 // Populate container for dependency injection.
 const CONTAINER = new Container(NAME, ENVIRONMENT)
-  .registerModule(constants.ASSETS, Assets)
-  .registerModule(constants.PROCESS, Process)
-  .registerModule(constants.SCRIPTS, Scripts)
-  .registerModule(constants.WINSTON_LOG, WinstonLog);
+  .registerModule(Assets)
+  .registerModule(Process)
+  .registerModule(Scripts)
+  .registerModule(WinstonLog);
 
 // Register additional modules based on environment definitions.
 if (!!ENVIRONMENT.get(constants.ENV_ROLLBAR_ACCESS_TOKEN)) {
-  CONTAINER.registerModule(constants.ROLLBAR_LOG, RollbarLog);
+  CONTAINER.registerModule(RollbarLog);
 }
 if (!!ENVIRONMENT.get(constants.ENV_TELEGRAF_HOST)) {
-  CONTAINER.registerModule(constants.TELEGRAF_METRIC, TelegrafMetric);
+  CONTAINER.registerModule(TelegrafMetric);
 }
 
 // Run following section if this is the main script.

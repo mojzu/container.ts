@@ -22,6 +22,7 @@ export interface IContainerModuleOpts {
 
 /** Container module constructor interface. */
 export interface IContainerModuleConstructor {
+  name: string;
   new (name: string, opts: IContainerModuleOpts): ContainerModule;
 }
 
@@ -116,15 +117,11 @@ export class Container {
   }
 
   /** Register a module in container, has singleton lifetime by default. */
-  public registerModule<T extends IContainerModuleConstructor>(
-    name: string,
-    instance: T,
-    lifetime = Lifetime.SINGLETON,
-  ): Container {
+  public registerModule<T extends IContainerModuleConstructor>(instance: T, lifetime = Lifetime.SINGLETON): Container {
     const options = {};
-    options[name] = [this.makeModule.bind(this, name, instance), { lifetime }];
+    options[instance.name] = [this.makeModule.bind(this, instance.name, instance), { lifetime }];
     this._container.registerFunction(options);
-    this.reportModuleState(name, false);
+    this.reportModuleState(instance.name, false);
     return this;
   }
 

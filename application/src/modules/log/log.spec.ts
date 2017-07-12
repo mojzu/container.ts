@@ -16,12 +16,11 @@ class TestLog extends Log {
 describe("Log", () => {
 
   const NAME = "test";
-  const MODULE_NAME = "log";
 
   const CONTAINER = new Container(NAME)
-    .registerModule(MODULE_NAME, TestLog);
+    .registerModule(TestLog);
 
-  const LOG = CONTAINER.resolve<TestLog>(MODULE_NAME);
+  const LOG = CONTAINER.resolve<TestLog>(TestLog.name);
 
   beforeAll((done) => {
     CONTAINER.start()
@@ -41,7 +40,7 @@ describe("Log", () => {
 
   it("#TestLog", () => {
     expect(LOG).toBeDefined();
-    expect(LOG.name).toEqual(MODULE_NAME);
+    expect(LOG.name).toEqual(TestLog.name);
   });
 
   it("#TestLog#emergency", (done) => {
@@ -52,7 +51,7 @@ describe("Log", () => {
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
-      expect(log.metadata.moduleName).toEqual(`${NAME}.${MODULE_NAME}`);
+      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLog.name}`);
       done();
     });
   });
@@ -65,7 +64,7 @@ describe("Log", () => {
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
-      expect(log.metadata.moduleName).toEqual(`${NAME}.${MODULE_NAME}`);
+      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLog.name}`);
       done();
     });
   });

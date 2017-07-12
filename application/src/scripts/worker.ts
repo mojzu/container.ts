@@ -12,8 +12,8 @@ const NAME = ENVIRONMENT.get(constants.ENV_NAME) || constants.DEFAULT_NAME;
 // Create container instance with name and environment.
 // Populate container for dependency injection.
 const CONTAINER = new Container(NAME, ENVIRONMENT)
-  .registerModule(constants.ASSETS, Assets)
-  .registerModule(constants.PROCESS, ChildProcess);
+  .registerModule(Assets)
+  .registerModule(ChildProcess);
 
 // Run following section if this is the main script.
 if (require.main === module) {

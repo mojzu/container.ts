@@ -30,14 +30,13 @@ describe("Container", () => {
   it("#Container#registerModule", () => {
     const name = "test";
     const container = new Container(name);
-    const moduleName = "testModule";
-    expect(container.registerModule(moduleName, ContainerModule) instanceof Container).toEqual(true);
-    const testModule = container.resolve<ContainerModule>(moduleName);
+    expect(container.registerModule(ContainerModule) instanceof Container).toEqual(true);
+    const testModule = container.resolve<ContainerModule>(ContainerModule.name);
     expect(testModule instanceof ContainerModule);
     expect(testModule.container).toEqual(container);
     expect(testModule.environment).toEqual(container.environment);
-    expect(testModule.name).toEqual(moduleName);
-    expect(testModule.namespace).toEqual(`${name}.${moduleName}`);
+    expect(testModule.name).toEqual(ContainerModule.name);
+    expect(testModule.namespace).toEqual(`${name}.${ContainerModule.name}`);
     expect(testModule.log instanceof ContainerModuleLog).toEqual(true);
     expect(testModule.metric instanceof ContainerModuleMetric).toEqual(true);
     expect(testModule.debug).toBeDefined();

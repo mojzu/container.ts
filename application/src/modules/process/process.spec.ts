@@ -10,10 +10,10 @@ describe("Process", () => {
     .set(constants.ENV_ASSETS, constants.DEFAULT_ASSETS);
 
   const CONTAINER = new Container("test", ENVIRONMENT)
-    .registerModule(constants.ASSETS, Assets)
-    .registerModule(constants.PROCESS, Process);
+    .registerModule(Assets)
+    .registerModule(Process);
 
-  const PROCESS = CONTAINER.resolve<Process>(constants.PROCESS);
+  const PROCESS = CONTAINER.resolve<Process>(Process.name);
 
   beforeAll((done) => {
     CONTAINER.start()
@@ -33,7 +33,7 @@ describe("Process", () => {
 
   it("#Process", () => {
     expect(PROCESS).toBeDefined();
-    expect(PROCESS.name).toEqual(constants.PROCESS);
+    expect(PROCESS.name).toEqual(Process.name);
   });
 
 });

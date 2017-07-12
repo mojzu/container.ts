@@ -35,7 +35,7 @@ export class Process extends ContainerModule {
   public get version(): string { return this._version; }
 
   public constructor(name: string, opts: IContainerModuleOpts) {
-    super(name, opts, { _assets: constants.ASSETS });
+    super(name, opts, { _assets: Assets.name });
 
     // Default unknown version value.
     this._version = "0.0.0-unknown";
@@ -43,7 +43,7 @@ export class Process extends ContainerModule {
 
   /** Read process information assets file, handle process events. */
   public start(): Observable<void> {
-    return this.container.waitStarted(constants.ASSETS)
+    return this.container.waitStarted(Assets.name)
       .switchMap(() => this._assets.readJson(constants.ASSET_PROCESS_JSON))
       .switchMap((data: IProcess) => {
 
