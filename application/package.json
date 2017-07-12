@@ -22,7 +22,7 @@
     "assets": "assets/**/*"
   },
   "dependencies": {
-    "awilix": "^2.5.0",
+    "awilix": "^2.6.0",
     "debug": "^2.6.8",
     "hot-shots": "^4.5.0",
     "rollbar": "^2.1.0",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "@types/debug": "^0.0.29",
     "@types/jasmine": "^2.5.53",
-    "@types/node": "^6.0.80",
+    "@types/node": "^6.0.81",
     "@types/winston": "^2.3.3",
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.1",
