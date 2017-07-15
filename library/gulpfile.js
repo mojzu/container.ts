@@ -46,6 +46,6 @@ gulp.task("docs", (done) => {
 });
 
 // Build library.
-gulp.task("build", ["tsc"], (done) => {
+gulp.task("build", ["test", "lint"], (done) => {
   shell.run("npm pack", packagePath, done);
 });

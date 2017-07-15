@@ -1,7 +1,7 @@
 {
   "name": "container.ts",
   "version": "0.1.0",
-  "description": "Dependency injection application framework",
+  "description": "Modular applications framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
   "repository": "https://github.com/mojzu/templates.ts",
@@ -10,7 +10,13 @@
   "files": [
     "index.d.ts",
     "index.js",
-    "index.js.map"
+    "index.js.map",
+    "container/**/*.d.ts",
+    "container/**/*.js",
+    "container/**/*.js.map",
+    "modules/**/*.d.ts",
+    "modules/**/*.js",
+    "modules/**/*.js.map"
   ],
   "scripts": {
     "clean": "gulp clean",
