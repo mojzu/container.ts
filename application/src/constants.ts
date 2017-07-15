@@ -11,9 +11,9 @@ export const ENV_ASSETS = "APP_ASSETS";
 export const ENV_ROLLBAR_ACCESS_TOKEN = "APP_ROLLBAR_ACCESS_TOKEN";
 export const ENV_ROLLBAR_REPORT_LEVEL = "APP_ROLLBAR_REPORT_LEVEL";
 
-// Telegraf environment variables.
-export const ENV_TELEGRAF_HOST = "APP_TELEGRAF_HOST";
-export const ENV_TELEGRAF_PORT = "APP_TELEGRAF_PORT";
+// StatsD environment variables.
+export const ENV_STATSD_HOST = "APP_STATSD_HOST";
+export const ENV_STATSD_PORT = "APP_STATSD_PORT";
 
 // Default environment variable values.
 export const DEFAULT_NODE_ENV = "production";

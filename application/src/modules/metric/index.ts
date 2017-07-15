@@ -1,2 +1,2 @@
 export * from "./metric";
-export * from "./metric.telegraf";
+export * from "./metric.statsd";

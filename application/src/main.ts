@@ -7,7 +7,7 @@ import {
   Scripts,
   WinstonLog,
   RollbarLog,
-  TelegrafMetric,
+  StatsdMetric,
 } from "./modules";
 
 // TODO: Command line argument support (minimist, argv).
@@ -41,8 +41,8 @@ const CONTAINER = new Container(NAME, ENVIRONMENT)
 if (!!ENVIRONMENT.get(constants.ENV_ROLLBAR_ACCESS_TOKEN)) {
   CONTAINER.registerModule(RollbarLog);
 }
-if (!!ENVIRONMENT.get(constants.ENV_TELEGRAF_HOST)) {
-  CONTAINER.registerModule(TelegrafMetric);
+if (!!ENVIRONMENT.get(constants.ENV_STATSD_HOST)) {
+  CONTAINER.registerModule(StatsdMetric);
 }
 
 // Run following section if this is the main script.
