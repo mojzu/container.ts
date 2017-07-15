@@ -1,0 +1,9 @@
+# Git ignored files.
+# <https://git-scm.com/docs/gitignore>
+/coverage
+/node_modules
+/*.log
+/*.tgz
+*.d.ts
+*.js
+*.js.map

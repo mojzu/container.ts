@@ -1,0 +1,28 @@
+{
+  "name": "container.ts",
+  "version": "0.1.0",
+  "description": "Dependency injection application framework",
+  "main": "./index.js",
+  "typings": "./index.d.ts",
+  "repository": "https://github.com/mojzu/templates.ts",
+  "author": "mojzu <mail@mojzu.net>",
+  "license": "Unlicense",
+  "files": [
+    "index.d.ts",
+    "index.js",
+    "index.js.map"
+  ],
+  "devDependencies": {
+    "@types/jasmine": "^2.5.53",
+    "@types/node": "^6.0.83",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-util": "^3.0.8",
+    "istanbul": "^0.4.5",
+    "jasmine": "^2.6.0",
+    "tslint": "^5.5.0",
+    "tslint-eslint-rules": "^4.1.1",
+    "typedoc": "^0.7.1",
+    "typescript": "^2.4.1"
+  }
+}
