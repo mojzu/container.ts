@@ -1,5 +1,7 @@
 # Library
 
+Modular applications framework library.
+
 ## Developer
 
 ```Shell

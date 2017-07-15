@@ -2,11 +2,15 @@
   "name": "application.ts",
   "version": "0.0.0",
   "description": "TypeScript application template",
-  "license": "Unlicense",
-  "author": "mojzu <mail@mojzu.net>",
-  "repository": "https://github.com/mojzu/templates.ts.git",
-  "private": true,
   "bin": "./dist/main.js",
+  "repository": "https://github.com/mojzu/templates.ts.git",
+  "author": "mojzu <mail@mojzu.net>",
+  "license": "Unlicense",
+  "private": true,
+  "pkg": {
+    "scripts": "dist/scripts/**/*.js",
+    "assets": "assets/**/*"
+  },
   "scripts": {
     "clean": "gulp clean",
     "distclean": "gulp distclean",
@@ -16,10 +20,6 @@
     "start": "gulp start",
     "inspect": "gulp inspect",
     "build": "gulp build"
-  },
-  "pkg": {
-    "scripts": "dist/scripts/**/*.js",
-    "assets": "assets/**/*"
   },
   "dependencies": {
     "awilix": "^2.6.0",

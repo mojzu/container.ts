@@ -3,7 +3,6 @@
 /build
 /coverage
 /dist
-/docs
 /node_modules
-*.log
-*.tgz
+/*.log
+/*.tgz
