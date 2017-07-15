@@ -1,10 +1,10 @@
 /// <reference types="jasmine" />
 import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./log";
 
-type ITestLogCallback = (level: ELogLevel, message: ILogMessage, metadata?: ILogMetadata) => void;
+type ITestLogCallback = (level: ELogLevel, message: ILogMessage, metadata: ILogMetadata) => void;
 
 class TestLog extends Log {
-  protected log(level: ELogLevel, message: ILogMessage, metadata?: ILogMetadata, callback?: ITestLogCallback): void {
+  protected log(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, callback?: ITestLogCallback): void {
     if (callback != null) {
       callback(level, message, metadata);
     }

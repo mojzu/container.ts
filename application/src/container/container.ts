@@ -13,7 +13,7 @@ import "rxjs/add/operator/take";
 import "rxjs/add/operator/timeout";
 import { Environment } from "./environment";
 import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./log";
-import { EMetricType, IMetricOptions, Metric } from "./metric";
+import { EMetricType, IMetricTags, Metric } from "./metric";
 
 /** Container options injected by awilix library. */
 export interface IContainerModuleOpts {
@@ -23,7 +23,7 @@ export interface IContainerModuleOpts {
 /** Container module constructor interface. */
 export interface IContainerModuleConstructor {
   name: string;
-  new (name: string, opts: IContainerModuleOpts): ContainerModule;
+  new(name: string, opts: IContainerModuleOpts): ContainerModule;
 }
 
 /** Container module dependencies. */
@@ -69,7 +69,7 @@ export interface IContainerMetricMessage {
   type: EMetricType;
   name: string;
   value: any;
-  options: IMetricOptions;
+  tags: IMetricTags;
 }
 
 /** Metric message class for stream of module metrics. */
@@ -77,8 +77,8 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
   public constructor(
     public type: EMetricType,
     public name: string,
-    public value: any = null,
-    public options: IMetricOptions = {},
+    public value: any,
+    public tags: IMetricTags,
   ) { }
 }
 
@@ -142,8 +142,8 @@ export class Container {
   }
 
   /** Send metric message of type for module. */
-  public sendMetric(type: EMetricType, name: string, value?: any, options?: IMetricOptions): void {
-    this._metrics.next(new ContainerMetricMessage(type, name, value, options));
+  public sendMetric(type: EMetricType, name: string, value: any, tags: IMetricTags): void {
+    this._metrics.next(new ContainerMetricMessage(type, name, value, tags));
   }
 
   /** Observable stream of logs filtered by level. */
@@ -234,9 +234,7 @@ export class ContainerModuleLog extends Log {
    * Sends log message to container bus for consumption by modules.
    * Adds module name to metadata object by default.
    */
-  protected log(level: ELogLevel, message: ILogMessage, metadata?: ILogMetadata, ...args: any[]): void {
-    // Add module name to metadata.
-    metadata = metadata || {};
+  protected log(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, ...args: any[]): void {
     metadata.moduleName = this._name;
     this._container.sendLog(level, message, metadata, args);
   }
@@ -253,11 +251,11 @@ export class ContainerModuleMetric extends Metric {
 
   /**
    * Sends metric message to container bus for consumption by modules.
-   * Prefixes metric name with module name by default
+   * Adds module name to tags object by default.
    */
-  protected metric(type: EMetricType, name: string, value?: any, options?: IMetricOptions): void {
-    name = `${this._name}.${name}`;
-    this._container.sendMetric(type, name, value, options);
+  protected metric(type: EMetricType, name: string, value: any, tags: IMetricTags): void {
+    tags.moduleName = this._name;
+    this._container.sendMetric(type, name, value, tags);
   }
 
 }

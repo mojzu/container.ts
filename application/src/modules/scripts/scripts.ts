@@ -115,7 +115,7 @@ export class ScriptProcess implements IProcessSend {
       }
       case EProcessMessageType.Metric: {
         const data: IContainerMetricMessage = message.data;
-        this.scripts.container.sendMetric(data.type, data.name, data.value, data.options);
+        this.scripts.container.sendMetric(data.type, data.name, data.value, data.tags);
         break;
       }
       // Call request received from child.
