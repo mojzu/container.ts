@@ -1,12 +1,12 @@
 /// <reference types="jasmine" />
-import * as constants from "../../constants";
 import { Container, Environment } from "../../container";
-import { Assets } from "./assets";
+import { ENV_ASSETS_PATH, Assets } from "./Assets";
 
 describe("Assets", () => {
 
+  // TODO: Fix path, examples?
   const ENVIRONMENT = new Environment()
-    .set(constants.ENV_ASSETS, constants.DEFAULT_ASSETS);
+    .set(ENV_ASSETS_PATH, "");
 
   const CONTAINER = new Container("test", ENVIRONMENT)
     .registerModule(Assets);
