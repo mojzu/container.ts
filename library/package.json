@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Modular applications framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -8,15 +8,15 @@
   "author": "mojzu <mail@mojzu.net>",
   "license": "Unlicense",
   "files": [
-    "index.d.ts",
-    "index.js",
-    "index.js.map",
-    "container/**/*.d.ts",
-    "container/**/*.js",
-    "container/**/*.js.map",
-    "modules/**/*.d.ts",
-    "modules/**/*.js",
-    "modules/**/*.js.map"
+    "/index.d.ts",
+    "/index.js",
+    "/index.js.map",
+    "/container/**/!(*.spec).d.ts",
+    "/container/**/!(*.spec).js",
+    "/container/**/!(*.spec).js.map",
+    "/modules/**/!(*.spec).d.ts",
+    "/modules/**/!(*.spec).js",
+    "/modules/**/!(*.spec).js.map"
   ],
   "scripts": {
     "clean": "gulp clean",

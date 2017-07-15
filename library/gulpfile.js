@@ -17,7 +17,16 @@ gulp.task("clean", (done) => {
     "test.d.ts",
     "test.js.map",
     "test.js",
-  ].concat(packageJson.files), done);
+    "index.d.ts",
+    "index.js.map",
+    "index.js",
+    "container/**/*.d.ts",
+    "container/**/*.js",
+    "container/**/*.js.map",
+    "modules/**/*.d.ts",
+    "modules/**/*.js",
+    "modules/**/*.js.map"
+  ], done);
 });
 
 // Clean and delete modules generated documentation.
