@@ -6,5 +6,7 @@
     "tslint:recommended",
     "tslint-eslint-rules"
   ],
-  "rules": {}
+  "rules": {
+    "no-var-requires": false
+  }
 }
