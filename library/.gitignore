@@ -5,5 +5,7 @@
 /*.log
 /*.tgz
 *.d.ts
-*.js
 *.js.map
+*.js
+!gulpfile.js
+!/gulp/**/*.js

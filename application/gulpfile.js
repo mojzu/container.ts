@@ -1,10 +1,10 @@
 "use strict";
 const gulp = require("gulp");
 const gutil = require("gulp-util");
-const clean = require("../gulp/clean");
-const shell = require("../gulp/shell");
-const file = require("../gulp/file.js");
-const pkg = require("../gulp/pkg.js");
+const clean = require("./gulp/clean");
+const shell = require("./gulp/shell");
+const file = require("./gulp/file.js");
+const pkg = require("./gulp/pkg.js");
 
 /** Package file. */
 const packageJson = require("./package.json");
