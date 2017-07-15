@@ -1438,6 +1438,10 @@ sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
 
+statsd-client@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/statsd-client/-/statsd-client-0.4.0.tgz#635e04a01bd111042c83c5e5d83e89086d873660"
+
 stream-consume@~0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/stream-consume/-/stream-consume-0.1.0.tgz#a41ead1a6d6081ceb79f65b061901b6d8f3d1d0f"

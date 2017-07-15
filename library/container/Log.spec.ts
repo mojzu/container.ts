@@ -1,5 +1,5 @@
 /// <reference types="jasmine" />
-import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./log";
+import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./Log";
 
 type ITestLogCallback = (level: ELogLevel, message: ILogMessage, metadata: ILogMetadata) => void;
 

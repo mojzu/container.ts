@@ -11,9 +11,9 @@ import "rxjs/add/operator/filter";
 import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/timeout";
-import { Environment } from "./environment";
-import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./log";
-import { EMetricType, IMetricTags, Metric } from "./metric";
+import { Environment } from "./Environment";
+import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./Log";
+import { EMetricType, IMetricTags, Metric } from "./Metric";
 
 /** Container options injected by awilix library. */
 export interface IContainerModuleOpts {

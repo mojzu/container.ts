@@ -1,10 +1,14 @@
+/// <reference types="node" />
 import * as assert from "assert";
-import * as constants from "../../constants";
 import { IContainerModuleOpts, ContainerMetricMessage, EMetricType } from "../../container";
-import { Metric } from "./metric";
+import { Metric } from "./Metric";
 
 // Package statsd-client types are out of date.
-const Statsd: any = require("statsd-client");
+const STATSD = require("statsd-client");
+
+// TODO: Validation library.
+export const ENV_STATSD_HOST = "STATSD_HOST";
+export const ENV_STATSD_PORT = "STATSD_PORT";
 
 export class StatsdMetric extends Metric {
 
@@ -14,15 +18,15 @@ export class StatsdMetric extends Metric {
     super(name, opts);
 
     // Get host and port environment values.
-    const host = this.environment.get(constants.ENV_STATSD_HOST);
-    const port = this.environment.get(constants.ENV_STATSD_PORT) || "8125";
+    const host = this.environment.get(ENV_STATSD_HOST);
+    const port = this.environment.get(ENV_STATSD_PORT) || "8125";
     assert(host != null, "StatsD host is undefined");
     assert(port != null, "StatsD port is undefined");
     this.debug(`host:port '${host}:${port}'`);
 
     // Create statsd client instance.
     // TODO: Handle more client options.
-    this._statsd = new Statsd({ host, port });
+    this._statsd = new STATSD({ host, port });
   }
 
   /** StatsD handler for incoming metric messages. */

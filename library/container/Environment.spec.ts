@@ -1,5 +1,5 @@
 /// <reference types="jasmine" />
-import { Environment } from "./environment";
+import { Environment } from "./Environment";
 
 describe("Environment", () => {
 
