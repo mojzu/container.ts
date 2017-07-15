@@ -7,6 +7,18 @@
     "tslint-eslint-rules"
   ],
   "rules": {
-    "no-var-requires": false
+    "ordered-imports": [
+      false
+    ],
+    "no-var-requires": false,
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore"
+    ],
+    "max-classes-per-file": [
+      false
+    ]
   }
 }

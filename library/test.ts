@@ -1,8 +1,13 @@
 /// <reference types="node" />
-const Jasmine = require("jasmine");
-const specs = new Jasmine();
+const JASMINE = require("jasmine");
+const SPECS = new JASMINE();
 
 // Run tests for compiled `*.spec.js` files
-specs.loadConfig({ spec_files: ["**/*[spec].js"] });
-specs.configureDefaultReporter({ showColors: true });
-specs.execute();
+SPECS.loadConfig({
+  spec_files: [
+    "container/**/*[spec].js",
+    "modules/**/*[spec].js",
+  ],
+});
+SPECS.configureDefaultReporter({ showColors: true });
+SPECS.execute();
