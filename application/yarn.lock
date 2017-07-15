@@ -1949,10 +1949,6 @@ hosted-git-info@^2.1.4:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.5.0.tgz#6d60e34b3abbc8313062c3b798ef8d901a07af3c"
 
-hot-shots@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/hot-shots/-/hot-shots-4.5.0.tgz#d0b7c2ad367cbb2f8c062b26151c0949ad9271f9"
-
 http-signature@~1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/http-signature/-/http-signature-1.1.1.tgz#df72e267066cd0ac67fb76adf8e134a8fbcf91bf"
@@ -3411,6 +3407,10 @@ stack-trace@0.0.x:
 stackframe@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/stackframe/-/stackframe-0.3.1.tgz#33aa84f1177a5548c8935533cbfeb3420975f5a4"
+
+statsd-client@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/statsd-client/-/statsd-client-0.4.0.tgz#635e04a01bd111042c83c5e5d83e89086d873660"
 
 stream-browserify@^2.0.1:
   version "2.0.1"
