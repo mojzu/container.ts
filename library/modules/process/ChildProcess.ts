@@ -8,7 +8,7 @@ import "rxjs/add/operator/filter";
 import "rxjs/add/operator/timeout";
 import "rxjs/add/operator/takeWhile";
 import { IContainerLogMessage, IContainerModuleOpts, Container } from "../../container";
-import { Process } from "./process";
+import { Process } from "./Process";
 
 /** Process message types. */
 export enum EProcessMessageType {

@@ -8,7 +8,6 @@ import "rxjs/add/observable/fromEvent";
 import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/takeUntil";
-import * as constants from "../../constants";
 import {
   IContainerLogMessage,
   IContainerMetricMessage,
@@ -22,12 +21,16 @@ import {
   IProcessMessage,
   IProcessSend,
   ChildProcess,
-} from "../process";
+} from "../process/ChildProcess";
 
 /** Script process options. */
 export interface IScriptOptions {
   args?: string[];
 }
+
+// TODO: Validation library.
+export const ENV_SCRIPTS_PATH = "SCRIPTS_PATH";
+export const ENV_SCRIPTS_NAME = "SCRIPTS_NAME";
 
 /** Spawned script process interface. */
 export class ScriptProcess implements IProcessSend {
@@ -139,7 +142,7 @@ export class Scripts extends ContainerModule {
     super(name, opts);
 
     // Get scripts directory path from environment.
-    const scriptsPath = this.environment.get(constants.ENV_SCRIPTS);
+    const scriptsPath = this.environment.get(ENV_SCRIPTS_PATH);
     assert(scriptsPath != null, "Scripts path is undefined");
     this._path = path.resolve(scriptsPath);
     this.debug(`path '${this.path}'`);
@@ -155,7 +158,7 @@ export class Scripts extends ContainerModule {
     // Use container environment when spawning processes.
     // Override name value to prepend application namespace.
     const name = `${this.namespace}.${target}.${identifier}`;
-    forkEnv.set(constants.ENV_NAME, name);
+    forkEnv.set(ENV_SCRIPTS_NAME, name);
 
     const forkOptions: childProcess.ForkOptions = {
       env: forkEnv.variables,

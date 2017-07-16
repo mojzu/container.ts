@@ -3,15 +3,17 @@ import * as process from "process";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import "rxjs/add/operator/switchMap";
-import * as constants from "../../constants";
 import { IContainerModuleOpts, ContainerModule } from "../../container";
-import { Assets } from "../assets";
+import { Assets } from "../assets/Assets";
 
 /** Process information interface. */
 export interface IProcess {
   name?: string;
   version?: string;
 }
+
+// TODO: Env/definition clean up.
+export const ASSET_PROCESS_JSON = "process.json";
 
 /** Node.js process interface. */
 export class Process extends ContainerModule {
@@ -34,6 +36,11 @@ export class Process extends ContainerModule {
   public get title(): string { return Process.title; }
   public get version(): string { return this._version; }
 
+  public get nodeEnvironment(): string {
+    const parts = this.version.split("-");
+    return parts[1] || "unknown";
+  }
+
   public constructor(name: string, opts: IContainerModuleOpts) {
     super(name, opts, { _assets: Assets.name });
 
@@ -44,7 +51,7 @@ export class Process extends ContainerModule {
   /** Read process information assets file, handle process events. */
   public start(): Observable<void> {
     return this.container.waitStarted(Assets.name)
-      .switchMap(() => this._assets.readJson(constants.ASSET_PROCESS_JSON))
+      .switchMap(() => this._assets.readJson(ASSET_PROCESS_JSON))
       .switchMap((data: IProcess) => {
 
         // Set process title.

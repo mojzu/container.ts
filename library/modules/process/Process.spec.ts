@@ -1,13 +1,13 @@
 /// <reference types="jasmine" />
-import * as constants from "../../constants";
 import { Container, Environment } from "../../container";
-import { Assets } from "../assets";
-import { Process } from "./process";
+import { ASSETS_PATH } from "../../examples";
+import { ENV_ASSETS_PATH, Assets } from "../assets/Assets";
+import { Process } from "./Process";
 
 describe("Process", () => {
 
   const ENVIRONMENT = new Environment()
-    .set(constants.ENV_ASSETS, constants.DEFAULT_ASSETS);
+    .set(ENV_ASSETS_PATH, ASSETS_PATH);
 
   const CONTAINER = new Container("test", ENVIRONMENT)
     .registerModule(Assets)

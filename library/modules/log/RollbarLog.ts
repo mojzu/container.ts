@@ -1,28 +1,33 @@
 import * as assert from "assert";
-import * as constants from "../../constants";
 import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "../../container";
-import { Log } from "./log";
+import { Process } from "../process/Process";
+import { Log } from "./Log";
 
 // Rollbar does not have defined types.
-const Rollbar: any = require("rollbar");
+const ROLLBAR = require("rollbar");
+
+// TODO: Validation library.
+export const ENV_ROLLBAR_ACCESS_TOKEN = "ROLLBAR_ACCESS_TOKEN";
+export const ENV_ROLLBAR_REPORT_LEVEL = "ROLLBAR_REPORT_LEVEL";
 
 export class RollbarLog extends Log {
 
+  private _process: Process;
   private _rollbar: any;
 
   public constructor(name: string, opts: IContainerModuleOpts) {
-    super(name, opts);
+    super(name, opts, { _process: Process.name });
 
     // Get Node environment value.
-    const environment = this.environment.get(constants.ENV_NODE_ENV) || constants.DEFAULT_NODE_ENV;
+    const environment = this._process.nodeEnvironment;
     this.debug(`environment '${environment}'`);
 
     // Get access token from environment.
-    const accessToken = this.environment.get(constants.ENV_ROLLBAR_ACCESS_TOKEN);
+    const accessToken = this.environment.get(ENV_ROLLBAR_ACCESS_TOKEN);
     assert(accessToken != null, "Rollbar access token is undefined");
 
     // Get report level from environment or fall back on log level.
-    const rawReportLevel = this.environment.get(constants.ENV_ROLLBAR_REPORT_LEVEL);
+    const rawReportLevel = this.environment.get(ENV_ROLLBAR_REPORT_LEVEL);
     const reportLevel = this.reportLevel(rawReportLevel);
     this.debug(`reportLevel '${reportLevel}'`);
 
@@ -30,7 +35,7 @@ export class RollbarLog extends Log {
     // Report level determined by module log level.
     // Handle uncaught exceptions and unhandled rejections by default.
     // Uncaught errors have 'critical' level by default.
-    this._rollbar = new Rollbar({
+    this._rollbar = new ROLLBAR({
       environment,
       accessToken,
       reportLevel,

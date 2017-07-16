@@ -1,4 +1,3 @@
-import * as constants from "../../constants";
 import {
   IContainerModuleOpts,
   IContainerModuleDepends,
@@ -6,6 +5,9 @@ import {
   ContainerLogMessage,
   ELogLevel,
 } from "../../container";
+
+// TODO: Validation library.
+export const ENV_LOG_LEVEL = "LOG_LEVEL";
 
 export abstract class Log extends ContainerModule {
 
@@ -17,7 +19,7 @@ export abstract class Log extends ContainerModule {
     super(name, opts, depends);
 
     // Get log level from environment or fall back on default.
-    const rawLevel = this.environment.get(constants.ENV_LOG_LEVEL) || constants.DEFAULT_LOG_LEVEL;
+    const rawLevel = this.environment.get(ENV_LOG_LEVEL) || "info";
     this._level = this.parseLevel(rawLevel);
     this.debug(`level '${ELogLevel[this.level]}'`);
 
