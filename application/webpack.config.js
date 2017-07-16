@@ -21,24 +21,8 @@ function externalDependencies() {
 function rxJsDependencies() {
   var externals = {};
   var dependencies = [
-    "rxjs/Observable",
-    "rxjs/Subject",
-    "rxjs/BehaviorSubject",
-    "rxjs/add/observable/of",
-    "rxjs/add/observable/throw",
-    "rxjs/add/observable/forkJoin",
-    "rxjs/add/observable/bindNodeCallback",
-    "rxjs/add/observable/fromEvent",
-    "rxjs/add/operator/do",
-    "rxjs/add/operator/map",
-    "rxjs/add/operator/catch",
-    "rxjs/add/operator/filter",
-    "rxjs/add/operator/switchMap",
-    "rxjs/add/operator/mergeMap",
-    "rxjs/add/operator/take",
-    "rxjs/add/operator/takeUntil",
-    "rxjs/add/operator/takeWhile",
-    "rxjs/add/operator/timeout",
+    // "rxjs/Observable",
+    // ...
   ];
   for (var key of dependencies) {
     externals[key] = "commonjs rxjs";
@@ -84,5 +68,6 @@ module.exports = {
   // Do not bundle Node modules.
   externals: [externalDependencies(), rxJsDependencies(), {
     // Additional external dependencies added here.
+    "container.ts/modules": "commonjs container.ts/modules",
   }],
 };

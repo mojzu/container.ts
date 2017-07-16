@@ -80,10 +80,11 @@ gulp.task("start", ["assets", "tsc"], (done) => {
   shell.run("node dist/main.js", packagePath, done);
 });
 
-// Start application with Chrome V8 inspector.
-gulp.task("inspect", ["assets", "tsc"], (done) => {
-  shell.run("node --inspect dist/main.js", packagePath, done);
-});
+// // Start application with Chrome V8 inspector.
+// // TODO: VSCode debugger integration.
+// gulp.task("inspect", ["assets", "tsc"], (done) => {
+//   shell.run("node --inspect dist/main.js", packagePath, done);
+// });
 
 // Build application binary.
 gulp.task("build", ["assets", "webpack", "lint"], (done) => {

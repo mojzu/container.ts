@@ -4,9 +4,7 @@ const gutil = require("gulp-util");
 const del = require("del");
 
 module.exports = {
-  /**
-   * Delete relative paths to absolute root.
-   */
+  /** Delete relative paths to absolute root. */
   run: (root, paths, done) => {
     const absolutePaths = paths.map((p) => path.join(root, p));
 

@@ -1,18 +1,12 @@
-const Jasmine = require("jasmine");
-const jasmine = new Jasmine();
+const JASMINE = require("jasmine");
+const SPECS = new JASMINE();
 
-// Run tests for `*.spec.js` files
-jasmine.loadConfig({
+// Run tests for compiled `*.spec.js` files
+SPECS.loadConfig({
   spec_dir: "dist",
   spec_files: [
-    // Run all tests.
     "**/*[spec].js",
-
-    // // Run tests by specifying file(s) here.
-    // "main.spec.js",
   ],
 });
-jasmine.configureDefaultReporter({
-  showColors: true,
-});
-jasmine.execute();
+SPECS.configureDefaultReporter({ showColors: true });
+SPECS.execute();
