@@ -1,7 +1,7 @@
 {
   "name": "container.ts",
-  "version": "0.3.0",
-  "description": "Modular applications framework",
+  "version": "0.4.0",
+  "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
   "repository": "https://github.com/mojzu/templates.ts",
@@ -29,7 +29,9 @@
   "dependencies": {
     "awilix": "^2.6.0",
     "debug": "^2.6.8",
-    "rxjs": "^5.4.2",
+    "rxjs": "^5.4.2"
+  },
+  "optionalDependencies": {
     "statsd-client": "^0.4.0"
   },
   "devDependencies": {
