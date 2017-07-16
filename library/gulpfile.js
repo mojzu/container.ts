@@ -23,6 +23,9 @@ gulp.task("clean", (done) => {
     "container/**/*.d.ts",
     "container/**/*.js",
     "container/**/*.js.map",
+    "examples/index.d.ts",
+    "examples/index.js",
+    "examples/index.js.map",
     "modules/**/*.d.ts",
     "modules/**/*.js",
     "modules/**/*.js.map"
