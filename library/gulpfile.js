@@ -12,6 +12,7 @@ const packageJson = require("./package.json");
 // Delete compiled files.
 gulp.task("clean", (done) => {
   clean.run(packagePath, [
+    "coverage",
     "*.tgz",
     "*.log",
     "test.d.ts",
