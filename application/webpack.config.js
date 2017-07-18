@@ -69,5 +69,6 @@ module.exports = {
   externals: [externalDependencies(), rxJsDependencies(), {
     // Additional external dependencies added here.
     "container.ts/modules": "commonjs container.ts/modules",
+    "container.ts/lib/validate": "commonjs container.ts/lib/validate",
   }],
 };
