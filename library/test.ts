@@ -7,6 +7,7 @@ SPECS.loadConfig({
   spec_files: [
     "container/**/*[spec].js",
     "modules/**/*[spec].js",
+    "lib/**/*[spec].js",
   ],
 });
 SPECS.configureDefaultReporter({ showColors: true });

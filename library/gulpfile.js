@@ -29,7 +29,10 @@ gulp.task("clean", (done) => {
     "examples/index.js.map",
     "modules/**/*.d.ts",
     "modules/**/*.js",
-    "modules/**/*.js.map"
+    "modules/**/*.js.map",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map",
   ], done);
 });
 
