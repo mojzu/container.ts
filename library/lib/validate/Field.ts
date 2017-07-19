@@ -65,6 +65,24 @@ export class StringField extends Field {
   }
 }
 
+export class LanguageField extends Field {
+  public validate(value: string): string {
+    return Validate.isLanguage(value);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class CountryField extends Field {
+  public validate(value: string): string {
+    return Validate.isCountry(value);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
 export class TimeZoneField extends Field {
   public validate(value: string): string {
     return Validate.isTimeZone(value);

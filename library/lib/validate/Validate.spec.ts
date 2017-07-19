@@ -108,6 +108,20 @@ describe("Validate", () => {
     }
   });
 
+  // Language tests.
+
+  it("#isLanguage", () => {
+    const language = Validate.isLanguage("en");
+    expect(language).toEqual("en");
+  });
+
+  // Country tests.
+
+  it("#isCountry", () => {
+    const country = Validate.isCountry("GB");
+    expect(country).toEqual("GB");
+  });
+
   // Time zone tests.
 
   it("#isTimeZone", () => {

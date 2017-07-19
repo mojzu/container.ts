@@ -1,5 +1,6 @@
 import * as validator from "validator";
 import * as moment from "moment-timezone";
+import { ISO639, ISO3166 } from "./data";
 
 /**
  * Validation error codes enumeration.
@@ -7,6 +8,8 @@ import * as moment from "moment-timezone";
 export enum ValidateErrorCode {
   InvalidBoolean,
   InvalidString,
+  InvalidLanguage,
+  InvalidCountry,
   InvalidTimeZone,
   InvalidArray,
 }
@@ -97,6 +100,22 @@ export class Validate {
     }
 
     return value;
+  }
+
+  public static isLanguage(value = ""): string {
+    try {
+      return Validate.isString(value.toLowerCase(), { minimum: 2, maximum: 2, values: ISO639 });
+    } catch (error) {
+      throw new ValidateError(ValidateErrorCode.InvalidLanguage, error);
+    }
+  }
+
+  public static isCountry(value = ""): string {
+    try {
+      return Validate.isString(value.toUpperCase(), { minimum: 2, maximum: 2, values: ISO3166 });
+    } catch (error) {
+      throw new ValidateError(ValidateErrorCode.InvalidCountry, error);
+    }
   }
 
   public static isTimeZone(value = ""): string {
