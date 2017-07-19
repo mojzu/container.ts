@@ -21,7 +21,7 @@
     "build": "gulp build"
   },
   "dependencies": {
-    "container.ts": "^0.5.0",
+    "container.ts": "^0.6.0",
     "rxjs": "^5.4.2"
   },
   "devDependencies": {
@@ -38,11 +38,11 @@
     "istanbul": "^0.4.5",
     "jasmine": "^2.6.0",
     "pkg": "^4.1.2",
-    "ts-loader": "^2.3.0",
+    "ts-loader": "^2.3.1",
     "tslint": "^5.5.0",
     "tslint-eslint-rules": "^4.1.1",
     "typedoc": "^0.7.1",
-    "typescript": "^2.4.1",
+    "typescript": "^2.4.2",
     "webpack": "^3.3.0"
   }
 }
