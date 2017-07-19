@@ -3,6 +3,9 @@ import { ValidateErrorCode, ValidateError, Validate } from "./Validate";
 
 describe("Validate", () => {
 
+  const invalidBoolean = ValidateErrorCode[ValidateErrorCode.InvalidBoolean];
+  const invalidString = ValidateErrorCode[ValidateErrorCode.InvalidString];
+
   // Error tests.
 
   it("#ValidateError is instance of Error and ValidateError", () => {
@@ -12,10 +15,17 @@ describe("Validate", () => {
   });
 
   it("#ValidateError has expected properties", () => {
-    const error = new ValidateError();
+    const error = new ValidateError(ValidateErrorCode.InvalidBoolean);
     expect(error.name).toEqual("ValidateError");
     expect(error.stack).toBeDefined();
-    expect(error.message).toBeDefined();
+    expect(error.message).toEqual(invalidBoolean);
+  });
+
+  it("#ValidateError passed thrown error has formatting", () => {
+    const error = new ValidateError(ValidateErrorCode.InvalidString, new Error("Unknown"));
+    expect(error.name).toEqual("ValidateError");
+    expect(error.stack).toBeDefined();
+    expect(error.message).toEqual(`${invalidString}: Error: Unknown`);
   });
 
   // Boolean tests.
@@ -35,8 +45,6 @@ describe("Validate", () => {
   });
 
   // String tests.
-
-  const invalidString = ValidateErrorCode[ValidateErrorCode.InvalidString];
 
   it("#isString string", () => {
     const value = Validate.isString("foo");
@@ -65,7 +73,6 @@ describe("Validate", () => {
     } catch (error) {
       expect(error instanceof Error).toEqual(true);
       expect(error.name).toEqual("ValidateError");
-      expect(error.message).toEqual("TypeError");
     }
   });
 
@@ -76,7 +83,6 @@ describe("Validate", () => {
     } catch (error) {
       expect(error instanceof Error).toEqual(true);
       expect(error.name).toEqual("ValidateError");
-      expect(error.message).toEqual(invalidString);
     }
   });
 
@@ -102,9 +108,11 @@ describe("Validate", () => {
     }
   });
 
-  it("#isStringArray array of strings", () => {
-    const values = Validate.isStringArray(["foo", "bar"]);
-    expect(values).toEqual(["foo", "bar"]);
+  // Time zone tests.
+
+  it("#isTimeZone", () => {
+    const timezone = Validate.isTimeZone("Europe/London");
+    expect(timezone).toEqual("Europe/London");
   });
 
 });

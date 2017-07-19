@@ -1,36 +1,33 @@
 import * as validator from "validator";
+import * as moment from "moment-timezone";
 
 /**
  * Validation error codes enumeration.
  */
 export enum ValidateErrorCode {
+  InvalidBoolean,
   InvalidString,
-  InvalidArray,
+  InvalidTimeZone,
 }
 
 /** Validation code message string or unknown. */
-function validateErrorMessage(message?: number | string) {
-  if (typeof message === "number") {
-    return ValidateErrorCode[message] || "Unknown";
-  } else {
-    return message || "Unknown";
+function validateErrorMessage(code: number, error?: any) {
+  let message = ValidateErrorCode[code] || "Unknown";
+  if (error != null) {
+    message += `: ${error}`;
   }
-}
-
-/** Throw error if values are not an array. */
-function validateIsArray(values: any): void {
-  if (!Array.isArray(values)) {
-    throw new ValidateError(ValidateErrorCode.InvalidArray);
-  }
+  return message;
 }
 
 /** Validate error class. */
 export class ValidateError extends Error {
-  public constructor(message?: number | string) {
-    const error: any = super(validateErrorMessage(message));
+  public thrownError?: any;
+  public constructor(code: number, thrownError?: any) {
+    const error: any = super(validateErrorMessage(code, thrownError));
     this.name = error.name = "ValidateError";
     this.stack = error.stack;
     this.message = error.message;
+    this.thrownError = thrownError;
   }
 }
 
@@ -62,13 +59,8 @@ export class Validate {
     try {
       return validator.toBoolean(value, strict);
     } catch (error) {
-      throw new ValidateError(error.name);
+      throw new ValidateError(ValidateErrorCode.InvalidBoolean, error);
     }
-  }
-
-  public static isBooleanArray(values: string[] = [], options: IValidateBooleanOptions = {}): boolean[] {
-    validateIsArray(values);
-    return values.map((value) => Validate.isBoolean(value, options));
   }
 
   public static isString(value = "", options: IValidateStringOptions = {}): string {
@@ -93,7 +85,7 @@ export class Validate {
         inArray = validator.isIn(value, values);
       }
     } catch (error) {
-      throw new ValidateError(error.name);
+      throw new ValidateError(ValidateErrorCode.InvalidString, error);
     }
 
     const notInArray = (values.length > 0) && !inArray;
@@ -106,9 +98,12 @@ export class Validate {
     return value;
   }
 
-  public static isStringArray(values: string[] = [], options: IValidateStringOptions = {}): string[] {
-    validateIsArray(values);
-    return values.map((value) => Validate.isString(value, options));
+  public static isTimeZone(value = ""): string {
+    try {
+      return Validate.isString(value, { values: moment.tz.names() });
+    } catch (error) {
+      throw new ValidateError(ValidateErrorCode.InvalidTimeZone, error);
+    }
   }
 
 }
