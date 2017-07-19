@@ -8,6 +8,7 @@ export enum ValidateErrorCode {
   InvalidBoolean,
   InvalidString,
   InvalidTimeZone,
+  InvalidArray,
 }
 
 /** Validation code message string or unknown. */
