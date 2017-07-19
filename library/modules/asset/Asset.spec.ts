@@ -1,17 +1,17 @@
 /// <reference types="jasmine" />
 import { Container, Environment } from "../../container";
-import { ASSETS_PATH } from "../../examples";
-import { ENV_ASSETS_PATH, Assets } from "./Assets";
+import { ASSET_PATH } from "../../examples";
+import { ENV_ASSET_PATH, Asset } from "./Asset";
 
-describe("Assets", () => {
+describe("Asset", () => {
 
   const ENVIRONMENT = new Environment()
-    .set(ENV_ASSETS_PATH, ASSETS_PATH);
+    .set(ENV_ASSET_PATH, ASSET_PATH);
 
   const CONTAINER = new Container("test", ENVIRONMENT)
-    .registerModule(Assets);
+    .registerModule(Asset);
 
-  const ASSETS = CONTAINER.resolve<Assets>(Assets.name);
+  const ASSET = CONTAINER.resolve<Asset>(Asset.name);
 
   beforeAll((done) => {
     CONTAINER.start()
@@ -29,11 +29,11 @@ describe("Assets", () => {
       });
   });
 
-  it("#Assets", () => {
-    expect(ASSETS).toBeDefined();
-    expect(ASSETS.name).toEqual(Assets.name);
-    expect(ASSETS.path).toBeDefined();
-    expect(ASSETS.cache).toEqual({});
+  it("#Asset", () => {
+    expect(ASSET).toBeDefined();
+    expect(ASSET.name).toEqual(Asset.name);
+    expect(ASSET.path).toBeDefined();
+    expect(ASSET.cache).toEqual({});
   });
 
 });

@@ -4,7 +4,7 @@ import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import "rxjs/add/operator/switchMap";
 import { IContainerModuleOpts, ContainerModule } from "../../container";
-import { Assets } from "../assets/Assets";
+import { Asset } from "../asset/Asset";
 
 /** Process information interface. */
 export interface IProcess {
@@ -30,7 +30,7 @@ export class Process extends ContainerModule {
     return process.title;
   }
 
-  private _assets: Assets;
+  private _asset: Asset;
   private _version: string;
 
   public get title(): string { return Process.title; }
@@ -42,16 +42,16 @@ export class Process extends ContainerModule {
   }
 
   public constructor(name: string, opts: IContainerModuleOpts) {
-    super(name, opts, { _assets: Assets.name });
+    super(name, opts, { _asset: Asset.name });
 
     // Default unknown version value.
     this._version = "0.0.0-unknown";
   }
 
-  /** Read process information assets file, handle process events. */
+  /** Read process information asset file, handle process events. */
   public start(): Observable<void> {
-    return this.container.waitStarted(Assets.name)
-      .switchMap(() => this._assets.readJson(ASSET_PROCESS_JSON))
+    return this.container.waitStarted(Asset.name)
+      .switchMap(() => this._asset.readJson(ASSET_PROCESS_JSON))
       .switchMap((data: IProcess) => {
 
         // Set process title.

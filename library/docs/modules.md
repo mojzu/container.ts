@@ -2,7 +2,7 @@
 
 Application functionality is split into interdependent modules, dependency injection is handled by the `Container` class.
 
-#### Assets
+#### Asset
 
 Read only files packaged with application binary.
 
@@ -10,7 +10,7 @@ Read only files packaged with application binary.
 
 Node.js process interface, reads `process.json` file asset to get package name and version. A `ChildProcess` module is also included for use by scripts, to support interprocess communication and forwarding logs and metrics to parent process.
 
-#### Scripts
+#### Script
 
 Node.js scripts packaged with application binary.
 

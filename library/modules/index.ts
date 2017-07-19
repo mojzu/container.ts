@@ -1,4 +1,4 @@
-export * from "./assets/Assets";
+export * from "./asset/Asset";
 export * from "./log/Log";
 export * from "./log/RollbarLog";
 export * from "./log/WinstonLog";
@@ -6,4 +6,4 @@ export * from "./metric/Metric";
 export * from "./metric/StatsdMetric";
 export * from "./process/Process";
 export * from "./process/ChildProcess";
-export * from "./scripts/Scripts";
+export * from "./script/Script";

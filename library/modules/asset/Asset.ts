@@ -10,31 +10,31 @@ import "rxjs/add/operator/do";
 import "rxjs/add/operator/map";
 import { IContainerModuleOpts, ContainerModule } from "../../container";
 
-/** Assets files cached when read. */
-export interface IAssetsCache {
+/** Asset files cached when read. */
+export interface IAssetCache {
   [key: string]: Buffer | string | object;
 }
 
 // TODO: Split caches.
 // TODO: Validation library.
-export const ENV_ASSETS_PATH = "ASSETS_PATH";
+export const ENV_ASSET_PATH = "ASSET_PATH";
 
 /** Assets read only files interface. */
-export class Assets extends ContainerModule {
+export class Asset extends ContainerModule {
 
   private _path: string;
-  private _cache: IAssetsCache = {};
+  private _cache: IAssetCache = {};
 
   public get path(): string { return this._path; }
-  public get cache(): IAssetsCache { return this._cache; }
+  public get cache(): IAssetCache { return this._cache; }
 
   public constructor(name: string, opts: IContainerModuleOpts) {
     super(name, opts);
 
-    // Get assets directory path from environment.
-    const assetsPath = this.environment.get(ENV_ASSETS_PATH);
-    assert(assetsPath != null, "Assets path is undefined");
-    this._path = path.resolve(assetsPath);
+    // Get asset directory path from environment.
+    const assetPath = this.environment.get(ENV_ASSET_PATH);
+    assert(assetPath != null, "Assets path is undefined");
+    this._path = path.resolve(assetPath);
     this.debug(`path '${this.path}'`);
   }
 
@@ -42,7 +42,7 @@ export class Assets extends ContainerModule {
   public readFile(target: string): Observable<Buffer>;
   public readFile(target: string, encoding?: string): Observable<string>;
 
-  /** Read assets file contents with optional encoding. */
+  /** Read asset file contents with optional encoding. */
   public readFile(target: string, encoding?: string): Observable<Buffer | string> {
     return this.read<Buffer | string>(target, encoding)
       .do((data) => {
@@ -51,7 +51,7 @@ export class Assets extends ContainerModule {
       });
   }
 
-  /** Read assets file contents and parse JSON object. */
+  /** Read asset file contents and parse JSON object. */
   public readJson(target: string, encoding = "utf8"): Observable<object> {
     return this.read<string>(target, encoding)
       .map((data) => {
@@ -66,7 +66,7 @@ export class Assets extends ContainerModule {
       });
   }
 
-  /** Read assets file contents. */
+  /** Read asset file contents. */
   protected read<T>(target: string, encoding?: string): Observable<T> {
     // Assets are read only, if contents defined in cache, return now.
     if (this.cache[target] != null) {
