@@ -24,9 +24,7 @@ function validateIsArray(values: any): void {
   }
 }
 
-/**
- * Validation error class.
- */
+/** Validate error class. */
 export class ValidateError extends Error {
   public constructor(message?: number | string) {
     const error: any = super(validateErrorMessage(message));
@@ -60,7 +58,7 @@ export interface IValidateStringOptions {
 export class Validate {
 
   public static isBoolean(value = "", options: IValidateBooleanOptions = {}): boolean {
-    const strict = options.strict || false;
+    const strict = !!options.strict;
     try {
       return validator.toBoolean(value, strict);
     } catch (error) {
@@ -74,7 +72,7 @@ export class Validate {
   }
 
   public static isString(value = "", options: IValidateStringOptions = {}): string {
-    const empty = options.empty || false;
+    const emptyIsAllowed = !!options.empty;
     const minimum = options.minimum || 1;
     const maximum = options.maximum;
     const values = options.values || [];
@@ -87,7 +85,7 @@ export class Validate {
       // Validate is string of length.
       isValid = validator.isLength(value, minimum, maximum);
       // Check if empty if allowed.
-      if (empty) {
+      if (emptyIsAllowed) {
         isEmpty = validator.isEmpty(value);
       }
       // Check in array if provided.
@@ -99,7 +97,7 @@ export class Validate {
     }
 
     const notInArray = (values.length > 0) && !inArray;
-    const notValid = !(empty && isEmpty) && !isValid;
+    const notValid = !(emptyIsAllowed && isEmpty) && !isValid;
 
     if (notInArray || notValid) {
       throw new ValidateError(ValidateErrorCode.InvalidString);
