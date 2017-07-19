@@ -1,13 +1,13 @@
 import * as process from "process";
 import { Container, Environment } from "container.ts";
 import {
-  ENV_ASSETS_PATH,
-  ENV_SCRIPTS_PATH,
+  ENV_ASSET_PATH,
+  ENV_SCRIPT_PATH,
   ENV_ROLLBAR_ACCESS_TOKEN,
   ENV_STATSD_HOST,
-  Assets,
+  Asset,
   Process,
-  Scripts,
+  Script,
   WinstonLog,
   RollbarLog,
   StatsdMetric,
@@ -26,15 +26,15 @@ const NAME = ENVIRONMENT.get(constants.ENV_NAME) || constants.DEFAULT_NAME;
 // Set application values in environment.
 ENVIRONMENT
   .set(constants.ENV_NAME, NAME)
-  .set(ENV_ASSETS_PATH, constants.DEFAULT_ASSETS_PATH)
-  .set(ENV_SCRIPTS_PATH, constants.DEFAULT_SCRIPTS_PATH);
+  .set(ENV_ASSET_PATH, constants.DEFAULT_ASSET_PATH)
+  .set(ENV_SCRIPT_PATH, constants.DEFAULT_SCRIPT_PATH);
 
 // Create container instance with name and environment.
 // Populate container for dependency injection.
 const CONTAINER = new Container(NAME, ENVIRONMENT)
-  .registerModule(Assets)
+  .registerModule(Asset)
   .registerModule(Process)
-  .registerModule(Scripts)
+  .registerModule(Script)
   .registerModule(WinstonLog);
 
 // Register additional modules based on environment definitions.
