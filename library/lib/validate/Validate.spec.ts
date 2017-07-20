@@ -44,6 +44,36 @@ describe("Validate", () => {
     }
   });
 
+  // Integer tests.
+
+  it("#isInterger throws error for invalid input", () => {
+    try {
+      Validate.isInteger("foo");
+      fail();
+    } catch (error) {
+      expect(error instanceof ValidateError).toEqual(true);
+    }
+  });
+
+  it("#isInteger", () => {
+    expect(Validate.isInteger("-4")).toEqual(-4);
+  });
+
+  // Float tests.
+
+  it("#isFloat throws error for invalid input", () => {
+    try {
+      Validate.isFloat("foo");
+      fail();
+    } catch (error) {
+      expect(error instanceof ValidateError).toEqual(true);
+    }
+  });
+
+  it("#isFloat", () => {
+    expect(Validate.isFloat("42.0")).toEqual(42.0);
+  });
+
   // String tests.
 
   it("#isString string", () => {
@@ -57,7 +87,7 @@ describe("Validate", () => {
   });
 
   it("#isString string of length", () => {
-    const value = Validate.isString("escape", { maximum: 7 });
+    const value = Validate.isString("escape", { max: 7 });
     expect(value).toEqual("escape");
   });
 
@@ -88,7 +118,7 @@ describe("Validate", () => {
 
   it("#isString string is too long", () => {
     try {
-      Validate.isString("foobar", { maximum: 3 });
+      Validate.isString("foobar", { max: 3 });
       fail();
     } catch (error) {
       expect(error instanceof Error).toEqual(true);
@@ -105,6 +135,32 @@ describe("Validate", () => {
       expect(error instanceof Error).toEqual(true);
       expect(error.name).toEqual("ValidateError");
       expect(error.message).toEqual(invalidString);
+    }
+  });
+
+  // Port tests.
+
+  it("#isPort", () => {
+    expect(Validate.isPort("3000")).toEqual(3000);
+  });
+
+  it("#isPort throws error for invalid input", () => {
+    try {
+      Validate.isPort("foo");
+      fail();
+    } catch (error) {
+      expect(error instanceof Error).toEqual(true);
+      expect(error.name).toEqual("ValidateError");
+    }
+  });
+
+  it("#isPort throws error for out of range number", () => {
+    try {
+      Validate.isPort("0");
+      fail();
+    } catch (error) {
+      expect(error instanceof Error).toEqual(true);
+      expect(error.name).toEqual("ValidateError");
     }
   });
 
@@ -127,6 +183,18 @@ describe("Validate", () => {
   it("#isTimeZone", () => {
     const timezone = Validate.isTimeZone("Europe/London");
     expect(timezone).toEqual("Europe/London");
+  });
+
+  // Email tests.
+
+  it("#isEmail throws error for invalid input", () => {
+    try {
+      Validate.isEmail("bar");
+      fail();
+    } catch (error) {
+      expect(error instanceof Error).toEqual(true);
+      expect(error.name).toEqual("ValidateError");
+    }
   });
 
 });

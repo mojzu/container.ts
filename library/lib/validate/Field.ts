@@ -1,8 +1,16 @@
+import * as moment from "moment-timezone";
 import {
   ValidateErrorCode,
   ValidateError,
   IValidateBooleanOptions,
+  IValidateIntegerOptions,
+  IValidateNumberOptions,
   IValidateStringOptions,
+  IValidateDateOptions,
+  IValidateIpOptions,
+  IValidateDomainOptions,
+  IValidateUrlOptions,
+  IValidateEmailOptions,
   Validate,
 } from "./Validate";
 
@@ -53,6 +61,30 @@ export class BooleanField extends Field {
   }
 }
 
+export class IntegerField extends Field {
+  public constructor(private _options: IValidateIntegerOptions = {}) {
+    super();
+  }
+  public validate(value: string): number {
+    return Validate.isInteger(value, this._options);
+  }
+  public format(value: number): string {
+    return String(value);
+  }
+}
+
+export class FloatField extends Field {
+  public constructor(private _options: IValidateNumberOptions = {}) {
+    super();
+  }
+  public validate(value: string): number {
+    return Validate.isFloat(value, this._options);
+  }
+  public format(value: number): string {
+    return String(value);
+  }
+}
+
 export class StringField extends Field {
   public constructor(private _options: IValidateStringOptions = {}) {
     super();
@@ -62,6 +94,39 @@ export class StringField extends Field {
   }
   public format(value: string): string {
     return value;
+  }
+}
+
+export class AsciiField extends Field {
+  public constructor(private _options: IValidateStringOptions = {}) {
+    super();
+  }
+  public validate(value: string): string {
+    return Validate.isAscii(value, this._options);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class Base64Field extends Field {
+  public constructor(private _options: IValidateStringOptions = {}) {
+    super();
+  }
+  public validate(value: string): string {
+    return Validate.isBase64(value, this._options);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class PortField extends Field {
+  public validate(value: string): number {
+    return Validate.isPort(value);
+  }
+  public format(value: number): string {
+    return String(value);
   }
 }
 
@@ -86,6 +151,75 @@ export class CountryField extends Field {
 export class TimeZoneField extends Field {
   public validate(value: string): string {
     return Validate.isTimeZone(value);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class DateField extends Field {
+  public constructor(private _options: IValidateDateOptions = {}) {
+    super();
+  }
+  public validate(value: string): moment.Moment {
+    return Validate.isDate(value, this._options);
+  }
+  public format(value: moment.Moment): string {
+    return value.format();
+  }
+}
+
+export class IpField extends Field {
+  public constructor(private _options: IValidateIpOptions = {}) {
+    super();
+  }
+  public validate(value: string): string {
+    return Validate.isIp(value, this._options);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class DomainField extends Field {
+  public constructor(private _options: IValidateDomainOptions = {}) {
+    super();
+  }
+  public validate(value: string): string {
+    return Validate.isDomain(value, this._options);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class UrlField extends Field {
+  public constructor(private _options: IValidateUrlOptions = { require_host: true }) {
+    super();
+  }
+  public validate(value: string): string {
+    return Validate.isUrl(value, this._options);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class EmailField extends Field {
+  public constructor(private _options: IValidateEmailOptions = {}) {
+    super();
+  }
+  public validate(value: string): string {
+    return Validate.isEmail(value, this._options);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class MongoIdField extends Field {
+  public validate(value: string): string {
+    return Validate.isMongoId(value);
   }
   public format(value: string): string {
     return value;
