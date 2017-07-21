@@ -25,8 +25,45 @@ export abstract class Field {
   public abstract format(value: any, context?: any): any;
 }
 
-/** Array field wrapper, uses field to validate/format array of values. */
-export class ArrayField<T> implements Field {
+/**
+ * Optional field wrapper, if value is defined uses field to validate/format.
+ * If value is undefined default or null value is returned.
+ */
+export class OptionalField<T> extends Field {
+
+  private _formatDefault: string | null;
+
+  public constructor(private _field: Field, private _default?: T, context?: any) {
+    super();
+    this._formatDefault = this.format(_default, context);
+  }
+
+  public validate(value?: string, context?: any): T | null {
+    if (value == null) {
+      if (this._formatDefault == null) {
+        return null;
+      }
+      return this._field.validate(this._formatDefault, context);
+    }
+    return this._field.validate(value, context);
+  }
+
+  public format(value?: T, context?: any): string | null {
+    if (value == null) {
+      if (this._default == null) {
+        return null;
+      }
+      return this._field.format(this._default, context);
+    }
+    return this._field.format(value, context);
+  }
+
+}
+
+/**
+ * Array field wrapper, uses field to validate/format array of values.
+ */
+export class ArrayField<T> extends Field {
 
   /** Throw error if values are not an array. */
   public static isArray(values: any): void {
@@ -35,7 +72,9 @@ export class ArrayField<T> implements Field {
     }
   }
 
-  public constructor(private _field: Field) { }
+  public constructor(private _field: Field) {
+    super();
+  }
 
   public validate(values: string[], context?: any): T[] {
     ArrayField.isArray(values);

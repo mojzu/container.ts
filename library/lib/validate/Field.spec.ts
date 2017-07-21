@@ -1,7 +1,35 @@
 /// <reference types="jasmine" />
-import { ArrayField, BooleanField } from "./Field";
+import {
+  OptionalField,
+  ArrayField,
+  IntegerField,
+  BooleanField,
+} from "./Field";
 
 describe("Field", () => {
+
+  const integerField = new IntegerField();
+  const optionalIntegerField = new OptionalField(integerField, 1);
+
+  it("#IntegerField validate", () => {
+    const value = integerField.validate("1");
+    expect(value).toEqual(1);
+  });
+
+  it("#IntegerField format", () => {
+    const value = integerField.format(1);
+    expect(value).toEqual("1");
+  });
+
+  it("#OptionalField validate", () => {
+    const value = optionalIntegerField.validate();
+    expect(value).toEqual(1);
+  });
+
+  it("#OptionalField format", () => {
+    const value = optionalIntegerField.format();
+    expect(value).toEqual("1");
+  });
 
   const booleanField = new BooleanField();
   const booleanArrayField = new ArrayField<boolean>(booleanField);

@@ -1,4 +1,3 @@
-import { ValidateError } from "./Validate";
 import { Field } from "./Field";
 
 /** Schema error class. */
@@ -21,6 +20,13 @@ export interface ISchemaMap {
   [key: string]: ISchemaMap | Schema | Field;
 }
 
+/** Schema map callback handlers. */
+export interface ISchemaMapHandlers {
+  isSchemaMap?: (map: ISchemaMap, key: string) => void;
+  isSchema?: (schema: any, key: string) => void;
+  isField?: (field: Field, key: string) => void;
+}
+
 export abstract class Schema {
 
   /** Schema map, override in child classes. */
@@ -37,94 +43,80 @@ export abstract class Schema {
   }
 
   /**
+   * Helper for iterating over schema fields.
+   * TODO: Asterisk support for wildcard fields.
+   */
+  public static map(map: ISchemaMap, handlers: ISchemaMapHandlers): void {
+    // For each key in schema map.
+    Object.keys(map).map((key) => {
+      const mapValue = map[key];
+
+      if (Schema.isSchema(mapValue) && (handlers.isSchema != null)) {
+
+        // Value is child schema.
+        const schema: any = mapValue as any;
+        handlers.isSchema(schema, key);
+
+      } else if ((mapValue instanceof Field) && (handlers.isField != null)) {
+
+        // Value is field class instance.
+        const field: Field = mapValue as any;
+        handlers.isField(field, key);
+
+      } else if ((typeof mapValue === "object") && (handlers.isSchemaMap != null)) {
+
+        // Value is schema map object.
+        const schemaMap: ISchemaMap = mapValue as any;
+        handlers.isSchemaMap(schemaMap, key);
+
+      } else {
+
+        // Unknown value.
+        throw new SchemaError(key);
+
+      }
+    });
+  }
+
+  /**
    * Validate input data, transform strings to typed values.
    * All static validation rules are applied, undefined data validation
-   * callbacks must provide a default value or throw an error.
+   * callbacks must provide a default value, null or throw an error.
    * @param data Input data.
    */
   public static validate<T extends ISchemaData>(data: any = {}, _map = this.MAP): T {
     const validated: any = {};
 
     try {
-      // For each key in schema map.
-      Object.keys(_map).map((key) => {
-        const mapValue = _map[key];
-
-        if (Schema.isSchema(mapValue)) {
-
-          // Value is child schema, call to static method.
-          const schema: any = mapValue as any;
-          validated[key] = schema.validate(data[key]);
-
-        } else if (mapValue instanceof Field) {
-
-          // Value is field class instance.
-          const field: Field = mapValue as any;
-          validated[key] = field.validate(data[key]);
-
-        } else if (typeof mapValue === "object") {
-
-          // Value is schema map object, recursive call.
-          const map: ISchemaMap = mapValue as any;
-          validated[key] = Schema.validate(data[key], map);
-
-        } else {
-
-          // Unknown value.
-          throw new SchemaError(key);
-
-        }
-      });
-    } catch (error) {
-      throw new ValidateError(error.name);
-    }
-
-    return validated;
-  }
-
-  /**
-   * Validate partial input data, transform object of strings to typed values.
-   * Classes static validation rules are only applied where data is present.
-   * @param data Partial input data.
-   */
-  public static validatePartial<T extends ISchemaData>(data: any = {}, _map = this.MAP): T {
-    const validated: any = {};
-
-    try {
-      // For each key in data object.
-      Object.keys(data).map((key) => {
-        const mapValue = _map[key];
-
-        if (mapValue != null) {
-          // Schema map value exists.
-          if (Schema.isSchema(mapValue)) {
-
-            // Value is child schema, call to static method.
-            const schema: any = mapValue as any;
-            validated[key] = schema.validatePartial(data[key]);
-
-          } else if (mapValue instanceof Field) {
-
-            // Value is field class instance.
-            const field: Field = mapValue as any;
-            validated[key] = field.validate(data[key]);
-
-          } else if (typeof mapValue === "object") {
-
-            // Value is a schema map object, recursive call.
-            const map: ISchemaMap = mapValue as any;
-            validated[key] = Schema.validatePartial(data[key], map);
-
-          } else {
-
-            // Unknown value.
-            throw new SchemaError(key);
-
+      Schema.map(_map, {
+        isSchemaMap: (map, key) => {
+          // Make recursive call for internal data maps.
+          // Only assign output if at least one field validated.
+          const output = Schema.validate(data[key], map);
+          if (Object.keys(output).length > 0) {
+            validated[key] = output;
           }
-        }
+        },
+        isSchema: (schema, key) => {
+          // Call static method of child schema.
+          // Only assign output if at least one field validated.
+          const output = schema.validate(data[key]);
+          if (Object.keys(output).length > 0) {
+            validated[key] = output;
+          }
+        },
+        isField: (field, key) => {
+
+          // Call validate method of field.
+          // Only assign output if defined.
+          const output = field.validate(data[key]);
+          if (output != null) {
+            validated[key] = output;
+          }
+        },
       });
     } catch (error) {
-      throw new ValidateError(error.name);
+      throw new SchemaError(error);
     }
 
     return validated;
@@ -139,40 +131,31 @@ export abstract class Schema {
     const formatted: any = {};
 
     try {
-      // For each key in data object.
-      Object.keys(data).map((key) => {
-        const mapValue = _map[key];
-
-        if (mapValue != null) {
-          // Schema map value exists.
-          if (Schema.isSchema(mapValue)) {
-
-            // Value is a child schema, call to static method.
-            const schema: any = mapValue as any;
-            formatted[key] = schema.format(data[key]);
-
-          } else if (mapValue instanceof Field) {
-
-            // Value is field class instance.
-            const field: Field = mapValue as any;
-            formatted[key] = field.format(data[key]);
-
-          } else if (typeof mapValue === "object") {
-
-            // Value is a schema map object, recursive call.
-            const map: ISchemaMap = mapValue as any;
-            formatted[key] = Schema.format(data[key], map);
-
-          } else {
-
-            // Unknown value.
-            throw new SchemaError(key);
-
+      Schema.map(_map, {
+        isSchemaMap: (map, key) => {
+          // Make recursive call for internal data maps.
+          const output = Schema.format(data[key], map);
+          if (Object.keys(output).length > 0) {
+            formatted[key] = output;
           }
-        }
+        },
+        isSchema: (schema, key) => {
+          // Call static method if child schema.
+          const output = schema.format(data[key]);
+          if (Object.keys(output).length > 0) {
+            formatted[key] = output;
+          }
+        },
+        isField: (field, key) => {
+          // Call format method of field.
+          const output = field.format(data[key]);
+          if (output != null) {
+            formatted[key] = output;
+          }
+        },
       });
     } catch (error) {
-      throw new ValidateError(error.name);
+      throw new SchemaError(error);
     }
 
     return formatted;

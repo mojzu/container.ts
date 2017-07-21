@@ -47,9 +47,6 @@ describe("Schema", () => {
       value1: "1",
     },
   };
-  const booleanPartialInputData = {
-    value1: "0",
-  };
   const booleanData: IBooleanData = {
     value1: true,
     value2: false,
@@ -62,21 +59,13 @@ describe("Schema", () => {
   };
 
   it("Boolean input data is validated", () => {
-    const data = BooleanDataSchema.validate<IBooleanData>(booleanInputData);
-    expect(data.value1).toEqual(true);
-    expect(data.value2).toEqual(false);
-    expect(data.group1).toBeDefined();
-    expect(data.group1.value1).toEqual(false);
-    expect(data.child1).toBeDefined();
-    expect(data.child1.value1).toEqual(true);
-  });
-
-  it("Boolean partial input data is validated", () => {
-    const data = BooleanDataSchema.validatePartial<IBooleanData>(booleanPartialInputData);
-    expect(data.value1).toEqual(false);
-    expect(data.value2).toBeUndefined();
-    expect(data.group1).toBeUndefined();
-    expect(data.child1).toBeUndefined();
+    const validated = BooleanDataSchema.validate<IBooleanData>(booleanInputData);
+    expect(validated.value1).toEqual(true);
+    expect(validated.value2).toEqual(false);
+    expect(validated.group1).toBeDefined();
+    expect(validated.group1.value1).toEqual(false);
+    expect(validated.child1).toBeDefined();
+    expect(validated.child1.value1).toEqual(true);
   });
 
   it("Boolean data is formatted", () => {
