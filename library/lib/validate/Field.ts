@@ -264,3 +264,21 @@ export class MongoIdField extends Field {
     return value;
   }
 }
+
+export class FileField extends Field {
+  public validate(value: string): string {
+    return Validate.isFile(value);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class DirectoryField extends Field {
+  public validate(value: string): string {
+    return Validate.isDirectory(value);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}

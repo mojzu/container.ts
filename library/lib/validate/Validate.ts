@@ -2,6 +2,10 @@ import * as validator from "validator";
 import * as moment from "moment-timezone";
 import { ISO639, ISO3166 } from "./data";
 
+// Conditionally import node for file/directory validators.
+const nodePath = (typeof window === "undefined") ? require("path") : null;
+const nodeFs = (typeof window === "undefined") ? require("fs") : null;
+
 /**
  * Validation error codes enumeration.
  */
@@ -22,7 +26,10 @@ export enum ValidateErrorCode {
   InvalidUrl,
   InvalidEmail,
   InvalidMongoId,
+  InvalidFile,
+  InvalidDirectory,
   InvalidArray,
+  NodeNotAvailable,
 }
 
 /** Validation code message string or unknown. */
@@ -43,6 +50,13 @@ export class ValidateError extends Error {
     this.stack = error.stack;
     this.message = error.message;
     this.thrownError = thrownError;
+  }
+}
+
+/** Test that node file system is available. */
+function checkNodeAvailable(): void {
+  if ((nodePath == null) && (nodeFs == null)) {
+    throw new ValidateError(ValidateErrorCode.NodeNotAvailable);
   }
 }
 
@@ -368,6 +382,42 @@ export class Validate {
 
     if (!isMongoId) {
       throw new ValidateError(ValidateErrorCode.InvalidMongoId);
+    }
+
+    return value;
+  }
+
+  public static isFile(value = ""): string {
+    checkNodeAvailable();
+    let isFile = false;
+
+    try {
+      value = nodePath.resolve(value);
+      isFile = nodeFs.lstatSync(value).isFile();
+    } catch (error) {
+      throw new ValidateError(ValidateErrorCode.InvalidFile, error);
+    }
+
+    if (!isFile) {
+      throw new ValidateError(ValidateErrorCode.InvalidFile);
+    }
+
+    return value;
+  }
+
+  public static isDirectory(value = ""): string {
+    checkNodeAvailable();
+    let isDirectory = false;
+
+    try {
+      value = nodePath.resolve(value);
+      isDirectory = nodeFs.lstatSync(value).isDirectory();
+    } catch (error) {
+      throw new ValidateError(ValidateErrorCode.InvalidDirectory, error);
+    }
+
+    if (!isDirectory) {
+      throw new ValidateError(ValidateErrorCode.InvalidDirectory);
     }
 
     return value;
