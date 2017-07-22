@@ -2,6 +2,12 @@
 # yarn lockfile v1
 
 
+"@types/bunyan@*":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@types/bunyan/-/bunyan-1.8.0.tgz#913bf718a2f4dd1efa063e808cab76609289c986"
+  dependencies:
+    "@types/node" "*"
+
 "@types/debug@^0.0.29":
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-0.0.29.tgz#a1e514adfbd92f03a224ba54d693111dbf1f3754"
@@ -43,6 +49,13 @@
 "@types/node@^6.0.85":
   version "6.0.85"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.85.tgz#ec02bfe54a61044f2be44f13b389c6a0e8ee05ae"
+
+"@types/restify@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@types/restify/-/restify-5.0.1.tgz#3ce7ed9f4613abafdc62e592f88565832ec60860"
+  dependencies:
+    "@types/bunyan" "*"
+    "@types/node" "*"
 
 "@types/shelljs@^0.7.0":
   version "0.7.2"

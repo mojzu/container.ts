@@ -7,3 +7,5 @@ export const ENV_NAME = "APP_NAME";
 export const DEFAULT_NAME = "main";
 export const DEFAULT_SCRIPT_PATH = path.resolve(`${__dirname}/scripts`);
 export const DEFAULT_ASSET_PATH = path.resolve(`${__dirname}/../assets`);
+export const DEFAULT_STATSD_HOST = "localhost";
+export const DEFAULT_RESTIFY_PORT = "4000";

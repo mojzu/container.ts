@@ -1,16 +1,13 @@
 import * as process from "process";
 import { Container, Environment } from "container.ts";
 import {
-  ENV_ASSET_PATH,
-  ENV_SCRIPT_PATH,
-  ENV_ROLLBAR_ACCESS_TOKEN,
-  ENV_STATSD_HOST,
-  Asset,
+  ENV_ASSET_PATH, Asset,
   Process,
-  Script,
+  ENV_SCRIPT_PATH, Script,
   WinstonLog,
-  RollbarLog,
-  StatsdMetric,
+  ENV_ROLLBAR_ACCESS_TOKEN, RollbarLog,
+  ENV_STATSD_HOST, StatsdMetric,
+  ENV_RESTIFY_PORT, RestifyServer,
 } from "container.ts/modules";
 import * as constants from "./constants";
 
@@ -27,7 +24,9 @@ const NAME = ENVIRONMENT.get(constants.ENV_NAME) || constants.DEFAULT_NAME;
 ENVIRONMENT
   .set(constants.ENV_NAME, NAME)
   .set(ENV_ASSET_PATH, constants.DEFAULT_ASSET_PATH)
-  .set(ENV_SCRIPT_PATH, constants.DEFAULT_SCRIPT_PATH);
+  .set(ENV_SCRIPT_PATH, constants.DEFAULT_SCRIPT_PATH)
+  .set(ENV_STATSD_HOST, constants.DEFAULT_STATSD_HOST)
+  .set(ENV_RESTIFY_PORT, constants.DEFAULT_RESTIFY_PORT);
 
 // Create container instance with name and environment.
 // Populate container for dependency injection.
@@ -35,14 +34,13 @@ const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(Asset)
   .registerModule(Process)
   .registerModule(Script)
-  .registerModule(WinstonLog);
+  .registerModule(WinstonLog)
+  .registerModule(StatsdMetric)
+  .registerModule(RestifyServer);
 
 // Register additional modules based on environment definitions.
 if (!!ENVIRONMENT.get(ENV_ROLLBAR_ACCESS_TOKEN)) {
   CONTAINER.registerModule(RollbarLog);
-}
-if (!!ENVIRONMENT.get(ENV_STATSD_HOST)) {
-  CONTAINER.registerModule(StatsdMetric);
 }
 
 // Run following section if this is the main script.
