@@ -56,6 +56,12 @@ gulp.task("lint", (done) => {
   shell.run("tslint -c tslint.json -p tsconfig.json --type-check", packagePath, done);
 });
 
+// Run example.
+gulp.task("example", ["tsc"], (done) => {
+  const file = gutil.env.f || gutil.env.file || "modules";
+  shell.run(`node ./examples/${file}.js`, packagePath, done);
+});
+
 // Build documentation.
 gulp.task("docs", (done) => {
   shell.run("typedoc --out docs/typedoc .", packagePath, done);

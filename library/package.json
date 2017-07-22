@@ -26,6 +26,7 @@
     "distclean": "gulp distclean",
     "test": "gulp test",
     "lint": "gulp lint",
+    "example": "gulp example",
     "docs": "gulp docs",
     "build": "gulp build"
   },
