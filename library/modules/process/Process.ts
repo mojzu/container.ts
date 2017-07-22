@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import * as process from "process";
+import * as os from "os";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import "rxjs/add/operator/switchMap";
@@ -10,6 +11,20 @@ import { Asset } from "../asset/Asset";
 export interface IProcess {
   name?: string;
   version?: string;
+}
+
+/** Process runtime information interface. */
+export interface IProcessInformation {
+  title: string;
+  version: string;
+  arch: string;
+  platform: string;
+  nodeVersion: string;
+  pid: number;
+  type: string;
+  release: string;
+  endianness: string;
+  hostname: string;
 }
 
 /** Process information asset file name. */
@@ -42,6 +57,21 @@ export class Process extends ContainerModule {
     return parts[1] || "production";
   }
 
+  public get information(): IProcessInformation {
+    return {
+      title: this.title,
+      version: this.version,
+      arch: process.arch,
+      platform: process.platform,
+      nodeVersion: process.version,
+      pid: process.pid,
+      type: os.type(),
+      release: os.release(),
+      endianness: os.endianness(),
+      hostname: os.hostname(),
+    };
+  }
+
   public constructor(name: string, opts: IContainerModuleOpts) {
     super(name, opts, { _asset: Asset.name });
 
@@ -67,6 +97,9 @@ export class Process extends ContainerModule {
         // Read process verion string.
         this._version = data.version || this._version;
         this.debug(`VERSION="${this.version}"`);
+
+        // Log process information.
+        this.log.info("ProcessInformation", this.information);
 
         // Process stop event handlers.
         process.on("SIGTERM", this.handleStop.bind(this, "SIGTERM"));
