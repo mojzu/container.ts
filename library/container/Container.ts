@@ -139,6 +139,7 @@ export class Container {
   /** Send log message of level for module. */
   public sendLog(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, args: any[]): void {
     this._logs.next(new ContainerLogMessage(level, message, metadata, args));
+    this.sendMetric(EMetricType.Increment, ELogLevel[level], 1, {});
   }
 
   /** Send metric message of type for module. */
@@ -209,6 +210,8 @@ export class Container {
       .timeout(timeout)
       .catch((error: Error) => Observable.throw(new ContainerError(error.message)))
       .switchMap(() => {
+        const message = state ? "ContainerStart" : "ContainerStop";
+        this.sendLog(ELogLevel.Informational, message, {}, []);
         return Observable.of(undefined);
       });
   }
