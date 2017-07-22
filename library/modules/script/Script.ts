@@ -14,6 +14,7 @@ import {
   IContainerModuleOpts,
   ContainerModule,
 } from "../../container";
+import { Validate } from "../../lib/validate";
 import {
   EProcessMessageType,
   IProcessCallOptions,
@@ -28,8 +29,10 @@ export interface IScriptOptions {
   args?: string[];
 }
 
-// TODO: Validation library.
+/** Environment variable name for script directory path. */
 export const ENV_SCRIPT_PATH = "SCRIPT_PATH";
+
+/** Environment variable name for script process names. */
 export const ENV_SCRIPT_NAME = "SCRIPT_NAME";
 
 /** Spawned script process interface. */
@@ -58,7 +61,7 @@ export class ScriptProcess implements IProcessSend {
     private _process: childProcess.ChildProcess,
     private _options: IScriptOptions = {},
   ) {
-    this.script.debug(`fork '${_target}.${_id}'`);
+    this.script.debug(`FORK="${_target}.${_id}"`);
 
     // Accumulate multiple callback arguments into array.
     const accumulator = (...args: any[]) => args;
@@ -72,7 +75,7 @@ export class ScriptProcess implements IProcessSend {
         return Observable.of(value || 1);
       });
 
-    this._exit.subscribe((code) => this.script.debug(`exit '${_target}.${_id}' '${code}'`));
+    this._exit.subscribe((code) => this.script.debug(`EXIT="${_target}.${_id}" "${code}"`));
 
     // Listen for process error, forward to script logger.
     Observable.fromEvent(_process, "error")
@@ -98,7 +101,7 @@ export class ScriptProcess implements IProcessSend {
     const args = options.args || [];
     const id = this.identifier;
 
-    this.script.debug(`call '${this.target}.${this.id}.${target}.${method}' '${id}'`);
+    this.script.debug(`CALL="${this.target}.${this.id}.${target}.${method}" "${id}"`);
 
     // Send call request to child process.
     const sendData: IProcessCallRequestData = { id, target, method, args };
@@ -142,15 +145,15 @@ export class Script extends ContainerModule {
     super(name, opts);
 
     // Get script directory path from environment.
-    const scriptPath = this.environment.get(ENV_SCRIPT_PATH);
+    const scriptPath = path.resolve(this.environment.get(ENV_SCRIPT_PATH));
+
     assert(scriptPath != null, "Scripts path is undefined");
-    this._path = path.resolve(scriptPath);
-    this.debug(`path '${this.path}'`);
+    this._path = Validate.isDirectory(scriptPath);
+    this.debug(`${ENV_SCRIPT_PATH}="${this.path}"`);
   }
 
   /** Spawn new Node.js process using script file. */
   public fork(target: string, options: IScriptOptions = {}): ScriptProcess {
-    const filePath = path.resolve(this.path, target);
     const forkArgs = options.args || [];
     const forkEnv = this.environment.copy();
     const identifier = this.identifier;
@@ -164,6 +167,8 @@ export class Script extends ContainerModule {
       env: forkEnv.variables,
     };
 
+    // Check script file exists.
+    const filePath = Validate.isFile(path.resolve(this.path, target));
     const process = childProcess.fork(filePath, forkArgs, forkOptions);
     return new ScriptProcess(this, target, identifier, process, options);
   }

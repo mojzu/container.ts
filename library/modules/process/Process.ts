@@ -12,7 +12,7 @@ export interface IProcess {
   version?: string;
 }
 
-// TODO: Env/definition clean up.
+/** Process information asset file name. */
 export const ASSET_PROCESS_JSON = "process.json";
 
 /** Node.js process interface. */
@@ -38,29 +38,34 @@ export class Process extends ContainerModule {
 
   public get nodeEnvironment(): string {
     const parts = this.version.split("-");
-    return parts[1] || "unknown";
+    return parts[1] || "production";
   }
 
   public constructor(name: string, opts: IContainerModuleOpts) {
     super(name, opts, { _asset: Asset.name });
 
-    // Default unknown version value.
-    this._version = "0.0.0-unknown";
+    // Default production version value.
+    this._version = "0.0.0-production";
   }
 
-  /** Read process information asset file, handle process events. */
+  /** Try to read process information asset file, handle process events. */
   public start(): Observable<void> {
     return this.container.waitStarted(Asset.name)
       .switchMap(() => this._asset.readJson(ASSET_PROCESS_JSON))
+      .catch((error) => {
+        // Handle error to read process information file.
+        this.log.error(error);
+        return Observable.of({});
+      })
       .switchMap((data: IProcess) => {
 
         // Set process title.
         Process.setTitle(data.name);
-        this.debug(`title '${this.title}'`);
+        this.debug(`TITLE="${this.title}"`);
 
         // Read process verion string.
         this._version = data.version || this._version;
-        this.debug(`version '${this.version}'`);
+        this.debug(`VERSION="${this.version}"`);
 
         // Process stop event handlers.
         process.on("SIGTERM", this.handleStop.bind(this, "SIGTERM"));
@@ -72,7 +77,7 @@ export class Process extends ContainerModule {
 
   /** Stop container when process termination event received. */
   protected handleStop(event: string): void {
-    this.debug(`stop '${event}'`);
+    this.debug(`STOP="${event}"`);
 
     this.container.stop()
       .subscribe({

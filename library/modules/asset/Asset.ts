@@ -1,5 +1,4 @@
 /// <reference types="node" />
-import * as assert from "assert";
 import * as path from "path";
 import * as fs from "fs";
 import { Observable } from "rxjs/Observable";
@@ -9,14 +8,14 @@ import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/operator/do";
 import "rxjs/add/operator/map";
 import { IContainerModuleOpts, ContainerModule } from "../../container";
+import { Validate } from "../../lib/validate";
 
 /** Asset files cached when read. */
 export interface IAssetCache {
-  [key: string]: Buffer | string | object;
+  [key: string]: Buffer | string;
 }
 
-// TODO: Split caches.
-// TODO: Validation library.
+/** Environment variable name for asset directory path. */
 export const ENV_ASSET_PATH = "ASSET_PATH";
 
 /** Assets read only files interface. */
@@ -32,10 +31,9 @@ export class Asset extends ContainerModule {
     super(name, opts);
 
     // Get asset directory path from environment.
-    const assetPath = this.environment.get(ENV_ASSET_PATH);
-    assert(assetPath != null, "Assets path is undefined");
-    this._path = path.resolve(assetPath);
-    this.debug(`path '${this.path}'`);
+    const assetPath = path.resolve(this.environment.get(ENV_ASSET_PATH));
+    this._path = Validate.isDirectory(assetPath);
+    this.debug(`${ENV_ASSET_PATH}="${this.path}"`);
   }
 
   /** Overload signature for correct return types. */
@@ -46,7 +44,6 @@ export class Asset extends ContainerModule {
   public readFile(target: string, encoding?: string): Observable<Buffer | string> {
     return this.read<Buffer | string>(target, encoding)
       .do((data) => {
-        // Save to cache.
         this.cache[target] = data;
       });
   }
@@ -55,11 +52,9 @@ export class Asset extends ContainerModule {
   public readJson(target: string, encoding = "utf8"): Observable<object> {
     return this.read<string>(target, encoding)
       .map((data) => {
+        this.cache[target] = data;
         try {
-          // Parse JSON and save to cache.
-          const json = JSON.parse(data);
-          this.cache[target] = json;
-          return json;
+          return JSON.parse(data);
         } catch (error) {
           return Observable.throw(error);
         }
@@ -74,11 +69,15 @@ export class Asset extends ContainerModule {
       return Observable.of(value);
     }
 
-    // Read file contents asynchronously.
-    const filePath = path.resolve(this.path, target);
-    const readFileCallback = fs.readFile.bind(this, filePath, encoding);
-    const readFile: () => Observable<T> = Observable.bindNodeCallback(readFileCallback);
-    return readFile();
+    try {
+      // Check file exists, read file contents asynchronously.
+      const filePath = Validate.isFile(path.resolve(this.path, target));
+      const readFileCallback = fs.readFile.bind(this, filePath, encoding);
+      const readFile: () => Observable<T> = Observable.bindNodeCallback(readFileCallback);
+      return readFile();
+    } catch (error) {
+      return Observable.throw(error);
+    }
   }
 
 }

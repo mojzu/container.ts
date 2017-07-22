@@ -117,8 +117,8 @@ export class ChildProcess extends Process implements IProcessSend {
 
       method(...data.args)
         .subscribe({
-          next: (value) => {
-            const nextData = Object.assign({ next: value }, responseData);
+          next: (next) => {
+            const nextData = Object.assign({ next }, responseData);
             emitter.send(type, nextData);
           },
           error: (error) => {
@@ -186,7 +186,6 @@ export class ChildProcess extends Process implements IProcessSend {
 
     // Listen for and handle messages from parent process.
     this._message = Observable.fromEvent(process, "message");
-
     this._message
       .subscribe((message) => this.handleMessage(message));
 
@@ -210,7 +209,7 @@ export class ChildProcess extends Process implements IProcessSend {
     const args = options.args || [];
     const id = this.identifier;
 
-    this.debug(`call '${target}.${method}' '${id}'`);
+    this.debug(`CALL="${target}.${method}" "${id}"`);
 
     // Send call request to parent process.
     const sendData: IProcessCallRequestData = { id, target, method, args };
