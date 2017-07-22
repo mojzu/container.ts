@@ -15,7 +15,7 @@ export interface IAssetCache {
   [key: string]: Buffer | string;
 }
 
-/** Environment variable name for asset directory path. */
+/** Environment variable name for asset directory path (required). */
 export const ENV_ASSET_PATH = "ASSET_PATH";
 
 /** Assets read only files interface. */

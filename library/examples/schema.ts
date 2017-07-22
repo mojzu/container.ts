@@ -1,6 +1,7 @@
 import * as process from "process";
 import * as validate from "../lib/validate";
 
+// Define data interface for schema.
 interface IGroup {
   name: string;
   information: {
@@ -16,7 +17,7 @@ const optionalThemeField = new validate.OptionalField(themeField, "default");
 const customerField = new validate.StringField({ max: 128 });
 const optionalCustomerField = new validate.OptionalField(customerField);
 
-// Define schema.
+// Define schema using fields.
 class GroupSchema extends validate.Schema {
   public static MAP: validate.ISchemaMap = {
     name: nameField,
@@ -27,6 +28,7 @@ class GroupSchema extends validate.Schema {
   };
 }
 
+// Validate input data.
 const input = {
   name: "GroupName",
   information: {

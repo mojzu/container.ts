@@ -14,6 +14,8 @@ import {
   Validate,
 } from "./Validate";
 
+// TODO: OrField wrapper.
+
 /**
  * Fields have validate and format methods.
  * Validate method takes string input and returns typed output.

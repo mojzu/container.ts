@@ -1,13 +1,15 @@
-import * as assert from "assert";
 import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "../../container";
+import { Validate } from "../../lib/validate";
 import { Process } from "../process/Process";
 import { Log } from "./Log";
 
 // Rollbar does not have defined types.
 const ROLLBAR = require("rollbar");
 
-// TODO: Validation library.
+/** Environment variable name for Rollbar access token (required). */
 export const ENV_ROLLBAR_ACCESS_TOKEN = "ROLLBAR_ACCESS_TOKEN";
+
+/** Environment variable name for Rollbar report level (default error). */
 export const ENV_ROLLBAR_REPORT_LEVEL = "ROLLBAR_REPORT_LEVEL";
 
 export class RollbarLog extends Log {
@@ -18,25 +20,21 @@ export class RollbarLog extends Log {
   public constructor(name: string, opts: IContainerModuleOpts) {
     super(name, opts, { _process: Process.name });
 
-    // Get Node environment value.
-    const environment = this._process.nodeEnvironment;
-    this.debug(`environment '${environment}'`);
-
     // Get access token from environment.
-    const accessToken = this.environment.get(ENV_ROLLBAR_ACCESS_TOKEN);
-    assert(accessToken != null, "Rollbar access token is undefined");
+    const accessToken = Validate.isString(this.environment.get(ENV_ROLLBAR_ACCESS_TOKEN));
+    this.debug(`${ENV_ROLLBAR_ACCESS_TOKEN}="${accessToken}"`);
 
     // Get report level from environment or fall back on log level.
-    const rawReportLevel = this.environment.get(ENV_ROLLBAR_REPORT_LEVEL);
+    const rawReportLevel = Validate.isString(this.environment.get(ENV_ROLLBAR_REPORT_LEVEL) || "error");
     const reportLevel = this.reportLevel(rawReportLevel);
-    this.debug(`reportLevel '${reportLevel}'`);
+    this.debug(`${ENV_ROLLBAR_REPORT_LEVEL}="${reportLevel}"`);
 
     // Create Rollbar instance.
     // Report level determined by module log level.
     // Handle uncaught exceptions and unhandled rejections by default.
     // Uncaught errors have 'critical' level by default.
     this._rollbar = new ROLLBAR({
-      environment,
+      environment: this._process.nodeEnvironment,
       accessToken,
       reportLevel,
       handleUncaughtExceptions: true,
@@ -47,7 +45,7 @@ export class RollbarLog extends Log {
 
   /** Rollbar handler for incoming log messages. */
   protected handleLog(log: ContainerLogMessage): void {
-    const callback = this.handlerError.bind(this);
+    const callback = this.handleError.bind(this);
 
     // Map log level to rollbar log methods.
     switch (log.level) {
@@ -78,22 +76,15 @@ export class RollbarLog extends Log {
   }
 
   /** Rollbar error handler callback. */
-  protected handlerError(error?: any): void {
+  protected handleError(error?: any): void {
     if (error != null) {
       process.stderr.write(String(error));
     }
   }
 
   /** Return rollbar report level. */
-  protected reportLevel(value?: string): string {
-    let level: ELogLevel;
-
-    if (value != null) {
-      level = this.parseLevel(value);
-    } else {
-      level = this.level;
-    }
-
+  protected reportLevel(value: string): string {
+    const level = this.parseLevel(value);
     switch (level) {
       case ELogLevel.Emergency:
       case ELogLevel.Alert:

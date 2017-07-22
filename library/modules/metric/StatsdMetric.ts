@@ -1,13 +1,15 @@
 /// <reference types="node" />
-import * as assert from "assert";
 import { IContainerModuleOpts, ContainerMetricMessage, EMetricType } from "../../container";
+import { Validate } from "../../lib/validate";
 import { Metric } from "./Metric";
 
 // Package statsd-client types are out of date.
 const STATSD = require("statsd-client");
 
-// TODO: Validation library.
+/** Environment variable name for StatsD server host (required). */
 export const ENV_STATSD_HOST = "STATSD_HOST";
+
+/** Environment variable name for StatsD server port (default 8125). */
 export const ENV_STATSD_PORT = "STATSD_PORT";
 
 export class StatsdMetric extends Metric {
@@ -18,15 +20,18 @@ export class StatsdMetric extends Metric {
     super(name, opts);
 
     // Get host and port environment values.
-    const host = this.environment.get(ENV_STATSD_HOST);
-    const port = this.environment.get(ENV_STATSD_PORT) || "8125";
-    assert(host != null, "StatsD host is undefined");
-    assert(port != null, "StatsD port is undefined");
-    this.debug(`host:port '${host}:${port}'`);
+    const host = Validate.isString(this.environment.get(ENV_STATSD_HOST));
+    this.debug(`${ENV_STATSD_HOST}="${host}"`);
+    const port = Validate.isPort(this.environment.get(ENV_STATSD_PORT) || "8125");
+    this.debug(`${ENV_STATSD_PORT}="${port}"`);
 
     // Create statsd client instance.
     // TODO: Handle more client options.
-    this._statsd = new STATSD({ host, port });
+    this._statsd = new STATSD({
+      prefix: this.container.name,
+      host,
+      port,
+    });
   }
 
   /** StatsD handler for incoming metric messages. */

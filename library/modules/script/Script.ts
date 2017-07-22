@@ -29,7 +29,7 @@ export interface IScriptOptions {
   args?: string[];
 }
 
-/** Environment variable name for script directory path. */
+/** Environment variable name for script directory path (required). */
 export const ENV_SCRIPT_PATH = "SCRIPT_PATH";
 
 /** Environment variable name for script process names. */
