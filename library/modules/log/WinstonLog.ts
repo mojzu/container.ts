@@ -10,7 +10,7 @@ export class WinstonLog extends Log {
     super(name, opts);
 
     // Construct Winston logger with console transport.
-    // TODO: Support more transports.
+    // TODO: Support more Winston transports.
     this._logger = new winston.Logger({
       transports: [
         new winston.transports.Console({

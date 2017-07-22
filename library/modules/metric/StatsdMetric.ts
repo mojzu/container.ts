@@ -26,7 +26,7 @@ export class StatsdMetric extends Metric {
     this.debug(`${ENV_STATSD_PORT}="${port}"`);
 
     // Create statsd client instance.
-    // TODO: Handle more client options.
+    // TODO: Handle more StatsD client options.
     this._statsd = new STATSD({
       prefix: this.container.name,
       host,

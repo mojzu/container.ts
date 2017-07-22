@@ -33,6 +33,7 @@ export class RollbarLog extends Log {
     // Report level determined by module log level.
     // Handle uncaught exceptions and unhandled rejections by default.
     // Uncaught errors have 'critical' level by default.
+    // TODO: Handle more Rollbar options.
     this._rollbar = new ROLLBAR({
       environment: this._process.nodeEnvironment,
       accessToken,
