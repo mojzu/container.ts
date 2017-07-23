@@ -51,6 +51,8 @@ export class ScriptProcess implements IProcessSend {
   public get exit(): Observable<number | string> { return this._exit; }
   public get message(): Observable<IProcessMessage> { return this._message; }
 
+  public get connected(): boolean { return this._process.connected; }
+
   /** Incrementing counter for unique identifiers. */
   protected get identifier(): number { return ++this._identifier; }
 
@@ -72,7 +74,7 @@ export class ScriptProcess implements IProcessSend {
       .switchMap((args: [number | null, string | null]) => {
         const [code, signal] = args;
         const value = (typeof code === "number") ? code : signal;
-        return Observable.of(value || 1);
+        return Observable.of((value != null) ? value : 1);
       });
 
     this._exit.subscribe((code) => this.script.debug(`EXIT="${_target}.${_id}" "${code}"`));

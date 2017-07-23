@@ -211,7 +211,7 @@ export class Container {
       .catch((error: Error) => Observable.throw(new ContainerError(error.message)))
       .switchMap(() => {
         const message = state ? "ContainerStart" : "ContainerStop";
-        this.sendLog(ELogLevel.Informational, message, {}, []);
+        this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
         return Observable.of(undefined);
       });
   }
