@@ -15,6 +15,7 @@ export interface IProcess {
 
 /** Process runtime information interface. */
 export interface IProcessInformation {
+  name: string;
   title: string;
   version: string;
   arch: string;
@@ -59,6 +60,7 @@ export class Process extends ContainerModule {
 
   public get information(): IProcessInformation {
     return {
+      name: this.container.name,
       title: this.title,
       version: this.version,
       arch: process.arch,

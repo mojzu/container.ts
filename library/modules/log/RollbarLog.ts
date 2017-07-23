@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "../../container";
 import { Validate } from "../../lib/validate";
 import { Process } from "../process/Process";

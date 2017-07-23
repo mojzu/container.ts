@@ -6,13 +6,13 @@ import {
   Asset,
   ENV_SCRIPT_NAME,
   ChildProcess,
-  ENV_RESTIFY_PORT,
-  RestifyServer,
+  ENV_SOCKETIO_PORT,
+  SocketioServer,
 } from "../../modules";
 
 // Create environment from process and define variables.
 const ENVIRONMENT = new Environment(process.env)
-  .set(ENV_RESTIFY_PORT, "4000");
+  .set(ENV_SOCKETIO_PORT, "4001");
 
 // Get script name from inherited environment.
 const NAME = Validate.isString(ENVIRONMENT.get(ENV_SCRIPT_NAME));
@@ -21,7 +21,7 @@ const NAME = Validate.isString(ENVIRONMENT.get(ENV_SCRIPT_NAME));
 const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(Asset)
   .registerModule(ChildProcess)
-  .registerModule(RestifyServer);
+  .registerModule(SocketioServer);
 
 // Start modules.
 CONTAINER.start()

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import * as restify from "restify";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/bindNodeCallback";
@@ -38,10 +39,13 @@ export class RestifyServer extends ContainerModule {
 
     // TODO: Handle more Restify options.
     this._server = restify.createServer();
+
+    // Register event handlers.
+    this._server.on("error", this.handleServerError.bind(this));
   }
 
   public start(): Observable<void> {
-    const listenCallback = this._server.listen.bind(this, this.port);
+    const listenCallback = this._server.listen.bind(this._server, this.port);
     const listen: () => Observable<void> = Observable.bindNodeCallback(listenCallback) as any;
     return listen()
       .do(() => {
@@ -51,12 +55,16 @@ export class RestifyServer extends ContainerModule {
   }
 
   public stop(): Observable<void> {
-    const closeCallback = this._server.close.bind(this);
+    const closeCallback = this._server.close.bind(this._server);
     const close: () => Observable<void> = Observable.bindNodeCallback(closeCallback) as any;
     return close()
       .do(() => {
         this.log.info("RestifyServerStop");
       });
+  }
+
+  protected handleServerError(error: any): void {
+    this.log.error(error);
   }
 
 }

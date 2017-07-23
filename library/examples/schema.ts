@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import * as process from "process";
 import * as validate from "../lib/validate";
 
