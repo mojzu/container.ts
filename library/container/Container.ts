@@ -7,6 +7,7 @@ import "rxjs/add/observable/of";
 import "rxjs/add/observable/throw";
 import "rxjs/add/observable/forkJoin";
 import "rxjs/add/operator/catch";
+import "rxjs/add/operator/do";
 import "rxjs/add/operator/filter";
 import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
@@ -199,10 +200,23 @@ export class Container {
   protected setModulesState(state: boolean, timeout = 10000): Observable<void> {
     // Map module methods and report states.
     const modules = this.modules.map((name) => this._container.resolve<ContainerModule>(name));
-    const observables = modules.map((mod) => {
-      const method: () => Observable<void> = mod[state ? "start" : "stop"].bind(mod);
-      return method().switchMap(() => this.reportModuleState(mod.name, state));
-    });
+    const observables: Observable<void>[] = modules
+      .map((mod) => {
+        const method: () => void | Observable<void> = mod[state ? "start" : "stop"].bind(mod);
+        const observable = method();
+
+        if (observable == null) {
+          // Module method has not returned observable, set state now.
+          this.reportModuleState(mod.name, state);
+          return null;
+        } else {
+          // Observable returned, update state on next.
+          return observable
+            .do(() => this.reportModuleState(mod.name, state));
+        }
+      })
+      // Filter to array of observables.
+      .filter((o) => (o != null)) as any;
 
     // Wait for modules to signal state.
     // Map TimeoutError to ContainerError.
@@ -314,12 +328,12 @@ export class ContainerModule {
   }
 
   /** Module operational state. */
-  public start(): Observable<void> {
+  public start(): void | Observable<void> {
     return Observable.of(undefined);
   }
 
   /** Module non-operational state. */
-  public stop(): Observable<void> {
+  public stop(): void | Observable<void> {
     return Observable.of(undefined);
   }
 
