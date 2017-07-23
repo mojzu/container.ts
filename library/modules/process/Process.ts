@@ -18,6 +18,7 @@ export interface IProcessInformation {
   name: string;
   title: string;
   version: string;
+  environment: string;
   arch: string;
   platform: string;
   nodeVersion: string;
@@ -50,11 +51,15 @@ export class Process extends ContainerModule {
   private _version: string;
 
   public get title(): string { return Process.title; }
-  public get version(): string { return this._version; }
+
+  public get version(): string {
+    const parts = this._version.split("-");
+    return parts[0] || "0.0.0";
+  }
 
   public get nodeEnvironment(): string {
     // TODO: Support `NODE_ENV` in environment.
-    const parts = this.version.split("-");
+    const parts = this._version.split("-");
     return parts[1] || "production";
   }
 
@@ -63,6 +68,7 @@ export class Process extends ContainerModule {
       name: this.container.name,
       title: this.title,
       version: this.version,
+      environment: this.nodeEnvironment,
       arch: process.arch,
       platform: process.platform,
       nodeVersion: process.version,
@@ -99,6 +105,7 @@ export class Process extends ContainerModule {
         // Read process verion string.
         this._version = data.version || this._version;
         this.debug(`VERSION="${this.version}"`);
+        this.debug(`ENVIRONMENT="${this.nodeEnvironment}"`);
 
         // Log process information.
         this.log.info("ProcessInformation", this.information);

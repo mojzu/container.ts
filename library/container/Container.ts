@@ -140,7 +140,7 @@ export class Container {
   /** Send log message of level for module. */
   public sendLog(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, args: any[]): void {
     this._logs.next(new ContainerLogMessage(level, message, metadata, args));
-    this.sendMetric(EMetricType.Increment, ELogLevel[level], 1, {});
+    this.sendMetric(EMetricType.Increment, `Log${ELogLevel[level]}`, 1, {});
   }
 
   /** Send metric message of type for module. */
@@ -200,7 +200,7 @@ export class Container {
   protected setModulesState(state: boolean, timeout = 10000): Observable<void> {
     // Map module methods and report states.
     const modules = this.modules.map((name) => this._container.resolve<ContainerModule>(name));
-    const observables: Observable<void>[] = modules
+    const observables: Array<Observable<void>> = modules
       .map((mod) => {
         const method: () => void | Observable<void> = mod[state ? "start" : "stop"].bind(mod);
         const observable = method();
@@ -231,10 +231,9 @@ export class Container {
   }
 
   /** Update and report module state via internal subject. */
-  protected reportModuleState(name: string, state: boolean): Observable<void> {
+  protected reportModuleState(name: string, state: boolean): void {
     this._modules.value[name] = state;
     this._modules.next(this._modules.value);
-    return Observable.of(undefined);
   }
 
 }
