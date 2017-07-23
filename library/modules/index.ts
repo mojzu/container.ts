@@ -8,3 +8,4 @@ export * from "./process/Process";
 export * from "./process/ChildProcess";
 export * from "./script/Script";
 export * from "./server/RestifyServer";
+export * from "./server/SocketioServer";
