@@ -52,7 +52,7 @@
     "@types/restify": "^5.0.1",
     "@types/socket.io": "^1.4.29",
     "@types/validator": "^6.2.1",
-    "@types/winston": "^2.3.3",
+    "@types/winston": "^2.3.4",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-util": "^3.0.8",
