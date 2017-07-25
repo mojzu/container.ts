@@ -8,12 +8,7 @@ import "rxjs/add/operator/mergeMap";
 import "rxjs/add/operator/filter";
 import "rxjs/add/operator/timeout";
 import "rxjs/add/operator/takeWhile";
-import {
-  IContainerLogMessage,
-  IContainerModuleOpts,
-  Container,
-  ContainerModule,
-} from "../../container";
+import { IContainerLogMessage, IContainerModuleOpts, ContainerModule } from "../../container";
 import { Process } from "./Process";
 
 /** Process message types. */
@@ -89,6 +84,7 @@ export interface IProcessMessage extends Object {
 
 /** Process send method interface. */
 export interface IProcessSend {
+  messages: Observable<IProcessMessage>;
   send: (type: EProcessMessageType, data: any) => void;
 }
 
@@ -115,10 +111,31 @@ export class ChildProcess extends Process implements IProcessSend {
     );
   }
 
+  /** Send call request to process. */
+  public static sendCallRequest<T>(
+    emitter: IProcessSend,
+    mod: ContainerModule,
+    target: string,
+    method: string,
+    id: number,
+    options: IProcessCallOptions = {},
+  ): Observable<T> {
+    const timeout = options.timeout || ChildProcess.DEFAULT_TIMEOUT;
+    const args = options.args || [];
+
+    mod.debug(`CALL="${target}.${method}" "${id}"`);
+
+    // Send call request to process.
+    const sendData: IProcessCallRequestData = { id, target, method, args };
+    emitter.send(EProcessMessageType.CallRequest, sendData);
+
+    return ChildProcess.handleCallResponse<T>(emitter.messages, id, args, timeout);
+  }
+
   /** Handle method call requests. */
   public static handleCallRequest(
     emitter: IProcessSend,
-    container: Container,
+    mod: ContainerModule,
     data: IProcessCallRequestData,
   ): void {
     const type = EProcessMessageType.CallResponse;
@@ -126,8 +143,8 @@ export class ChildProcess extends Process implements IProcessSend {
 
     try {
       // Retrieve target module and make subscribe call to method.
-      const mod = container.resolve<any>(data.target);
-      const method: ProcessCallType = mod[data.method].bind(mod);
+      const targetMod = mod.container.resolve<any>(data.target);
+      const method: ProcessCallType = targetMod[data.method].bind(targetMod);
 
       method(...data.args)
         .subscribe({
@@ -247,17 +264,7 @@ export class ChildProcess extends Process implements IProcessSend {
 
   /** Make call to module.method in parent process. */
   public call<T>(target: string, method: string, options: IProcessCallOptions = {}): Observable<T> {
-    const timeout = options.timeout || ChildProcess.DEFAULT_TIMEOUT;
-    const args = options.args || [];
-    const id = this.identifier;
-
-    this.debug(`CALL="${target}.${method}" "${id}"`);
-
-    // Send call request to parent process.
-    const sendData: IProcessCallRequestData = { id, target, method, args };
-    this.send(EProcessMessageType.CallRequest, sendData);
-
-    return ChildProcess.handleCallResponse<T>(this.messages, id, args, timeout);
+    return ChildProcess.sendCallRequest<T>(this, this, target, method, this.identifier, options);
   }
 
   /** Send event with optional data to parent process. */
@@ -275,7 +282,7 @@ export class ChildProcess extends Process implements IProcessSend {
     switch (message.type) {
       // Call request received from parent.
       case EProcessMessageType.CallRequest: {
-        ChildProcess.handleCallRequest(this, this.container, message.data);
+        ChildProcess.handleCallRequest(this, this, message.data);
         break;
       }
       // Send event on internal event bus.

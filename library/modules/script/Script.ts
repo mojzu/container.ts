@@ -19,7 +19,6 @@ import { Validate } from "../../lib/validate";
 import {
   EProcessMessageType,
   IProcessCallOptions,
-  IProcessCallRequestData,
   IProcessEventData,
   IProcessMessage,
   IProcessSend,
@@ -103,17 +102,7 @@ export class ScriptProcess implements IProcessSend {
 
   /** Make call to module.method in child process. */
   public call<T>(target: string, method: string, options: IProcessCallOptions = {}): Observable<T> {
-    const timeout = options.timeout || ChildProcess.DEFAULT_TIMEOUT;
-    const args = options.args || [];
-    const id = this.identifier;
-
-    this.script.debug(`CALL="${this.target}.${this.id}.${target}.${method}" "${id}"`);
-
-    // Send call request to child process.
-    const sendData: IProcessCallRequestData = { id, target, method, args };
-    this.send(EProcessMessageType.CallRequest, sendData);
-
-    return ChildProcess.handleCallResponse<T>(this.messages, id, args, timeout);
+    return ChildProcess.sendCallRequest<T>(this, this.script, target, method, this.identifier, options);
   }
 
   /** Send event with optional data to child process. */
@@ -142,7 +131,7 @@ export class ScriptProcess implements IProcessSend {
       }
       // Call request received from child.
       case EProcessMessageType.CallRequest: {
-        ChildProcess.handleCallRequest(this, this.script.container, message.data);
+        ChildProcess.handleCallRequest(this, this.script, message.data);
         break;
       }
       // Send event on internal event bus.
