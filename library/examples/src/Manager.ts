@@ -5,7 +5,7 @@ import "rxjs/add/observable/of";
 import "rxjs/add/operator/takeUntil";
 import "rxjs/add/operator/map";
 import { IContainerModuleOpts, ContainerModule } from "../../container";
-import { Script, ScriptProcess } from "../../modules";
+import { Script, ScriptProcess, ChildProcess } from "../../modules";
 
 // Define application container module.
 export class Manager extends ContainerModule {
@@ -52,6 +52,11 @@ export class Manager extends ContainerModule {
         this.debug(`Server worker process exit, restarting.`);
         this.startServerWorker();
       });
+    this._serverProcess.listen<number>(ChildProcess.EVENTS.UPTIME)
+      .takeUntil(this._unsubscribe)
+      .subscribe((uptime) => {
+        this.debug(`Server worker uptime: ${uptime}`);
+      });
   }
 
   public startSocketWorker(): void {
@@ -62,6 +67,11 @@ export class Manager extends ContainerModule {
       .subscribe(() => {
         this.debug(`Socket worker process exit, restarting.`);
         this.startSocketWorker();
+      });
+    this._socketProcess.listen<number>(ChildProcess.EVENTS.UPTIME)
+      .takeUntil(this._unsubscribe)
+      .subscribe((uptime) => {
+        this.debug(`Socket worker uptime: ${uptime}`);
       });
   }
 

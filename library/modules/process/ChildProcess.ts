@@ -3,6 +3,7 @@ import * as process from "process";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import "rxjs/add/observable/fromEvent";
+import "rxjs/add/observable/interval";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 import "rxjs/add/operator/filter";
@@ -90,8 +91,16 @@ export interface IProcessSend {
 
 export class ChildProcess extends Process implements IProcessSend {
 
-  /** Default call method timeout. */
+  /** Default call method timeout (10s). */
   public static DEFAULT_TIMEOUT = 10000;
+
+  /** Default interval to send uptime events (1m). */
+  public static DEFAULT_UPTIME_INTERVAL = 60000;
+
+  /** Class event names. */
+  public static EVENTS = {
+    UPTIME: "uptime",
+  };
 
   /** Extract serialisable error properties to object. */
   public static serialiseError(error: Error): IProcessError {
@@ -253,6 +262,10 @@ export class ChildProcess extends Process implements IProcessSend {
 
     this.container.metrics
       .subscribe((metric) => this.send(EProcessMessageType.Metric, metric));
+
+    // Send uptime event on interval.
+    Observable.interval(ChildProcess.DEFAULT_UPTIME_INTERVAL)
+      .subscribe(() => this.event<number>(ChildProcess.EVENTS.UPTIME, process.uptime()));
   }
 
   /** Send message to parent process. */
