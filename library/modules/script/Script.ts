@@ -3,6 +3,7 @@ import * as assert from "assert";
 import * as path from "path";
 import * as childProcess from "child_process";
 import { Observable } from "rxjs/Observable";
+import { Subject } from "rxjs/Subject";
 import "rxjs/add/observable/of";
 import "rxjs/add/observable/fromEvent";
 import "rxjs/add/operator/switchMap";
@@ -19,6 +20,7 @@ import {
   EProcessMessageType,
   IProcessCallOptions,
   IProcessCallRequestData,
+  IProcessEventData,
   IProcessMessage,
   IProcessSend,
   ChildProcess,
@@ -39,7 +41,8 @@ export const ENV_SCRIPT_NAME = "SCRIPT_NAME";
 export class ScriptProcess implements IProcessSend {
 
   private _exit: Observable<number | string>;
-  private _message: Observable<IProcessMessage>;
+  private _messages: Observable<IProcessMessage>;
+  private _events = new Subject<IProcessEventData>();
   private _identifier = 0;
 
   public get script(): Script { return this._script; }
@@ -49,7 +52,8 @@ export class ScriptProcess implements IProcessSend {
   public get options(): IScriptOptions { return this._options; }
 
   public get exit(): Observable<number | string> { return this._exit; }
-  public get message(): Observable<IProcessMessage> { return this._message; }
+  public get messages(): Observable<IProcessMessage> { return this._messages; }
+  public get events(): Observable<IProcessEventData> { return this._events; }
 
   public get connected(): boolean { return this._process.connected; }
 
@@ -85,10 +89,10 @@ export class ScriptProcess implements IProcessSend {
       .subscribe((error: Error) => this.script.log.error(error));
 
     // Listen for and handle process messages.
-    this._message = Observable.fromEvent<IProcessMessage>(_process, "message")
+    this._messages = Observable.fromEvent<IProcessMessage>(_process, "message")
       .takeUntil(this._exit);
 
-    this._message
+    this._messages
       .subscribe((message) => this.handleMessage(message));
   }
 
@@ -109,7 +113,17 @@ export class ScriptProcess implements IProcessSend {
     const sendData: IProcessCallRequestData = { id, target, method, args };
     this.send(EProcessMessageType.CallRequest, sendData);
 
-    return ChildProcess.handleCallResponse(this.message, id, args, timeout);
+    return ChildProcess.handleCallResponse<T>(this.messages, id, args, timeout);
+  }
+
+  /** Send event with optional data to child process. */
+  public event<T>(name: string, data?: T): void {
+    ChildProcess.sendEvent<T>(this, this.script, name, data);
+  }
+
+  /** Listen for event sent by child process. */
+  public listen<T>(name: string): Observable<T> {
+    return ChildProcess.listenForEvent<T>(this.events, name);
   }
 
   /** Handle messages received from child process. */
@@ -129,6 +143,12 @@ export class ScriptProcess implements IProcessSend {
       // Call request received from child.
       case EProcessMessageType.CallRequest: {
         ChildProcess.handleCallRequest(this, this.script.container, message.data);
+        break;
+      }
+      // Send event on internal event bus.
+      case EProcessMessageType.Event: {
+        const event: IProcessEventData = message.data;
+        this._events.next(event);
         break;
       }
     }
