@@ -15,11 +15,14 @@ export interface IAssetCache {
   [key: string]: Buffer | string;
 }
 
-/** Environment variable name for asset directory path (required). */
-export const ENV_ASSET_PATH = "ASSET_PATH";
-
 /** Assets read only files interface. */
 export class Asset extends ContainerModule {
+
+  /** Environment variable names. */
+  public static ENV = {
+    /** Asset directory path (required). */
+    PATH: "ASSET_PATH",
+  };
 
   private _path: string;
   private _cache: IAssetCache = {};
@@ -31,9 +34,9 @@ export class Asset extends ContainerModule {
     super(name, opts);
 
     // Get asset directory path from environment.
-    const assetPath = path.resolve(this.environment.get(ENV_ASSET_PATH));
+    const assetPath = path.resolve(this.environment.get(Asset.ENV.PATH));
     this._path = Validate.isDirectory(assetPath);
-    this.debug(`${ENV_ASSET_PATH}="${this.path}"`);
+    this.debug(`${Asset.ENV.PATH}="${this.path}"`);
   }
 
   /** Overload signature for correct return types. */

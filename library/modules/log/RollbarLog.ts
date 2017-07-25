@@ -7,13 +7,17 @@ import { Log } from "./Log";
 // Rollbar does not have defined types.
 const ROLLBAR = require("rollbar");
 
-/** Environment variable name for Rollbar access token (required). */
-export const ENV_ROLLBAR_ACCESS_TOKEN = "ROLLBAR_ACCESS_TOKEN";
-
-/** Environment variable name for Rollbar report level (default error). */
-export const ENV_ROLLBAR_REPORT_LEVEL = "ROLLBAR_REPORT_LEVEL";
-
 export class RollbarLog extends Log {
+
+  /** Environment variable names. */
+  public static ENV = {
+    /** Application log level (default info). */
+    LEVEL: "LOG_LEVEL",
+    /** Rollbar access token (required). */
+    ACCESS_TOKEN: "ROLLBAR_ACCESS_TOKEN",
+    /** Rollbar report level (default error). */
+    REPORT_LEVEL: "ROLLBAR_REPORT_LEVEL",
+  };
 
   private _process: Process;
   private _rollbar: any;
@@ -22,13 +26,13 @@ export class RollbarLog extends Log {
     super(name, opts, { _process: Process.name });
 
     // Get access token from environment.
-    const accessToken = Validate.isString(this.environment.get(ENV_ROLLBAR_ACCESS_TOKEN));
-    this.debug(`${ENV_ROLLBAR_ACCESS_TOKEN}="${accessToken}"`);
+    const accessToken = Validate.isString(this.environment.get(RollbarLog.ENV.ACCESS_TOKEN));
+    this.debug(`${RollbarLog.ENV.ACCESS_TOKEN}="${accessToken}"`);
 
     // Get report level from environment or fall back on log level.
-    const rawReportLevel = Validate.isString(this.environment.get(ENV_ROLLBAR_REPORT_LEVEL) || "error");
+    const rawReportLevel = Validate.isString(this.environment.get(RollbarLog.ENV.REPORT_LEVEL) || "error");
     const reportLevel = this.reportLevel(rawReportLevel);
-    this.debug(`${ENV_ROLLBAR_REPORT_LEVEL}="${reportLevel}"`);
+    this.debug(`${RollbarLog.ENV.REPORT_LEVEL}="${reportLevel}"`);
 
     // Create Rollbar instance.
     // Report level determined by module log level.

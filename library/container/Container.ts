@@ -83,11 +83,11 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
   ) { }
 }
 
-/** Container reference name used internally by modules. */
-export const CONTAINER_NAME = "_container";
-
 /** Wrapper around awilix library. */
 export class Container {
+
+  /** Container reference name used internally by modules. */
+  public static NAME = "_container";
 
   private _environment: Environment;
   private _container: AwilixContainer;
@@ -114,7 +114,7 @@ export class Container {
   public constructor(private _name: string, environment = new Environment()) {
     this._environment = environment;
     this._container = createContainer({ resolutionMode: ResolutionMode.PROXY });
-    this.registerValue<Container>(CONTAINER_NAME, this);
+    this.registerValue<Container>(Container.NAME, this);
   }
 
   /** Register a module in container, has singleton lifetime by default. */
@@ -313,7 +313,7 @@ export class ContainerModule {
   public constructor(name: string, opts: IContainerModuleOpts, depends: IContainerModuleDepends = {}) {
     // Set name, resolve container instance and construct log, debug instances.
     this._name = name;
-    this._container = opts[CONTAINER_NAME];
+    this._container = opts[Container.NAME];
     this._log = new ContainerModuleLog(this._container, this.namespace);
     this._metric = new ContainerModuleMetric(this._container, this.namespace);
     this._debug = Debug(this.namespace);

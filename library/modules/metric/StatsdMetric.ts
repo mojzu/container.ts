@@ -6,13 +6,15 @@ import { Metric } from "./Metric";
 // Package statsd-client types are out of date.
 const STATSD = require("statsd-client");
 
-/** Environment variable name for StatsD server host (required). */
-export const ENV_STATSD_HOST = "STATSD_HOST";
-
-/** Environment variable name for StatsD server port (default 8125). */
-export const ENV_STATSD_PORT = "STATSD_PORT";
-
 export class StatsdMetric extends Metric {
+
+  /** Environment variable names. */
+  public static ENV = {
+    /** StatsD server host (required). */
+    HOST: "STATSD_HOST",
+    /** StatsD server port (default 8125). */
+    PORT: "STATSD_PORT",
+  };
 
   private _statsd: any;
 
@@ -20,10 +22,10 @@ export class StatsdMetric extends Metric {
     super(name, opts);
 
     // Get host and port environment values.
-    const host = Validate.isString(this.environment.get(ENV_STATSD_HOST));
-    this.debug(`${ENV_STATSD_HOST}="${host}"`);
-    const port = Validate.isPort(this.environment.get(ENV_STATSD_PORT) || "8125");
-    this.debug(`${ENV_STATSD_PORT}="${port}"`);
+    const host = Validate.isString(this.environment.get(StatsdMetric.ENV.HOST));
+    this.debug(`${StatsdMetric.ENV.HOST}="${host}"`);
+    const port = Validate.isPort(this.environment.get(StatsdMetric.ENV.PORT) || "8125");
+    this.debug(`${StatsdMetric.ENV.PORT}="${port}"`);
 
     // Create statsd client instance.
     // TODO: Handle more StatsD client options.

@@ -13,10 +13,13 @@ export interface ISocketioServerInformation {
   origins: string;
 }
 
-/** Environment variable name for SocketIO server port (required). */
-export const ENV_SOCKETIO_PORT = "SOCKETIO_PORT";
-
 export class SocketioServer extends ContainerModule {
+
+  /** Environment variable names. */
+  public static ENV = {
+    /** SocketIO server port (required). */
+    PORT: "SOCKETIO_PORT",
+  };
 
   private _port: number;
   private _server: http.Server;
@@ -36,8 +39,8 @@ export class SocketioServer extends ContainerModule {
     super(name, opts);
 
     // Get port environment value.
-    this._port = Validate.isPort(this.environment.get(ENV_SOCKETIO_PORT));
-    this.debug(`${ENV_SOCKETIO_PORT}="${this.port}"`);
+    this._port = Validate.isPort(this.environment.get(SocketioServer.ENV.PORT));
+    this.debug(`${SocketioServer.ENV.PORT}="${this.port}"`);
 
     // TODO: Handle more SocketIO options.
     this._server = http.createServer();

@@ -20,10 +20,13 @@ export interface IServerRequest extends restify.Request { }
 /** Restify server response wrapper. */
 export interface IServerResponse extends restify.Response { }
 
-/** Environment variable name for Restify server port (required). */
-export const ENV_RESTIFY_PORT = "RESTIFY_PORT";
-
 export class RestifyServer extends ContainerModule {
+
+  /** Environment variable names. */
+  public static ENV = {
+    /** Restify server port (required). */
+    PORT: "RESTIFY_PORT",
+  };
 
   private _port: number;
   private _server: restify.Server;
@@ -44,8 +47,8 @@ export class RestifyServer extends ContainerModule {
     super(name, opts);
 
     // Get port environment value.
-    this._port = Validate.isPort(this.environment.get(ENV_RESTIFY_PORT));
-    this.debug(`${ENV_RESTIFY_PORT}="${this.port}"`);
+    this._port = Validate.isPort(this.environment.get(RestifyServer.ENV.PORT));
+    this.debug(`${RestifyServer.ENV.PORT}="${this.port}"`);
 
     // Create Restify server.
     this._server = restify.createServer({ name: "", version: "1.0.0" });

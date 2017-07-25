@@ -30,12 +30,6 @@ export interface IScriptOptions {
   args?: string[];
 }
 
-/** Environment variable name for script directory path (required). */
-export const ENV_SCRIPT_PATH = "SCRIPT_PATH";
-
-/** Environment variable name for script process names. */
-export const ENV_SCRIPT_NAME = "SCRIPT_NAME";
-
 /** Spawned script process interface. */
 export class ScriptProcess implements IProcessSend {
 
@@ -148,6 +142,12 @@ export class ScriptProcess implements IProcessSend {
 /** Node.js scripts interface. */
 export class Script extends ContainerModule {
 
+  /** Environment variable names. */
+  public static ENV = {
+    /** Script directory path (required). */
+    PATH: "SCRIPT_PATH",
+  };
+
   private _path: string;
 
   public get path(): string { return this._path; }
@@ -156,11 +156,11 @@ export class Script extends ContainerModule {
     super(name, opts);
 
     // Get script directory path from environment.
-    const scriptPath = path.resolve(this.environment.get(ENV_SCRIPT_PATH));
+    const scriptPath = path.resolve(this.environment.get(Script.ENV.PATH));
 
     assert(scriptPath != null, "Scripts path is undefined");
     this._path = Validate.isDirectory(scriptPath);
-    this.debug(`${ENV_SCRIPT_PATH}="${this.path}"`);
+    this.debug(`${Script.ENV.PATH}="${this.path}"`);
   }
 
   /** Spawn new Node.js process using script file. */
@@ -172,7 +172,7 @@ export class Script extends ContainerModule {
     // Use container environment when spawning processes.
     // Override name value to prepend application namespace.
     const name = `${this.namespace}.${target}.${identifier}`;
-    forkEnv.set(ENV_SCRIPT_NAME, name);
+    forkEnv.set(ChildProcess.ENV.NAME, name);
 
     const forkOptions: childProcess.ForkOptions = {
       env: forkEnv.variables,

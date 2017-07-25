@@ -29,11 +29,14 @@ export interface IProcessInformation {
   hostname: string;
 }
 
-/** Process information asset file name. */
-export const ASSET_PROCESS_JSON = "process.json";
-
 /** Node.js process interface. */
 export class Process extends ContainerModule {
+
+  /** Asset file names. */
+  public static ASSET = {
+    /** Process information asset file. */
+    PROCESS_JSON: "process.json",
+  };
 
   /** Get Node.js process title. */
   public static get title(): string { return process.title; }
@@ -90,7 +93,7 @@ export class Process extends ContainerModule {
   /** Try to read process information asset file, handle process events. */
   public start(): Observable<void> {
     return this.container.waitStarted(Asset.name)
-      .switchMap(() => this._asset.readJson(ASSET_PROCESS_JSON))
+      .switchMap(() => this._asset.readJson(Process.ASSET.PROCESS_JSON))
       .catch((error) => {
         // Handle error to read process information file.
         this.log.error(error);

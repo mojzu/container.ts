@@ -97,6 +97,12 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Default interval to send uptime events (1m). */
   public static DEFAULT_UPTIME_INTERVAL = 60000;
 
+  /** Environment variable names. */
+  public static ENV = {
+    /** Application log level (default info). */
+    NAME: "CHILD_PROCESS_NAME",
+  };
+
   /** Class event names. */
   public static EVENTS = {
     UPTIME: "uptime",

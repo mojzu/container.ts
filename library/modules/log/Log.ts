@@ -7,10 +7,13 @@ import {
 } from "../../container";
 import { Validate } from "../../lib/validate";
 
-/** Environment variable name for application log level (default info). */
-export const ENV_LOG_LEVEL = "LOG_LEVEL";
-
 export abstract class Log extends ContainerModule {
+
+  /** Environment variable names. */
+  public static ENV = {
+    /** Application log level (default info). */
+    LEVEL: "LOG_LEVEL",
+  };
 
   private _level: ELogLevel;
 
@@ -20,9 +23,9 @@ export abstract class Log extends ContainerModule {
     super(name, opts, depends);
 
     // Get log level from environment or fall back on default.
-    const rawLevel = Validate.isString(this.environment.get(ENV_LOG_LEVEL) || "info");
+    const rawLevel = Validate.isString(this.environment.get(Log.ENV.LEVEL) || "info");
     this._level = this.parseLevel(rawLevel);
-    this.debug(`${ENV_LOG_LEVEL}="${ELogLevel[this.level]}"`);
+    this.debug(`${Log.ENV.LEVEL}="${ELogLevel[this.level]}"`);
 
     // Subscribe to container log messages filtered by level.
     this.container.filterLogs(this.level)
