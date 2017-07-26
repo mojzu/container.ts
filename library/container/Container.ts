@@ -117,6 +117,11 @@ export class Container {
     this.registerValue<Container>(Container.NAME, this);
   }
 
+  /** Create scoped container. */
+  public createScope(): AwilixContainer {
+    return this._container.createScope();
+  }
+
   /** Register a module in container, has singleton lifetime by default. */
   public registerModule<T extends IContainerModuleConstructor>(instance: T, lifetime = Lifetime.SINGLETON): Container {
     const options = {};
