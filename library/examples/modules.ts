@@ -8,8 +8,8 @@ import {
   Script,
   WinstonLog,
   StatsdMetric,
+  ManagerFactory,
 } from "../modules";
-import { Manager } from "./src";
 
 // Create environment from process and define variables.
 const ENVIRONMENT = new Environment(process.env)
@@ -24,7 +24,10 @@ const CONTAINER = new Container("Main", ENVIRONMENT)
   .registerModule(Script)
   .registerModule(WinstonLog)
   .registerModule(StatsdMetric)
-  .registerModule(Manager);
+  .registerModule(ManagerFactory.create([
+    { name: "server.js" },
+    { name: "socket.js" },
+  ]));
 
 // Start container modules.
 CONTAINER.start()

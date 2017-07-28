@@ -40,7 +40,6 @@ export class ScriptProcess implements IProcessSend {
 
   public get script(): Script { return this._script; }
   public get target(): string { return this._target; }
-  public get id(): number { return this._id; }
   public get process(): childProcess.ChildProcess { return this._process; }
   public get options(): IScriptOptions { return this._options; }
 
@@ -56,11 +55,10 @@ export class ScriptProcess implements IProcessSend {
   public constructor(
     private _script: Script,
     private _target: string,
-    private _id: number,
     private _process: childProcess.ChildProcess,
     private _options: IScriptOptions = {},
   ) {
-    this.script.debug(`FORK="${_target}.${_id}"`);
+    this.script.debug(`FORK="${_target}"`);
 
     // Accumulate multiple callback arguments into array.
     const accumulator = (...args: any[]) => args;
@@ -74,7 +72,8 @@ export class ScriptProcess implements IProcessSend {
         return Observable.of((value != null) ? value : 1);
       });
 
-    this._exit.subscribe((code) => this.script.debug(`EXIT="${_target}.${_id}" "${code}"`));
+    // TODO: Log error if script exits with error code.
+    this._exit.subscribe((code) => this.script.debug(`EXIT="${_target}" CODE="${code}"`));
 
     // Listen for process error, forward to script logger.
     Observable.fromEvent(_process, "error")
@@ -87,6 +86,12 @@ export class ScriptProcess implements IProcessSend {
 
     this._messages
       .subscribe((message) => this.handleMessage(message));
+  }
+
+  /** End child process with signal. */
+  public kill(signal?: string): Observable<number | string> {
+    this.process.kill(signal);
+    return this.exit;
   }
 
   /** Send message to child process. */
@@ -181,7 +186,7 @@ export class Script extends ContainerModule {
     // Check script file exists.
     const filePath = Validate.isFile(path.resolve(this.path, target));
     const process = childProcess.fork(filePath, forkArgs, forkOptions);
-    return new ScriptProcess(this, target, identifier, process, options);
+    return new ScriptProcess(this, `${target}.${identifier}`, process, options);
   }
 
 }

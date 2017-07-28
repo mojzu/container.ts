@@ -1,6 +1,7 @@
 export * from "./Asset";
 export * from "./ChildProcess";
 export * from "./Log";
+export * from "./Manager";
 export * from "./Metric";
 export * from "./Process";
 export * from "./RestifyServer";
