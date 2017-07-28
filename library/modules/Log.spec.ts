@@ -1,5 +1,5 @@
 /// <reference types="jasmine" />
-import { ContainerLogMessage, Container, ELogLevel } from "../../container";
+import { ContainerLogMessage, Container, ELogLevel } from "../container";
 import { Log } from "./Log";
 
 type ITestLogCallback = (log: ContainerLogMessage) => void;

@@ -7,8 +7,8 @@ import "rxjs/add/observable/throw";
 import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/operator/do";
 import "rxjs/add/operator/map";
-import { IContainerModuleOpts, ContainerModule } from "../../container";
-import { Validate } from "../../lib/validate";
+import { IContainerModuleOpts, ContainerModule } from "../container";
+import { Validate } from "../lib/validate";
 
 /** Asset files cached when read. */
 export interface IAssetCache {

@@ -3,7 +3,7 @@ import {
   IContainerModuleDepends,
   ContainerModule,
   ContainerMetricMessage,
-} from "../../container";
+} from "../container";
 
 export abstract class Metric extends ContainerModule {
 

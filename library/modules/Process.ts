@@ -4,8 +4,8 @@ import * as os from "os";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import "rxjs/add/operator/switchMap";
-import { IContainerModuleOpts, ContainerModule } from "../../container";
-import { Asset } from "../asset/Asset";
+import { IContainerModuleOpts, ContainerModule } from "../container";
+import { Asset } from "./Asset";
 
 /** Process information interface. */
 export interface IProcess {

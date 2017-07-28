@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import * as winston from "winston";
-import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "../../container";
+import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "../container";
 import { Log } from "./Log";
 
 export class WinstonLog extends Log {

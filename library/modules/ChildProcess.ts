@@ -9,7 +9,7 @@ import "rxjs/add/operator/mergeMap";
 import "rxjs/add/operator/filter";
 import "rxjs/add/operator/timeout";
 import "rxjs/add/operator/takeWhile";
-import { IContainerLogMessage, IContainerModuleOpts, ContainerModule } from "../../container";
+import { IContainerLogMessage, IContainerModuleOpts, ContainerModule } from "../container";
 import { Process } from "./Process";
 
 /** Process message types. */
@@ -104,7 +104,7 @@ export class ChildProcess extends Process implements IProcessSend {
   };
 
   /** Class event names. */
-  public static EVENTS = {
+  public static EVENT = {
     UPTIME: "uptime",
   };
 
@@ -271,7 +271,7 @@ export class ChildProcess extends Process implements IProcessSend {
 
     // Send uptime event on interval.
     Observable.interval(ChildProcess.DEFAULT_UPTIME_INTERVAL)
-      .subscribe(() => this.event<number>(ChildProcess.EVENTS.UPTIME, process.uptime()));
+      .subscribe(() => this.event<number>(ChildProcess.EVENT.UPTIME, process.uptime()));
   }
 
   /** Send message to parent process. */

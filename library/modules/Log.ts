@@ -4,8 +4,8 @@ import {
   ContainerModule,
   ContainerLogMessage,
   ELogLevel,
-} from "../../container";
-import { Validate } from "../../lib/validate";
+} from "../container";
+import { Validate } from "../lib/validate";
 
 export abstract class Log extends ContainerModule {
 

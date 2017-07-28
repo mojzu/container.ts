@@ -14,8 +14,8 @@ import {
   IContainerMetricMessage,
   IContainerModuleOpts,
   ContainerModule,
-} from "../../container";
-import { Validate } from "../../lib/validate";
+} from "../container";
+import { Validate } from "../lib/validate";
 import {
   EProcessMessageType,
   IProcessCallOptions,
@@ -23,7 +23,7 @@ import {
   IProcessMessage,
   IProcessSend,
   ChildProcess,
-} from "../process/ChildProcess";
+} from "./ChildProcess";
 
 /** Script process options. */
 export interface IScriptOptions {

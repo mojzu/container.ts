@@ -1,17 +1,19 @@
 /// <reference types="jasmine" />
-import { Container, Environment } from "../../container";
-import { ASSET_PATH } from "../../examples";
+import { Container, Environment } from "../container";
+import { ASSET_PATH } from "../examples";
 import { Asset } from "./Asset";
+import { Process } from "./Process";
 
-describe("Asset", () => {
+describe("Process", () => {
 
   const ENVIRONMENT = new Environment()
     .set(Asset.ENV.PATH, ASSET_PATH);
 
   const CONTAINER = new Container("test", ENVIRONMENT)
-    .registerModule(Asset);
+    .registerModule(Asset)
+    .registerModule(Process);
 
-  const ASSET = CONTAINER.resolve<Asset>(Asset.name);
+  const PROCESS = CONTAINER.resolve<Process>(Process.name);
 
   beforeAll((done) => {
     CONTAINER.start()
@@ -29,11 +31,9 @@ describe("Asset", () => {
       });
   });
 
-  it("#Asset", () => {
-    expect(ASSET).toBeDefined();
-    expect(ASSET.name).toEqual(Asset.name);
-    expect(ASSET.path).toBeDefined();
-    expect(ASSET.cache).toEqual({});
+  it("#Process", () => {
+    expect(PROCESS).toBeDefined();
+    expect(PROCESS.name).toEqual(Process.name);
   });
 
 });

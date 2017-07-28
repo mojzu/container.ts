@@ -4,8 +4,8 @@ import { AwilixContainer } from "awilix";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/operator/do";
-import { IContainerModuleOpts, ContainerModule, IMetricTags } from "../../container";
-import { Validate } from "../../lib/validate";
+import { IContainerModuleOpts, ContainerModule, IMetricTags } from "../container";
+import { Validate } from "../lib/validate";
 
 /** Restify server information interface. */
 export interface IRestifyServerInformation {
@@ -164,5 +164,8 @@ export class RestifyServer extends ContainerModule {
     const value = req.scope.resolve<Date>(RestifyServer.METRIC.RESPONSE_TIME);
     this.metric.timing(RestifyServer.METRIC.RESPONSE_TIME, value, tags);
   }
+
+  // TODO: ServerController
+  // TODO: registerController
 
 }
