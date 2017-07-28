@@ -2,11 +2,7 @@
 import * as process from "process";
 import { Container, Environment } from "../../container";
 import { Validate } from "../../lib/validate";
-import {
-  Asset,
-  ChildProcess,
-  SocketioServer,
-} from "../../modules";
+import { Asset, ChildProcess, SocketioServer } from "../../modules";
 
 // Create environment from process and define variables.
 const ENVIRONMENT = new Environment(process.env)
@@ -16,12 +12,13 @@ const ENVIRONMENT = new Environment(process.env)
 const NAME = Validate.isString(ENVIRONMENT.get(ChildProcess.ENV.NAME));
 
 // Create container and register modules.
+// Populate container for dependency injection.
 const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(Asset)
   .registerModule(ChildProcess)
   .registerModule(SocketioServer);
 
-// Start modules.
+// Start container modules.
 CONTAINER.start()
   .subscribe({
     error: (error) => {

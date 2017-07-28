@@ -2,7 +2,7 @@
 import * as process from "process";
 import { Container, Environment } from "container.ts";
 import { Validate } from "container.ts/lib/validate";
-import { Asset, ChildProcess } from "container.ts/modules";
+import { Asset, ChildProcess, RestifyServer } from "container.ts/modules";
 
 // Create environment instance using process environment.
 const ENVIRONMENT = new Environment(process.env);
@@ -14,7 +14,8 @@ const NAME = Validate.isString(ENVIRONMENT.get(ChildProcess.ENV.NAME));
 // Populate container for dependency injection.
 const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(Asset)
-  .registerModule(ChildProcess);
+  .registerModule(ChildProcess)
+  .registerModule(RestifyServer);
 
 // Start container modules.
 if (require.main === module) {
