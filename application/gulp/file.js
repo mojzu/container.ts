@@ -5,9 +5,7 @@ const fs = require("fs");
 const gutil = require("gulp-util");
 
 module.exports = {
-  /**
-   * Write JSON content to file.
-   */
+  /** Write JSON content to file. */
   writeJson: (root, target, content, done) => {
     const absolutePath = path.resolve(root, target);
     content = JSON.stringify(content, null, 2);

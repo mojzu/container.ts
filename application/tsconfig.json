@@ -5,7 +5,7 @@
     "declaration": false,
     "sourceMap": true,
     "outDir": "./dist",
-    "removeComments": false,
+    "removeComments": true,
     "strict": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,

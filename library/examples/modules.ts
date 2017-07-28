@@ -26,7 +26,7 @@ const CONTAINER = new Container("Main", ENVIRONMENT)
   .registerModule(StatsdMetric)
   .registerModule(Manager);
 
-// Start modules.
+// Start container modules.
 CONTAINER.start()
   .subscribe({
     error: (error) => {

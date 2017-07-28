@@ -1,54 +1,56 @@
 "use strict";
 const process = require("process");
+const path = require("path");
 const gulp = require("gulp");
 const gutil = require("gulp-util");
-const shell = require("./shell");
+const config = require("./config.js");
+const shell = require("./shell.js");
 
-function hostVersion() {
-  return "node" + process.version[1];
-}
+const PLATFORMS = {
+  linux: "linux",
+  win32: "win",
+  darwin: "macos",
+};
 
-function hostPlatform() {
-  switch (process.platform) {
-    case "linux": {
-      return "linux";
-    }
-    case "win32": {
-      return "win";
-    }
-  }
-}
+const ARCHITECTURES = {
+  x64: "x64",
+  ia32: "x86",
+  arm: "armv6",
+};
 
-function hostArch() {
-  switch (process.arch) {
-    case "x64": {
-      return "x64";
-    }
-    case "ia32": {
-      return "x86";
-    }
-    case "arm": {
-      return "armv6";
-    }
-  }
+function defaultTarget() {
+  const version = `node${process.version[1]}`;
+  const platform = PLATFORMS[process.platform];
+  const arch = ARCHITECTURES[process.arch];
+  return `${version}-${platform}-${arch}`;
 }
 
 module.exports = {
-  /**
-   * Package application into binary for host platform.
-   * TODO: Improve version/platform/arch support.
-   * TODO: Improve native module support.
-   */
-  run: (configuration, nativeModules, root, done) => {
-    const hostTarget = [hostVersion(), hostPlatform(), hostArch()].join("-");
-    gutil.log("[pkg]", hostTarget);
+  /** Package application into binary for host platform(s). */
+  run: (root, output, done) => {
+    const targets = config.pkg.targets || [];
+    let command = ["pkg", ".", "--out-path", output];
 
-    for (const path of nativeModules) {
-      gutil.log("[pkg]", "[module]", path);
-      gulp.src(path).pipe(gulp.dest("./build"));
+    // Target host platform by default.
+    if (targets.length === 0) {
+      targets.push(defaultTarget());
     }
 
-    const command = ["pkg", "--targets", hostTarget, "--out-path", "build", "."];
-    shell.run(command.join(" "), root, done);
+    // If target(s) specified, append to command.
+    if (targets.length > 0) {
+      command.push("--targets");
+      command.push(targets.join(","));
+
+      // Copy target native modules to output directory.
+      for (const target of targets) {
+        const nativeModules = path.join(config.pkg.nativeModules, target, "/**/*");
+        gulp.src(nativeModules).pipe(gulp.dest(path.resolve(output, target)));
+        gutil.log("[pkg]", "[modules]", nativeModules);
+      }
+    }
+
+    command = command.join(" ");
+    gutil.log("[pkg]", command);
+    shell.run(command, root, done);
   },
 };
