@@ -15,28 +15,117 @@ import {
   Validate,
 } from "./Validate";
 
-// TODO: OrField wrapper.
-
 /**
  * Fields have validate and format methods.
  * Validate method takes string input and returns typed output.
  * Format method takes typed input and returns string output.
  * Optional context available for additional validation/formatting information.
+ * TODO: Clean up 'any' types.
  */
-export abstract class Field {
-  public abstract validate(value: any, context?: any): any;
-  public abstract format(value: any, context?: any): any;
+export abstract class Field<T> {
+  public abstract validate(value?: string | any, context?: any): T | any;
+  public abstract format(value: T, context?: any): string | any;
+  public and(...fields: Array<Field<T>>): AndField<T> {
+    return new AndField<T>(this, ...fields);
+  }
+  public or(...fields: Array<Field<T>>): OrField<T> {
+    return new OrField<T>(this, ...fields);
+  }
+}
+
+/**
+ * And field wrapper, all input fields used to validate/format values.
+ */
+export class AndField<T> extends Field<T> {
+
+  private _fields: Array<Field<T>>;
+
+  public constructor(...fields: Array<Field<T>>) {
+    super();
+    this._fields = fields;
+  }
+
+  public validate(value: string, context?: any): T {
+    const validated = this._fields
+      .map((f) => f.validate(value, context))
+      .reduce((p, c) => ((p != null) ? p : c), null);
+
+    if (validated == null) {
+      throw new ValidateError(ValidateErrorCode.InvalidAnd);
+    }
+    return validated;
+  }
+
+  public format(value: T, context?: any): string {
+    const formatted = this._fields
+      .map((f) => f.format(value, context))
+      .reduce((p, c) => ((p != null) ? p : c), null);
+
+    if (formatted == null) {
+      throw new ValidateError(ValidateErrorCode.InvalidAnd);
+    }
+    return formatted;
+  }
+
+}
+
+/**
+ * Or field wrapper, at least one input field used to validate/format values.
+ */
+export class OrField<T> extends Field<T> {
+
+  private _fields: Array<Field<T>>;
+
+  public constructor(...fields: Array<Field<T>>) {
+    super();
+    this._fields = fields;
+  }
+
+  public validate(value: string, context?: any): T {
+    const validated = this._fields
+      .map((f) => {
+        try {
+          return f.validate(value, context);
+        } catch (error) {
+          return null;
+        }
+      })
+      .reduce((p, c) => ((p != null) ? p : c), null);
+
+    if (validated == null) {
+      throw new ValidateError(ValidateErrorCode.InvalidOr);
+    }
+    return validated;
+  }
+
+  public format(value: T, context?: any): string {
+    const formatted = this._fields
+      .map((f) => {
+        try {
+          return f.format(value, context);
+        } catch (error) {
+          return null;
+        }
+      })
+      .reduce((p, c) => ((p != null) ? p : c), null);
+
+    if (formatted == null) {
+      throw new ValidateError(ValidateErrorCode.InvalidOr);
+    }
+    return formatted;
+  }
+
 }
 
 /**
  * Optional field wrapper, if value is defined uses field to validate/format.
  * If value is undefined default or null value is returned.
  */
-export class OptionalField<T> extends Field {
+export class OptionalField<T> extends Field<T> {
 
   private _formatDefault: string | null;
 
-  public constructor(private _field: Field, private _default?: T, context?: any) {
+  public constructor(private _field: Field<T>, private _default?: T, context?: any) {
     super();
     this._formatDefault = this.format(_default, context);
   }
@@ -66,7 +155,7 @@ export class OptionalField<T> extends Field {
 /**
  * Array field wrapper, uses field to validate/format array of values.
  */
-export class ArrayField<T> extends Field {
+export class ArrayField<T> extends Field<T[]> {
 
   /** Throw error if values are not an array. */
   public static isArray(values: any): void {
@@ -75,7 +164,7 @@ export class ArrayField<T> extends Field {
     }
   }
 
-  public constructor(private _field: Field) {
+  public constructor(private _field: Field<T>) {
     super();
   }
 
@@ -91,7 +180,7 @@ export class ArrayField<T> extends Field {
 
 }
 
-export class BooleanField extends Field {
+export class BooleanField extends Field<boolean> {
   public constructor(private _options: IValidateBooleanOptions = {}) {
     super();
   }
@@ -103,7 +192,7 @@ export class BooleanField extends Field {
   }
 }
 
-export class IntegerField extends Field {
+export class IntegerField extends Field<number> {
   public constructor(private _options: IValidateIntegerOptions = {}) {
     super();
   }
@@ -115,7 +204,7 @@ export class IntegerField extends Field {
   }
 }
 
-export class FloatField extends Field {
+export class FloatField extends Field<number> {
   public constructor(private _options: IValidateNumberOptions = {}) {
     super();
   }
@@ -127,7 +216,7 @@ export class FloatField extends Field {
   }
 }
 
-export class StringField extends Field {
+export class StringField extends Field<string> {
   public constructor(private _options: IValidateStringOptions = {}) {
     super();
   }
@@ -139,7 +228,7 @@ export class StringField extends Field {
   }
 }
 
-export class AsciiField extends Field {
+export class AsciiField extends Field<string> {
   public constructor(private _options: IValidateStringOptions = {}) {
     super();
   }
@@ -151,7 +240,7 @@ export class AsciiField extends Field {
   }
 }
 
-export class Base64Field extends Field {
+export class Base64Field extends Field<string> {
   public constructor(private _options: IValidateStringOptions = {}) {
     super();
   }
@@ -163,7 +252,7 @@ export class Base64Field extends Field {
   }
 }
 
-export class PortField extends Field {
+export class PortField extends Field<number> {
   public validate(value: string): number {
     return Validate.isPort(value);
   }
@@ -172,7 +261,7 @@ export class PortField extends Field {
   }
 }
 
-export class LanguageField extends Field {
+export class LanguageField extends Field<string> {
   public validate(value: string): string {
     return Validate.isLanguage(value);
   }
@@ -181,7 +270,7 @@ export class LanguageField extends Field {
   }
 }
 
-export class CountryField extends Field {
+export class CountryField extends Field<string> {
   public validate(value: string): string {
     return Validate.isCountry(value);
   }
@@ -190,7 +279,7 @@ export class CountryField extends Field {
   }
 }
 
-export class TimeZoneField extends Field {
+export class TimeZoneField extends Field<string> {
   public validate(value: string): string {
     return Validate.isTimeZone(value);
   }
@@ -199,7 +288,7 @@ export class TimeZoneField extends Field {
   }
 }
 
-export class DateField extends Field {
+export class DateField extends Field<moment.Moment> {
   public constructor(private _options: IValidateDateOptions = {}) {
     super();
   }
@@ -211,7 +300,7 @@ export class DateField extends Field {
   }
 }
 
-export class DurationField extends Field {
+export class DurationField extends Field<moment.Duration> {
   public constructor(private _options: IValidateDurationOptions = {}) {
     super();
   }
@@ -223,7 +312,7 @@ export class DurationField extends Field {
   }
 }
 
-export class IpField extends Field {
+export class IpField extends Field<string> {
   public constructor(private _options: IValidateIpOptions = {}) {
     super();
   }
@@ -235,7 +324,7 @@ export class IpField extends Field {
   }
 }
 
-export class DomainField extends Field {
+export class DomainField extends Field<string> {
   public constructor(private _options: IValidateDomainOptions = {}) {
     super();
   }
@@ -247,7 +336,7 @@ export class DomainField extends Field {
   }
 }
 
-export class UrlField extends Field {
+export class UrlField extends Field<string> {
   public constructor(private _options: IValidateUrlOptions = { require_host: true }) {
     super();
   }
@@ -259,7 +348,7 @@ export class UrlField extends Field {
   }
 }
 
-export class EmailField extends Field {
+export class EmailField extends Field<string> {
   public constructor(private _options: IValidateEmailOptions = {}) {
     super();
   }
@@ -271,7 +360,7 @@ export class EmailField extends Field {
   }
 }
 
-export class MongoIdField extends Field {
+export class MongoIdField extends Field<string> {
   public validate(value: string): string {
     return Validate.isMongoId(value);
   }
@@ -280,7 +369,7 @@ export class MongoIdField extends Field {
   }
 }
 
-export class FileField extends Field {
+export class FileField extends Field<string> {
   public validate(value: string): string {
     return Validate.isFile(value);
   }
@@ -289,7 +378,7 @@ export class FileField extends Field {
   }
 }
 
-export class DirectoryField extends Field {
+export class DirectoryField extends Field<string> {
   public validate(value: string): string {
     return Validate.isDirectory(value);
   }

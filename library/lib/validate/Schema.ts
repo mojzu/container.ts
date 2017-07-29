@@ -17,14 +17,14 @@ export interface ISchemaData extends Object {
 
 /** Schema map type, recursive type. */
 export interface ISchemaMap {
-  [key: string]: ISchemaMap | Schema | Field;
+  [key: string]: ISchemaMap | Schema | Field<any>;
 }
 
 /** Schema map callback handlers. */
 export interface ISchemaMapHandlers {
   isSchemaMap?: (map: ISchemaMap, key: string) => void;
   isSchema?: (schema: any, key: string) => void;
-  isField?: (field: Field, key: string) => void;
+  isField?: (field: Field<any>, key: string) => void;
 }
 
 export abstract class Schema {
@@ -60,7 +60,7 @@ export abstract class Schema {
       } else if ((mapValue instanceof Field) && (handlers.isField != null)) {
 
         // Value is field class instance.
-        const field: Field = mapValue as any;
+        const field: Field<any> = mapValue as any;
         handlers.isField(field, key);
 
       } else if ((typeof mapValue === "object") && (handlers.isSchemaMap != null)) {

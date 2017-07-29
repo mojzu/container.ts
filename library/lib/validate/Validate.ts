@@ -30,6 +30,8 @@ export enum ValidateErrorCode {
   InvalidFile,
   InvalidDirectory,
   InvalidArray,
+  InvalidAnd,
+  InvalidOr,
   NodeNotAvailable,
 }
 
