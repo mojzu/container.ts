@@ -11,19 +11,19 @@ import { Validate } from "../lib/validate";
 import { Script, ScriptProcess } from "./Script";
 import { ChildProcess } from "./ChildProcess";
 
-// TODO: Manager script options (restart limit, ...).
+// TODO: Script manager options (restart limit, ...).
 
-/** Manager script interface. */
-export interface IManagerScript {
+/** Script manager target interface. */
+export interface IScriptManagerTarget {
   name: string;
   uptimeLimit?: number;
 }
 
-export class ManagerFactory {
+export class ScriptManagerFactory {
 
   /** Create manager classes for target scripts. */
-  public static create(scripts: IManagerScript[]): IContainerModuleConstructor {
-    class Manager extends ContainerModule {
+  public static create(scripts: IScriptManagerTarget[]): IContainerModuleConstructor {
+    class ScriptManager extends ContainerModule {
 
       private _script: Script;
       private _workers: Array<ScriptProcess | null> = [];
@@ -57,7 +57,7 @@ export class ManagerFactory {
         }
       }
 
-      protected startWorker(script: IManagerScript, index: number): void {
+      protected startWorker(script: IScriptManagerTarget, index: number): void {
         const uptimeLimit = this.validUptimeLimit(script.uptimeLimit);
         const worker = this._script.fork(script.name);
         this._workers[index] = worker;
@@ -91,7 +91,7 @@ export class ManagerFactory {
       }
 
     }
-    return Manager;
+    return ScriptManager;
   }
 
 }

@@ -8,7 +8,7 @@ import {
   Script,
   WinstonLog,
   StatsdMetric,
-  ManagerFactory,
+  ScriptManagerFactory,
 } from "../modules";
 
 // Create environment from process and define variables.
@@ -24,7 +24,7 @@ const CONTAINER = new Container("Main", ENVIRONMENT)
   .registerModule(Script)
   .registerModule(WinstonLog)
   .registerModule(StatsdMetric)
-  .registerModule(ManagerFactory.create([
+  .registerModule(ScriptManagerFactory.create([
     { name: "server.js" },
     { name: "socket.js" },
   ]));
