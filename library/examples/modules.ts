@@ -25,7 +25,7 @@ const CONTAINER = new Container("Main", ENVIRONMENT)
   .registerModule(WinstonLog)
   .registerModule(StatsdMetric)
   .registerModule(ScriptManagerFactory.create([
-    { name: "server.js" },
+    { name: "server.js", uptimeLimit: "PT5M" },
     { name: "socket.js" },
   ]));
 

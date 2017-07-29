@@ -16,7 +16,8 @@ import { ChildProcess } from "./ChildProcess";
 /** Script manager target interface. */
 export interface IScriptManagerTarget {
   name: string;
-  uptimeLimit?: number;
+  /** Maximum script uptime as ISO8601 duration. */
+  uptimeLimit?: string;
 }
 
 export class ScriptManagerFactory {
@@ -82,9 +83,9 @@ export class ScriptManagerFactory {
           });
       }
 
-      protected validUptimeLimit(limit?: number): number | null {
+      protected validUptimeLimit(limit?: string): number | null {
         if (limit != null) {
-          const duration = Validate.isDuration(String(limit), { unit: "m" });
+          const duration = Validate.isDuration(limit);
           return duration.asSeconds();
         }
         return null;
