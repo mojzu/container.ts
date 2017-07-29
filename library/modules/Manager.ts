@@ -1,4 +1,3 @@
-import * as moment from "moment-timezone";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import "rxjs/add/operator/takeUntil";
@@ -8,6 +7,7 @@ import {
   IContainerModuleConstructor,
   ContainerModule,
 } from "../container";
+import { Validate } from "../lib/validate";
 import { Script, ScriptProcess } from "./Script";
 import { ChildProcess } from "./ChildProcess";
 
@@ -16,7 +16,6 @@ import { ChildProcess } from "./ChildProcess";
 /** Manager script interface. */
 export interface IManagerScript {
   name: string;
-  // TODO: isDuration validator.
   uptimeLimit?: number;
 }
 
@@ -59,9 +58,7 @@ export class ManagerFactory {
       }
 
       protected startWorker(script: IManagerScript, index: number): void {
-        // TODO: Clean up argument validation.
-        const uptimeLimit = moment.duration(script.uptimeLimit || 1440, "minutes").asSeconds();
-
+        const uptimeLimit = this.validUptimeLimit(script.uptimeLimit);
         const worker = this._script.fork(script.name);
         this._workers[index] = worker;
 
@@ -78,11 +75,19 @@ export class ManagerFactory {
             this._uptimes[index] = uptime;
 
             // Restart worker process if uptime limit exceeded.
-            if (uptime > uptimeLimit) {
+            if ((uptimeLimit != null) && (uptime > uptimeLimit)) {
               this.debug(`WORKER="${worker.target}" RESTART`);
               worker.kill();
             }
           });
+      }
+
+      protected validUptimeLimit(limit?: number): number | null {
+        if (limit != null) {
+          const duration = Validate.isDuration(String(limit), { unit: "m" });
+          return duration.asSeconds();
+        }
+        return null;
       }
 
     }

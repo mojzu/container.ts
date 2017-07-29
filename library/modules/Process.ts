@@ -61,7 +61,6 @@ export class Process extends ContainerModule {
   }
 
   public get nodeEnvironment(): string {
-    // TODO: Support `NODE_ENV` in environment.
     const parts = this._version.split("-");
     return parts[1] || "production";
   }
