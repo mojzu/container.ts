@@ -21,6 +21,7 @@ export enum ValidateErrorCode {
   InvalidCountry,
   InvalidTimeZone,
   InvalidDate,
+  InvalidDuration,
   InvalidIp,
   InvalidDomain,
   InvalidUrl,
@@ -94,7 +95,13 @@ export interface IValidateStringOptions {
 
 /** Date validation options. */
 export interface IValidateDateOptions {
+  format?: string | string[];
   timezone?: string;
+}
+
+/** Duration validation options. */
+export interface IValidateDurationOptions {
+  unit?: moment.unitOfTime.DurationConstructor;
 }
 
 /** IP validation options. */
@@ -125,6 +132,7 @@ export interface IValidateUrlOptions {
 
 /** Email validation options. */
 export interface IValidateEmailOptions {
+  normalise?: boolean;
   lowercase?: boolean;
   remove_dots?: boolean;
   remove_extension?: boolean;
@@ -284,11 +292,12 @@ export class Validate {
   }
 
   public static isDate(value = "", options: IValidateDateOptions = {}): moment.Moment {
+    const format = options.format || moment.ISO_8601;
     const timezone = options.timezone || "Etc/UTC";
     let date: moment.Moment;
 
     try {
-      date = moment.tz(value, timezone);
+      date = moment.tz(value, format, timezone);
     } catch (error) {
       throw new ValidateError(ValidateErrorCode.InvalidDate, error);
     }
@@ -298,6 +307,15 @@ export class Validate {
     }
 
     return date;
+  }
+
+  public static isDuration(value = "", options: IValidateDurationOptions = {}): moment.Duration {
+    const unit = options.unit || "ms";
+    try {
+      return moment.duration(value, unit);
+    } catch (error) {
+      throw new ValidateError(ValidateErrorCode.InvalidDuration, error);
+    }
   }
 
   public static isIp(value = "", options: IValidateIpOptions = {}): string {
@@ -350,15 +368,19 @@ export class Validate {
   }
 
   public static isEmail(value = "", options: IValidateEmailOptions = {}): string {
+    const normalise = options.normalise || false;
     let email: string;
     let isEmail = false;
 
     try {
-      const normalised = validator.normalizeEmail(value, options);
-      if (!normalised) {
-        throw new ValidateError(ValidateErrorCode.InvalidEmail);
+      email = value;
+      if (normalise) {
+        const normalisedEmail = validator.normalizeEmail(value, options);
+        if (!normalisedEmail) {
+          throw new ValidateError(ValidateErrorCode.InvalidEmail);
+        }
+        email = normalisedEmail;
       }
-      email = normalised;
       isEmail = validator.isEmail(email, options);
     } catch (error) {
       throw new ValidateError(ValidateErrorCode.InvalidEmail, error);

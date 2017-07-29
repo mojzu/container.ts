@@ -7,6 +7,7 @@ import {
   IValidateNumberOptions,
   IValidateStringOptions,
   IValidateDateOptions,
+  IValidateDurationOptions,
   IValidateIpOptions,
   IValidateDomainOptions,
   IValidateUrlOptions,
@@ -207,6 +208,18 @@ export class DateField extends Field {
   }
   public format(value: moment.Moment): string {
     return value.format();
+  }
+}
+
+export class DurationField extends Field {
+  public constructor(private _options: IValidateDurationOptions = {}) {
+    super();
+  }
+  public validate(value: string): moment.Duration {
+    return Validate.isDuration(value, this._options);
+  }
+  public format(value: moment.Duration): string {
+    return value.toISOString();
   }
 }
 
