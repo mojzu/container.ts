@@ -32,6 +32,8 @@ export class RestifyServer extends ContainerModule {
   public static ENV = {
     /** Restify server port (required). */
     PORT: "RESTIFY_SERVER_PORT",
+    /** Restify server port (optional). */
+    PATH: "RESTIFY_SERVER_PATH",
   };
 
   /** Log names. */
@@ -53,9 +55,11 @@ export class RestifyServer extends ContainerModule {
   };
 
   private _port: number;
+  private _path: string;
   private _server: restify.Server;
 
   public get port(): number { return this._port; }
+  public get path(): string { return this._path; }
   public get server(): restify.Server { return this._server; }
 
   public get information(): IRestifyServerInformation {
@@ -70,9 +74,11 @@ export class RestifyServer extends ContainerModule {
   public constructor(name: string, opts: IContainerModuleOpts) {
     super(name, opts);
 
-    // Get port environment value.
+    // Get port and path environment values.
     this._port = Validate.isPort(this.environment.get(RestifyServer.ENV.PORT));
+    this._path = Validate.isString(this.environment.get(RestifyServer.ENV.PATH), { empty: true });
     this.debug(`${RestifyServer.ENV.PORT}="${this.port}"`);
+    this.debug(`${RestifyServer.ENV.PATH}="${this.path}"`);
 
     // Create Restify server with empty name and default version.
     this._server = restify.createServer({ name: "", version: RestifyServer.DEFAULT_VERSION });

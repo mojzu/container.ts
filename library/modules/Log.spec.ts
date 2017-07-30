@@ -15,7 +15,7 @@ class TestLog extends Log {
 
 describe("Log", () => {
 
-  const NAME = "test";
+  const NAME = "Test";
 
   const CONTAINER = new Container(NAME)
     .registerModule(TestLog);
