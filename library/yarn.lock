@@ -56,6 +56,12 @@
   version "6.0.85"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.85.tgz#ec02bfe54a61044f2be44f13b389c6a0e8ee05ae"
 
+"@types/restify-errors@^4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@types/restify-errors/-/restify-errors-4.3.1.tgz#900c7e1a9051a19eb8e143777f8af6b7fde2de0d"
+  dependencies:
+    "@types/verror" "*"
+
 "@types/restify@^5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@types/restify/-/restify-5.0.1.tgz#3ce7ed9f4613abafdc62e592f88565832ec60860"
@@ -78,6 +84,10 @@
 "@types/validator@^6.2.1":
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/@types/validator/-/validator-6.2.1.tgz#15ee3c2934b0bd03897116c598f93eef9f3a85e2"
+
+"@types/verror@*":
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@types/verror/-/verror-1.10.0.tgz#caf9b85518e87ac47c96b4425ddbd41606444b90"
 
 "@types/winston@^2.3.4":
   version "2.3.4"

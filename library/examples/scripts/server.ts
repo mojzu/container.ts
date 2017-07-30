@@ -3,6 +3,7 @@ import * as process from "process";
 import { Container, Environment } from "../../container";
 import { Validate } from "../../lib/validate";
 import { Asset, ChildProcess, RestifyServer } from "../../modules";
+import { ServerController } from "../src/ServerController";
 
 // Create environment from process and define variables.
 const ENVIRONMENT = new Environment(process.env)
@@ -16,7 +17,8 @@ const NAME = Validate.isString(ENVIRONMENT.get(ChildProcess.ENV.NAME));
 const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(Asset)
   .registerModule(ChildProcess)
-  .registerModule(RestifyServer);
+  .registerModule(RestifyServer)
+  .registerModule(ServerController);
 
 // Start container modules.
 CONTAINER.start()

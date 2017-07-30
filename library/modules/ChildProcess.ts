@@ -106,6 +106,7 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Class event names. */
   public static EVENT = {
     UPTIME: "uptime",
+    // TODO: Add CPU/memory usage events (move to Process?).
   };
 
   /** Extract serialisable error properties to object. */

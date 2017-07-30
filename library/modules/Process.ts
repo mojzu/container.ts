@@ -38,6 +38,11 @@ export class Process extends ContainerModule {
     PROCESS_JSON: "process.json",
   };
 
+  /** Log names. */
+  public static LOG = {
+    INFORMATION: "ProcessInformation",
+  };
+
   /** Get Node.js process title. */
   public static get title(): string { return process.title; }
 
@@ -110,7 +115,7 @@ export class Process extends ContainerModule {
         this.debug(`ENVIRONMENT="${this.nodeEnvironment}"`);
 
         // Log process information.
-        this.log.info("ProcessInformation", this.information);
+        this.log.info(Process.LOG.INFORMATION, this.information);
 
         // Process stop event handlers.
         process.on("SIGTERM", this.handleStop.bind(this, "SIGTERM"));

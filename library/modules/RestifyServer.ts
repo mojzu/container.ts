@@ -1,11 +1,18 @@
 /// <reference types="node" />
 import * as restify from "restify";
+import * as errors from "restify-errors";
 import { AwilixContainer } from "awilix";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/operator/do";
-import { IContainerModuleOpts, ContainerModule, IMetricTags } from "../container";
-import { Validate } from "../lib/validate";
+import {
+  IContainerModuleOpts,
+  IContainerModuleDepends,
+  ContainerModule,
+  IMetricTags,
+} from "../container";
+import { Validate, ISchemaMap, ISchemaConstructor, Schema } from "../lib/validate";
+import { EServerMethod, EServerStatus } from "./Server";
 
 /** Restify server information interface. */
 export interface IRestifyServerInformation {
@@ -18,10 +25,50 @@ export interface IRestifyServerInformation {
 /** Restify server request wrapper. */
 export interface IServerRequest extends restify.Request {
   scope: AwilixContainer;
+  urlParameters<T>(): T;
+  queryParameters<T>(): T;
+  bodyData<T>(): T;
 }
 
 /** Restify server response wrapper. */
 export interface IServerResponse extends restify.Response { }
+
+/** Restify server request schema options. */
+export interface IServerSchemaOptions<T> {
+  url?: T;
+  query?: T;
+  body?: T;
+  response: T;
+}
+
+/** Restify server route options. */
+export interface IServerRouteOptions {
+  name: string;
+  path: string[];
+  version?: string;
+  versions?: string[];
+  schema: IServerSchemaOptions<ISchemaMap>;
+}
+
+/** Restify server route handler. */
+export type ServerRouteHandler<T> = (req: IServerRequest, res: IServerResponse) => Promise<T>;
+
+/** Restify server request options. */
+export interface IServerRequestOptions {
+  schema: IServerSchemaOptions<ISchemaConstructor>;
+}
+
+/** Restify server route parts. */
+export type ServerRoute = [restify.RouteOptions, restify.RequestHandler[]];
+
+/** Restify server controller abstract class. */
+export abstract class RestifyServerController extends ContainerModule {
+  private _server: RestifyServer;
+  public get server(): RestifyServer { return this._server; }
+  public constructor(name: string, opts: IContainerModuleOpts, depends?: IContainerModuleDepends) {
+    super(name, opts, Object.assign({ _server: RestifyServer.name }, depends));
+  }
+}
 
 export class RestifyServer extends ContainerModule {
 
@@ -52,6 +99,13 @@ export class RestifyServer extends ContainerModule {
     RESPONSE_CLIENT_ERROR: "RestifyServerResponseClientError",
     RESPONSE_SERVER_ERROR: "RestifyServerResponseServerError",
     RESPONSE_TIME: "RestifyServerResponseTime",
+  };
+
+  /** Scope value names. */
+  public static SCOPE = {
+    URL_PARAMETERS: "urlParameters",
+    QUERY_PARAMETERS: "queryParameters",
+    BODY_DATA: "bodyData",
   };
 
   private _port: number;
@@ -96,11 +150,12 @@ export class RestifyServer extends ContainerModule {
 
     // Restify bundled plugin request handler(s).
     // TODO: Support more Restify bodyParser, throttle plugin options.
+    // TODO: CORS middleware with options.
     this._server.use(restify.plugins.acceptParser(this._server.acceptable));
     this._server.use(restify.plugins.dateParser());
     this._server.use(restify.plugins.queryParser({ mapParams: false }));
     this._server.use(restify.plugins.bodyParser({ mapParams: false }));
-    this._server.use(restify.plugins.throttle({ burst: 100, rate: 50, ip: true }));
+    // this._server.use(restify.plugins.throttle({ burst: 100, rate: 50, ip: true }));
   }
 
   public start(): Observable<void> {
@@ -113,6 +168,41 @@ export class RestifyServer extends ContainerModule {
     // Do not wait for server close, causes timeout.
     this._server.close();
     this.handleServerClose();
+  }
+
+  public get<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+    const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.GET, options, handler);
+    this._server.get(routeOptions, ...routeHandlers);
+  }
+
+  public head<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+    const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.HEAD, options, handler);
+    this._server.head(routeOptions, ...routeHandlers);
+  }
+
+  public post<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+    const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.POST, options, handler);
+    this._server.post(routeOptions, ...routeHandlers);
+  }
+
+  public put<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+    const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.PUT, options, handler);
+    this._server.put(routeOptions, ...routeHandlers);
+  }
+
+  public del<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+    const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.DELETE, options, handler);
+    this._server.get(routeOptions, ...routeHandlers);
+  }
+
+  public options<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+    const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.OPTIONS, options, handler);
+    this._server.opts(routeOptions, ...routeHandlers);
+  }
+
+  public patch<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+    const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.PATCH, options, handler);
+    this._server.patch(routeOptions, ...routeHandlers);
   }
 
   protected handleServerError(error: any): void {
@@ -138,7 +228,54 @@ export class RestifyServer extends ContainerModule {
     // Create container scope on request.
     req.scope = this.container.createScope();
     req.scope.registerValue(RestifyServer.METRIC.RESPONSE_TIME, new Date());
+
+    // Getters for scope values.
+    Object.keys(RestifyServer.SCOPE).map((key) => {
+      const target = RestifyServer.SCOPE[key];
+      req[target] = req.scope.resolve.bind(req.scope, target);
+    });
+
     return next();
+  }
+
+  protected handleRequestSchema(options: IServerRequestOptions): restify.RequestHandler {
+    return (req: IServerRequest, res: IServerResponse, next: restify.Next) => {
+      try {
+        // Perform URL, query and body validation using schemas.
+        if (options.schema.url != null) {
+          const data = options.schema.url.validate(req.params);
+          req.scope.registerValue(RestifyServer.SCOPE.URL_PARAMETERS, data);
+        }
+        if (options.schema.query != null) {
+          const data = options.schema.query.validate(req.query);
+          req.scope.registerValue(RestifyServer.SCOPE.QUERY_PARAMETERS, data);
+        }
+        if (options.schema.body != null) {
+          const data = options.schema.body.validate(req.body);
+          req.scope.registerValue(RestifyServer.SCOPE.BODY_DATA, data);
+        }
+        return next();
+      } catch (error) {
+        this.debug(error);
+        return next(new errors.BadRequestError(error));
+      }
+    };
+  }
+
+  protected handleRequest<T>(options: IServerRequestOptions, handler: ServerRouteHandler<T>): restify.RequestHandler {
+    return (req: IServerRequest, res: IServerResponse, next: restify.Next) => {
+      handler(req, res)
+        .then((data) => {
+          // Apply schema format rules.
+          data = options.schema.response.format<T>(data);
+          res.send(data);
+          next();
+        })
+        .catch((error) => {
+          this.debug(error);
+          next(error);
+        });
+    };
   }
 
   protected handlePostRequest(req: IServerRequest, res: IServerResponse, route?: restify.Route, error?: any): void {
@@ -152,14 +289,12 @@ export class RestifyServer extends ContainerModule {
     }
 
     // Emit response status code category metric.
-    // TODO: Status code enumeration.
-    if (res.statusCode < 400) {
+    if (res.statusCode < EServerStatus.BAD_REQUEST) {
       this.metric.increment(RestifyServer.METRIC.RESPONSE_OK, 1, tags);
-    } else if (res.statusCode < 500) {
+    } else if (res.statusCode < EServerStatus.INTERNAL_SERVER_ERROR) {
       this.metric.increment(RestifyServer.METRIC.RESPONSE_CLIENT_ERROR, 1, tags);
     } else {
       this.metric.increment(RestifyServer.METRIC.RESPONSE_SERVER_ERROR, 1, tags);
-
       // Log errors if server error.
       if (error != null) {
         this.log.error(error, tags);
@@ -171,7 +306,60 @@ export class RestifyServer extends ContainerModule {
     this.metric.timing(RestifyServer.METRIC.RESPONSE_TIME, value, tags);
   }
 
-  // TODO: ServerController
-  // TODO: registerController
+  protected buildRoute<T>(
+    method: EServerMethod,
+    options: IServerRouteOptions,
+    handler: ServerRouteHandler<T>,
+  ): ServerRoute {
+    const requestOptions: IServerRequestOptions = {
+      schema: {
+        // Default empty schema for responses.
+        response: this.buildSchema(),
+      },
+    };
+
+    // Build request schema classes.
+    Object.keys(options.schema).map((key) => {
+      if (options.schema[key] != null) {
+        requestOptions.schema[key] = this.buildSchema(options.schema[key]);
+      }
+    });
+
+    // Restify route options.
+    const routeOptions: restify.RouteOptions = {
+      name: options.name,
+      path: this.joinPath(...options.path),
+      // TODO: Handle version/versions properties.
+    };
+
+    // Prepend default handlers to request.
+    const routeHandlers: restify.RequestHandler[] = [
+      this.handleRequestSchema(requestOptions),
+      this.handleRequest<T>(requestOptions, handler),
+    ];
+
+    this.debugRoute(method, routeOptions);
+    return [routeOptions, routeHandlers];
+  }
+
+  /** Build schema class using input map. */
+  protected buildSchema(map: ISchemaMap = {}): ISchemaConstructor {
+    class RestifyServerSchema extends Schema {
+      public static MAP: ISchemaMap = map;
+    }
+    return RestifyServerSchema;
+  }
+
+  protected debugRoute(method: EServerMethod, route: restify.RouteOptions): void {
+    this.debug(`${EServerMethod[method]} NAME="${route.name}" PATH="${route.path}"`);
+  }
+
+  /** Join URL segments and remove duplicate '/' characters. */
+  protected joinPath(...parts: string[]): string {
+    const output = ["/", this.path, "/"];
+    output.push(parts.join("/"));
+    output.push("/");
+    return output.join("/").replace(/(\/\/+)/g, "/");
+  }
 
 }

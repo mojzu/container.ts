@@ -50,6 +50,7 @@
     "@types/moment-timezone": "^0.2.34",
     "@types/node": "^6.0.85",
     "@types/restify": "^5.0.1",
+    "@types/restify-errors": "^4.3.1",
     "@types/socket.io": "^1.4.29",
     "@types/validator": "^6.2.1",
     "@types/winston": "^2.3.4",
