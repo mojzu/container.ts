@@ -27,6 +27,16 @@ export interface ISchemaMapHandlers {
   isField?: (field: Field<any>, key: string) => void;
 }
 
+/** Schema static interface. */
+export interface ISchemaConstructor {
+  MAP: ISchemaMap;
+  new(name: string): Schema;
+  isSchema(value: any): boolean;
+  map(map: ISchemaMap, handlers: ISchemaMapHandlers): void;
+  validate<T extends ISchemaData>(data: any): T;
+  format<T extends ISchemaData>(data: T): any;
+}
+
 export abstract class Schema {
 
   /** Schema map, override in child classes. */
