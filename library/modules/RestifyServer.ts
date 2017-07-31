@@ -86,6 +86,10 @@ export class RestifyServer extends ContainerModule {
     PORT: "RESTIFY_SERVER_PORT",
     /** Restify server port (optional). */
     PATH: "RESTIFY_SERVER_PATH",
+    /** Restify server throttle rate (default 50). */
+    THROTTLE_RATE: "RESTIFY_SERVER_THROTTLE_RATE",
+    /** Restify server throttle burst (default 100). */
+    THROTTLE_BURST: "RESTIFY_SERVER_THROTTLE_BURST",
   };
 
   /** Log names. */
@@ -115,10 +119,14 @@ export class RestifyServer extends ContainerModule {
 
   private _port: number;
   private _path: string;
+  private _throttleRate: number;
+  private _throttleBurst: number;
   private _server: restify.Server;
 
   public get port(): number { return this._port; }
   public get path(): string { return this._path; }
+  public get throttleRate(): number { return this._throttleRate; }
+  public get throttleBurst(): number { return this._throttleBurst; }
   public get server(): restify.Server { return this._server; }
 
   public get information(): IRestifyServerInformation {
@@ -135,9 +143,19 @@ export class RestifyServer extends ContainerModule {
 
     // Get port and path environment values.
     this._port = Validate.isPort(this.environment.get(RestifyServer.ENV.PORT));
-    this._path = Validate.isString(this.environment.get(RestifyServer.ENV.PATH), { empty: true });
     this.debug(`${RestifyServer.ENV.PORT}="${this.port}"`);
+
+    this._path = Validate.isString(this.environment.get(RestifyServer.ENV.PATH), { empty: true });
     this.debug(`${RestifyServer.ENV.PATH}="${this.path}"`);
+
+    // Get rate and burst environment values.
+    const throttleRate = this.environment.get(RestifyServer.ENV.THROTTLE_RATE) || "50";
+    this._throttleRate = Validate.isInteger(throttleRate, { min: 0 });
+    this.debug(`${RestifyServer.ENV.THROTTLE_RATE}="${this.throttleRate}"`);
+
+    const throttleBurst = this.environment.get(RestifyServer.ENV.THROTTLE_BURST) || "100";
+    this._throttleBurst = Validate.isInteger(throttleBurst, { min: 0 });
+    this.debug(`${RestifyServer.ENV.THROTTLE_BURST}="${this.throttleBurst}"`);
 
     // Create Restify server with empty name and default version.
     this._server = restify.createServer({ name: "", version: RestifyServer.DEFAULT_VERSION });
@@ -154,13 +172,17 @@ export class RestifyServer extends ContainerModule {
     this._server.pre(this.handlePreRequest.bind(this));
 
     // Restify bundled plugin request handler(s).
-    // TODO: Support more Restify bodyParser, throttle plugin options.
+    // TODO: Support more Restify bodyParser plugin options.
     // TODO: CORS middleware with options.
     this._server.use(restify.plugins.acceptParser(this._server.acceptable));
     this._server.use(restify.plugins.dateParser());
     this._server.use(restify.plugins.queryParser({ mapParams: false }));
     this._server.use(restify.plugins.bodyParser({ mapParams: false }));
-    // this._server.use(restify.plugins.throttle({ burst: 100, rate: 50, ip: true }));
+    this._server.use(restify.plugins.throttle({
+      rate: this.throttleRate,
+      burst: this.throttleBurst,
+      xff: true,
+    }));
   }
 
   public start(): Observable<void> {
@@ -195,9 +217,9 @@ export class RestifyServer extends ContainerModule {
     this._server.put(routeOptions, ...routeHandlers);
   }
 
-  public del<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+  public delete<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
     const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.DELETE, options, handler);
-    this._server.get(routeOptions, ...routeHandlers);
+    this._server.del(routeOptions, ...routeHandlers);
   }
 
   public options<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
@@ -334,8 +356,13 @@ export class RestifyServer extends ContainerModule {
     const routeOptions: restify.RouteOptions = {
       name: options.name,
       path: this.joinPath(...options.path),
-      // TODO: Handle version/versions properties.
     };
+    if (options.version != null) {
+      routeOptions.version = options.version;
+    }
+    if (options.versions != null) {
+      routeOptions.versions = options.versions;
+    }
 
     // Prepend default handlers to request.
     const routeHandlers: restify.RequestHandler[] = [
