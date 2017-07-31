@@ -19,15 +19,13 @@ const customerField = new validate.StringField({ max: 128 });
 const optionalCustomerField = new validate.OptionalField(customerField);
 
 // Define schema using fields.
-class GroupSchema extends validate.Schema {
-  public static MAP: validate.ISchemaMap = {
-    name: nameField,
-    information: {
-      theme: optionalThemeField,
-      customer: optionalCustomerField,
-    },
-  };
-}
+const groupSchema = validate.buildSchema({
+  name: nameField,
+  information: {
+    theme: optionalThemeField,
+    customer: optionalCustomerField,
+  },
+});
 
 // Validate input data.
 const input = {
@@ -37,5 +35,5 @@ const input = {
     customer: "CustomerName",
   },
 };
-const validated = GroupSchema.validate<IGroup>(input);
+const validated = groupSchema.validate<IGroup>(input);
 process.stdout.write(`${JSON.stringify(validated, null, 2)}\n`);
