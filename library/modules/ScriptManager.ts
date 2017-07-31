@@ -8,6 +8,7 @@ import {
   ContainerModule,
 } from "../container";
 import { Validate } from "../lib/validate";
+import { IProcessStatus } from "./Process";
 import { Script, ScriptProcess } from "./Script";
 import { ChildProcess } from "./ChildProcess";
 
@@ -20,19 +21,22 @@ export interface IScriptManagerTarget {
   uptimeLimit?: string;
 }
 
+/** Script manager module interface. */
+export interface IScriptManager {
+  workers: Array<ScriptProcess | null>;
+}
+
 export class ScriptManagerFactory {
 
   /** Create manager classes for target scripts. */
   public static create(scripts: IScriptManagerTarget[]): IContainerModuleConstructor {
-    class ScriptManager extends ContainerModule {
+    class ScriptManager extends ContainerModule implements IScriptManager {
 
       private _script: Script;
       private _workers: Array<ScriptProcess | null> = [];
-      private _uptimes: Array<number | null> = [];
       private _unsubscribe = new Subject<void>();
 
       public get workers(): Array<ScriptProcess | null> { return this._workers; }
-      public get uptimes(): Array<number | null> { return this._uptimes; }
 
       public constructor(name: string, opts: IContainerModuleOpts) {
         super(name, opts, { _script: Script.name });
@@ -69,14 +73,11 @@ export class ScriptManagerFactory {
           .subscribe((code) => this.startWorker(script, index));
 
         // Track process uptime.
-        worker.listen<number>(ChildProcess.EVENT.UPTIME)
+        worker.listen<IProcessStatus>(ChildProcess.EVENT.STATUS)
           .takeUntil(this._unsubscribe)
-          .subscribe((uptime) => {
-            this.debug(`WORKER="${worker.target}" UPTIME="${uptime}"`);
-            this._uptimes[index] = uptime;
-
+          .subscribe((status) => {
             // Restart worker process if uptime limit exceeded.
-            if ((uptimeLimit != null) && (uptime > uptimeLimit)) {
+            if ((uptimeLimit != null) && (status.uptime > uptimeLimit)) {
               this.debug(`WORKER="${worker.target}" RESTART`);
               worker.kill();
             }

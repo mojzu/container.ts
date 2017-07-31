@@ -10,7 +10,7 @@ import "rxjs/add/operator/filter";
 import "rxjs/add/operator/timeout";
 import "rxjs/add/operator/takeWhile";
 import { IContainerLogMessage, IContainerModuleOpts, ContainerModule } from "../container";
-import { Process } from "./Process";
+import { IProcessStatus, Process } from "./Process";
 
 /** Process message types. */
 export enum EProcessMessageType {
@@ -94,8 +94,8 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Default call method timeout (10s). */
   public static DEFAULT_TIMEOUT = 10000;
 
-  /** Default interval to send uptime events (1m). */
-  public static DEFAULT_UPTIME_INTERVAL = 60000;
+  /** Default interval to send status events (1m). */
+  public static DEFAULT_STATUS_INTERVAL = 60000;
 
   /** Environment variable names. */
   public static ENV = {
@@ -105,8 +105,7 @@ export class ChildProcess extends Process implements IProcessSend {
 
   /** Class event names. */
   public static EVENT = {
-    UPTIME: "uptime",
-    // TODO: Add CPU/memory usage events (move to Process?).
+    STATUS: "status",
   };
 
   /** Extract serialisable error properties to object. */
@@ -270,9 +269,9 @@ export class ChildProcess extends Process implements IProcessSend {
     this.container.metrics
       .subscribe((metric) => this.send(EProcessMessageType.Metric, metric));
 
-    // Send uptime event on interval.
-    Observable.interval(ChildProcess.DEFAULT_UPTIME_INTERVAL)
-      .subscribe(() => this.event<number>(ChildProcess.EVENT.UPTIME, process.uptime()));
+    // Send status event on interval.
+    Observable.interval(ChildProcess.DEFAULT_STATUS_INTERVAL)
+      .subscribe(() => this.event<IProcessStatus>(ChildProcess.EVENT.STATUS, this.status));
   }
 
   /** Send message to parent process. */

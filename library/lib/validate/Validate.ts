@@ -47,6 +47,7 @@ function validateErrorMessage(code: number, error?: any) {
 /** Validate error class. */
 export class ValidateError extends Error {
   public thrownError?: any;
+  // TODO: Clean up/test error handling.
   public constructor(code: number, thrownError?: any) {
     const error: any = super(validateErrorMessage(code, thrownError));
     this.name = error.name = "ValidateError";

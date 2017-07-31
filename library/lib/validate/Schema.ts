@@ -3,6 +3,7 @@ import { Field } from "./Field";
 /** Schema error class. */
 export class SchemaError extends Error {
   // TODO: Improve SchemaError input arguments.
+  // TODO: Clean up/test error handling.
   public constructor(key: any) {
     const error: any = super(key);
     this.name = error.name = "SchemaError";
