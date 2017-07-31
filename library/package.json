@@ -38,7 +38,7 @@
   "optionalDependencies": {
     "moment-timezone": "^0.5.13",
     "restify": "^5.0.1",
-    "rollbar": "^2.1.0",
+    "rollbar": "^2.1.1",
     "socket.io": "^2.0.3",
     "statsd-client": "^0.4.0",
     "validator": "^8.0.0",

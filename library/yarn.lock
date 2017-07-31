@@ -1233,8 +1233,8 @@ js-tokens@^3.0.0:
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
 
 js-yaml@3.x:
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.9.0.tgz#4ffbbf25c2ac963b8299dc74da7e3740de1c18ce"
+  version "3.9.1"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.9.1.tgz#08775cebdfdd359209f0d2acd383c8f86a6904a0"
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
@@ -1918,9 +1918,9 @@ rimraf@~2.4.0:
   dependencies:
     glob "^6.0.1"
 
-rollbar@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.1.0.tgz#fa1e002683188d11553cd701e41f0dd66a9f91cd"
+rollbar@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.1.1.tgz#f53672abbb9f5a09749e4e41b1059bc353d1379c"
   dependencies:
     async "~1.2.1"
     console-polyfill "0.3.0"
