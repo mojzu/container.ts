@@ -184,4 +184,28 @@ describe("Schema", () => {
     expect(formatted.wildcardArray[2]).toEqual("baz");
   });
 
+  it("#Mask", () => {
+    const inputMask = {
+      booleanField: true,
+      mapOuter: {
+        booleanMapOuterField: true,
+      },
+      childSchema: true,
+    };
+    const masked = dataSchema.validate<IData>(inputData, inputMask);
+    expect(masked.booleanField).toEqual(true);
+    expect(masked.stringField).toBeUndefined();
+    expect(masked.mapOuter).toBeDefined();
+    expect(masked.mapOuter.booleanMapOuterField).toEqual(false);
+    expect(masked.mapOuter.stringMapOuterField).toBeUndefined();
+    expect(masked.mapOuter.mapInner).toBeUndefined();
+    expect(masked.mapOptional).toBeUndefined();
+    expect(masked.childSchema).toBeDefined();
+    expect(masked.childSchema.booleanField).toEqual(true);
+    expect(masked.childSchema.stringField).toEqual("foo");
+    expect(masked.arrayOuter).toBeUndefined();
+    expect(masked.wildcardMap).toBeUndefined();
+    expect(masked.wildcardArray).toBeUndefined();
+  });
+
 });
