@@ -107,6 +107,7 @@ export class RestifyServer extends ContainerModule {
     RESPONSE_OK: "RestifyServerResponseOk",
     RESPONSE_CLIENT_ERROR: "RestifyServerResponseClientError",
     RESPONSE_SERVER_ERROR: "RestifyServerResponseServerError",
+    // TODO: Telegraf not receiving timing metrics?
     RESPONSE_TIME: "RestifyServerResponseTime",
   };
 

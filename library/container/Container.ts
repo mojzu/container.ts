@@ -145,6 +145,7 @@ export class Container {
   /** Send log message of level for module. */
   public sendLog(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, args: any[]): void {
     this._logs.next(new ContainerLogMessage(level, message, metadata, args));
+    // TODO: Default tags including moduleName?
     this.sendMetric(EMetricType.Increment, `Log${ELogLevel[level]}`, 1, {});
   }
 
