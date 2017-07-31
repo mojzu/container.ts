@@ -2,10 +2,8 @@
 import { ValidateError } from "./Validate";
 import {
   OptionalField,
-  ArrayField,
   IntegerField,
   FloatField,
-  BooleanField,
   PortField,
 } from "./Field";
 
@@ -32,19 +30,6 @@ describe("Field", () => {
   it("#OptionalField format", () => {
     const value = optionalIntegerField.format();
     expect(value).toEqual("1");
-  });
-
-  const booleanField = new BooleanField();
-  const booleanArrayField = new ArrayField<boolean>(booleanField);
-
-  it("#ArrayField validate", () => {
-    const values = booleanArrayField.validate(["1", "false"]);
-    expect(values).toEqual([true, false]);
-  });
-
-  it("#ArrayField format", () => {
-    const values = booleanArrayField.format([true, false]);
-    expect(values).toEqual(["true", "false"]);
   });
 
   const portField = new PortField();

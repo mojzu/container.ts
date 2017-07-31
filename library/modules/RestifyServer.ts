@@ -11,7 +11,12 @@ import {
   ContainerModule,
   IMetricTags,
 } from "../container";
-import { Validate, ISchemaMap, ISchemaConstructor, Schema } from "../lib/validate";
+import {
+  Validate,
+  ISchemaMap,
+  ISchemaConstructor,
+  buildSchema,
+} from "../lib/validate";
 import { EServerMethod, EServerStatus } from "./Server";
 
 /** Restify server information interface. */
@@ -314,14 +319,14 @@ export class RestifyServer extends ContainerModule {
     const requestOptions: IServerRequestOptions = {
       schema: {
         // Default empty schema for responses.
-        response: this.buildSchema(),
+        response: buildSchema(),
       },
     };
 
     // Build request schema classes.
     Object.keys(options.schema).map((key) => {
       if (options.schema[key] != null) {
-        requestOptions.schema[key] = this.buildSchema(options.schema[key]);
+        requestOptions.schema[key] = buildSchema(options.schema[key]);
       }
     });
 
@@ -340,14 +345,6 @@ export class RestifyServer extends ContainerModule {
 
     this.debugRoute(method, routeOptions);
     return [routeOptions, routeHandlers];
-  }
-
-  /** Build schema class using input map. */
-  protected buildSchema(map: ISchemaMap = {}): ISchemaConstructor {
-    class RestifyServerSchema extends Schema {
-      public static MAP: ISchemaMap = map;
-    }
-    return RestifyServerSchema;
   }
 
   protected debugRoute(method: EServerMethod, route: restify.RouteOptions): void {

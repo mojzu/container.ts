@@ -1,81 +1,187 @@
 /// <reference types="jasmine" />
-import { Schema, ISchemaMap } from "./Schema";
-import { BooleanField } from "./Field";
+import { buildSchema } from "./Schema";
+import { OptionalField, BooleanField, StringField } from "./Field";
 
 const booleanField = new BooleanField();
-const booleanStrictField = new BooleanField({ strict: true });
+const stringField = new StringField();
+const optionalBooleanField = new OptionalField(booleanField);
+const optionalStringField = new OptionalField(stringField);
 
-interface IBooleanChildData {
-  value1: boolean;
-}
-
-interface IBooleanData {
-  value1: boolean;
-  value2: boolean;
-  group1: {
-    value1: boolean;
-  };
-  child1: IBooleanChildData;
-}
-
-class BooleanChildDataSchema extends Schema {
-  public static MAP: ISchemaMap = {
-    value1: booleanStrictField,
-  };
-}
-
-class BooleanDataSchema extends Schema {
-  public static MAP: ISchemaMap = {
-    value1: booleanField,
-    value2: booleanStrictField,
-    group1: {
-      value1: booleanField,
+interface IData {
+  booleanField: boolean;
+  stringField: string;
+  mapOuter: {
+    booleanMapOuterField: boolean;
+    stringMapOuterField: string;
+    mapInner: {
+      booleanMapInnerField: boolean;
+      stringMapInnerField: string;
     },
-    child1: BooleanChildDataSchema,
   };
+  mapOptional?: {
+    booleanOptionalField?: boolean;
+    stringOptionalField?: string;
+  };
+  childSchema: {
+    booleanField: boolean;
+    stringField: string;
+  };
+  arrayOuter: [
+    boolean,
+    string,
+    [
+      boolean,
+      string
+    ]
+  ];
+  wildcardMap?: {
+    [key: string]: boolean;
+  };
+  wildcardArray?: string[];
 }
+
+const dataSchema = buildSchema({
+  // Fields.
+  booleanField,
+  stringField,
+  // Mapped fields.
+  mapOuter: {
+    booleanMapOuterField: booleanField,
+    stringMapOuterField: stringField,
+    mapInner: {
+      booleanMapInnerField: booleanField,
+      stringMapInnerField: stringField,
+    },
+  },
+  // Optional mapped fields.
+  mapOptional: {
+    booleanOptionalField: optionalBooleanField,
+    stringOptionalField: optionalStringField,
+  },
+  // Child schemas.
+  childSchema: buildSchema({
+    booleanField,
+    stringField,
+  }),
+  // Array of fields.
+  arrayOuter: [
+    booleanField,
+    stringField,
+    [
+      booleanField,
+      stringField,
+    ],
+  ],
+  // Wildcard mapped fields.
+  wildcardMap: {
+    "*": booleanField,
+  },
+  // Wildcard array fields.
+  wildcardArray: ["*", stringField],
+});
 
 describe("Schema", () => {
 
-  const booleanInputData = {
-    value1: "foo",
-    value2: "false",
-    group1: {
-      value1: "",
+  const inputData = {
+    booleanField: "1",
+    stringField: "foo",
+    mapOuter: {
+      booleanMapOuterField: "false",
+      stringMapOuterField: "bar",
+      mapInner: {
+        booleanMapInnerField: "1",
+        stringMapInnerField: "baz",
+      },
     },
-    child1: {
-      value1: "1",
+    mapOptional: {
+      booleanOptionalField: "10",
     },
+    childSchema: {
+      booleanField: "1",
+      stringField: "foo",
+    },
+    arrayOuter: [
+      "true",
+      "bar",
+      [
+        "false",
+        "baz",
+      ],
+    ],
+    wildcardMap: {
+      one: "0",
+      two: "1",
+    },
+    wildcardArray: ["foo", "bar", "baz"],
   };
-  const booleanData: IBooleanData = {
-    value1: true,
-    value2: false,
-    group1: {
-      value1: false,
-    },
-    child1: {
-      value1: true,
-    },
-  };
+  const validated = dataSchema.validate<IData>(inputData);
+  const formatted = dataSchema.format<IData>(validated);
 
-  it("Boolean input data is validated", () => {
-    const validated = BooleanDataSchema.validate<IBooleanData>(booleanInputData);
-    expect(validated.value1).toEqual(true);
-    expect(validated.value2).toEqual(false);
-    expect(validated.group1).toBeDefined();
-    expect(validated.group1.value1).toEqual(false);
-    expect(validated.child1).toBeDefined();
-    expect(validated.child1.value1).toEqual(true);
+  it("#Field", () => {
+    expect(validated.booleanField).toEqual(true);
+    expect(validated.stringField).toEqual("foo");
+    expect(formatted.booleanField).toEqual("true");
+    expect(formatted.stringField).toEqual("foo");
   });
 
-  it("Boolean data is formatted", () => {
-    const formatted = BooleanDataSchema.format<IBooleanData>(booleanData);
-    expect(formatted.value1).toEqual("true");
-    expect(formatted.value2).toEqual("false");
-    expect(formatted.group1).toBeDefined();
-    expect(formatted.group1.value1).toEqual("false");
-    expect(formatted.child1).toBeDefined();
-    expect(formatted.child1.value1).toEqual("true");
+  it("#Map", () => {
+    expect(validated.mapOuter).toBeDefined();
+    expect(validated.mapOuter.booleanMapOuterField).toEqual(false);
+    expect(validated.mapOuter.stringMapOuterField).toEqual("bar");
+    expect(validated.mapOuter.mapInner).toBeDefined();
+    expect(validated.mapOuter.mapInner.booleanMapInnerField).toEqual(true);
+    expect(validated.mapOuter.mapInner.stringMapInnerField).toEqual("baz");
+  });
+
+  it("#OptionalField", () => {
+    expect(validated.mapOptional).toBeDefined();
+    if (validated.mapOptional != null) {
+      expect(validated.mapOptional.booleanOptionalField).toEqual(true);
+      expect(validated.mapOptional.stringOptionalField).toBeUndefined();
+    }
+  });
+
+  it("#ChildSchema", () => {
+    expect(validated.childSchema).toBeDefined();
+    expect(validated.childSchema.booleanField).toEqual(true);
+    expect(validated.childSchema.stringField).toEqual("foo");
+  });
+
+  it("#Array", () => {
+    expect(validated.arrayOuter).toBeDefined();
+    expect(validated.arrayOuter.length).toEqual(3);
+    expect(validated.arrayOuter[0]).toEqual(true);
+    expect(validated.arrayOuter[1]).toEqual("bar");
+    expect(validated.arrayOuter[2]).toBeDefined();
+    expect(validated.arrayOuter[2].length).toEqual(2);
+    expect(validated.arrayOuter[2][0]).toEqual(false);
+    expect(validated.arrayOuter[2][1]).toEqual("baz");
+  });
+
+  it("#WildcardMap", () => {
+    expect(validated.wildcardMap).toBeDefined();
+    if (validated.wildcardMap != null) {
+      expect(validated.wildcardMap.one).toEqual(false);
+      expect(validated.wildcardMap.two).toEqual(true);
+    }
+    expect(formatted.wildcardMap).toBeDefined();
+    expect(formatted.wildcardMap.one).toEqual("false");
+    expect(formatted.wildcardMap.two).toEqual("true");
+  });
+
+  it("#WildcardArray", () => {
+    expect(validated.wildcardArray).toBeDefined();
+    if (validated.wildcardArray != null) {
+      expect(validated.wildcardArray.length).toEqual(3);
+      expect(validated.wildcardArray[0]).toEqual("foo");
+      expect(validated.wildcardArray[1]).toEqual("bar");
+      expect(validated.wildcardArray[2]).toEqual("baz");
+    }
+    expect(formatted.wildcardArray).toBeDefined();
+    expect(formatted.wildcardArray.length).toEqual(3);
+    expect(formatted.wildcardArray[0]).toEqual("foo");
+    expect(formatted.wildcardArray[1]).toEqual("bar");
+    expect(formatted.wildcardArray[2]).toEqual("baz");
   });
 
 });

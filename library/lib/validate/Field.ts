@@ -20,11 +20,11 @@ import {
  * Validate method takes string input and returns typed output.
  * Format method takes typed input and returns string output.
  * Optional context available for additional validation/formatting information.
- * TODO: Clean up 'any' types.
+ * TODO: Add NotField wrapper.
  */
 export abstract class Field<T> {
-  public abstract validate(value?: string | any, context?: any): T | any;
-  public abstract format(value: T, context?: any): string | any;
+  public abstract validate(value?: string, context?: any): T | null;
+  public abstract format(value: T, context?: any): string | null;
   public and(...fields: Array<Field<T>>): AndField<T> {
     return new AndField<T>(this, ...fields);
   }
@@ -148,34 +148,6 @@ export class OptionalField<T> extends Field<T> {
       return this._field.format(this._default, context);
     }
     return this._field.format(value, context);
-  }
-
-}
-
-/**
- * Array field wrapper, uses field to validate/format array of values.
- */
-export class ArrayField<T> extends Field<T[]> {
-
-  /** Throw error if values are not an array. */
-  public static isArray(values: any): void {
-    if (!Array.isArray(values)) {
-      throw new ValidateError(ValidateErrorCode.InvalidArray);
-    }
-  }
-
-  public constructor(private _field: Field<T>) {
-    super();
-  }
-
-  public validate(values: string[], context?: any): T[] {
-    ArrayField.isArray(values);
-    return values.map((v) => this._field.validate(v, context));
-  }
-
-  public format(values: T[], context?: any): string[] {
-    ArrayField.isArray(values);
-    return values.map((v) => this._field.format(v, context));
   }
 
 }
