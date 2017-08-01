@@ -29,14 +29,13 @@ export enum ValidateErrorCode {
   InvalidMongoId,
   InvalidFile,
   InvalidDirectory,
-  InvalidArray,
   InvalidAnd,
   InvalidOr,
+  InvalidSchema,
   NodeNotAvailable,
 }
 
-/** Validation code message string or unknown. */
-function validateErrorMessage(code: number, value?: any, error?: any) {
+function validateErrorMessage(code: number, value?: any, error?: any): string {
   let message = ValidateErrorCode[code] || "Unknown";
   if (value != null) {
     message += ` "${value}"`;
