@@ -2,8 +2,8 @@
 const path = require("path");
 const gulp = require("gulp");
 const gutil = require("gulp-util");
-const clean = require("./gulp/clean");
-const shell = require("./gulp/shell");
+const clean = require("./gulp/clean.js");
+const shell = require("./gulp/shell.js");
 
 // Library package path and file.
 const packagePath = path.resolve(__dirname);
