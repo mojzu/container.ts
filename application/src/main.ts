@@ -10,7 +10,7 @@ import {
   RollbarLog,
   StatsdMetric,
   RestifyServer,
-  ManagerFactory,
+  ScriptManagerFactory,
 } from "container.ts/modules";
 import * as constants from "./constants";
 
@@ -41,7 +41,7 @@ const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(Script)
   .registerModule(WinstonLog)
   .registerModule(StatsdMetric)
-  .registerModule(ManagerFactory.create([
+  .registerModule(ScriptManagerFactory.create([
     { name: "worker.js" },
   ]));
 
