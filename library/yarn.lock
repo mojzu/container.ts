@@ -49,8 +49,8 @@
     moment ">=2.14.0"
 
 "@types/node@*":
-  version "8.0.18"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.18.tgz#9e96603a02a38889d08f451906f9cb56a2725ff5"
+  version "8.0.19"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.19.tgz#e46e2b0243de7d03f15b26b45c59ebb84f657a4e"
 
 "@types/node@^6.0.85":
   version "6.0.85"
