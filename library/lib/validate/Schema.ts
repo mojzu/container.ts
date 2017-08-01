@@ -1,4 +1,4 @@
-import { ValidateErrorCode, ValidateError } from "./Validate";
+import { EValidateErrorCode, ValidateError } from "./Validate";
 import { Field } from "./Field";
 
 function schemaErrorMessage(keys: string, error?: any): string {
@@ -140,7 +140,7 @@ export abstract class Schema {
         } else {
 
           // Unknown schema field value.
-          throw new ValidateError(ValidateErrorCode.InvalidSchema, value);
+          throw new ValidateError(EValidateErrorCode.InvalidSchema, value);
 
         }
       } catch (error) {

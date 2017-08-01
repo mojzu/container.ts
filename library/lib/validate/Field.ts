@@ -1,6 +1,6 @@
 import * as moment from "moment-timezone";
 import {
-  ValidateErrorCode,
+  EValidateErrorCode,
   ValidateError,
   IValidateBooleanOptions,
   IValidateIntegerOptions,
@@ -51,7 +51,7 @@ export class AndField<T> extends Field<T> {
       .reduce((p, c) => ((p != null) ? p : c), null);
 
     if (validated == null) {
-      throw new ValidateError(ValidateErrorCode.InvalidAnd);
+      throw new ValidateError(EValidateErrorCode.InvalidAnd);
     }
     return validated;
   }
@@ -62,7 +62,7 @@ export class AndField<T> extends Field<T> {
       .reduce((p, c) => ((p != null) ? p : c), null);
 
     if (formatted == null) {
-      throw new ValidateError(ValidateErrorCode.InvalidAnd);
+      throw new ValidateError(EValidateErrorCode.InvalidAnd);
     }
     return formatted;
   }
@@ -93,7 +93,7 @@ export class OrField<T> extends Field<T> {
       .reduce((p, c) => ((p != null) ? p : c), null);
 
     if (validated == null) {
-      throw new ValidateError(ValidateErrorCode.InvalidOr);
+      throw new ValidateError(EValidateErrorCode.InvalidOr);
     }
     return validated;
   }
@@ -110,7 +110,7 @@ export class OrField<T> extends Field<T> {
       .reduce((p, c) => ((p != null) ? p : c), null);
 
     if (formatted == null) {
-      throw new ValidateError(ValidateErrorCode.InvalidOr);
+      throw new ValidateError(EValidateErrorCode.InvalidOr);
     }
     return formatted;
   }
