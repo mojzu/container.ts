@@ -22,10 +22,10 @@ describe("Validate", () => {
   });
 
   it("#ValidateError passed thrown error has formatting", () => {
-    const error = new ValidateError(EValidateErrorCode.InvalidString, new Error("Unknown"));
+    const error = new ValidateError(EValidateErrorCode.InvalidString, "", new Error("Unknown"));
     expect(error.name).toEqual("ValidateError");
     expect(error.stack).toBeDefined();
-    expect(error.message).toEqual(`${invalidString}: Error: Unknown`);
+    expect(error.message).toEqual(`${invalidString} "": Error: Unknown`);
   });
 
   // Boolean tests.
@@ -123,7 +123,7 @@ describe("Validate", () => {
     } catch (error) {
       expect(error instanceof Error).toEqual(true);
       expect(error.name).toEqual("ValidateError");
-      expect(error.message).toEqual(invalidString);
+      expect(error.message).toEqual(`${invalidString} "foobar"`);
     }
   });
 
@@ -134,7 +134,7 @@ describe("Validate", () => {
     } catch (error) {
       expect(error instanceof Error).toEqual(true);
       expect(error.name).toEqual("ValidateError");
-      expect(error.message).toEqual(invalidString);
+      expect(error.message).toEqual(`${invalidString} "baz"`);
     }
   });
 
