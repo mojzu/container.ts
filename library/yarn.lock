@@ -49,8 +49,8 @@
     moment ">=2.14.0"
 
 "@types/node@*":
-  version "8.0.17"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.17.tgz#677bc8c118cfb76013febb62ede1f31d2c7222a1"
+  version "8.0.18"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.18.tgz#9e96603a02a38889d08f451906f9cb56a2725ff5"
 
 "@types/node@^6.0.85":
   version "6.0.85"
@@ -208,13 +208,12 @@ async@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/async/-/async-1.2.1.tgz#a4816a17cd5ff516dfa2c7698a453369b9790de0"
 
-awilix@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/awilix/-/awilix-2.6.0.tgz#453b4a17d42a9e5ffcd753d7702687037964ddab"
+awilix@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/awilix/-/awilix-2.7.0.tgz#b440b8fb84652038b5f355703868aba2345b721b"
   dependencies:
     camel-case "^3.0.0"
     glob "^7.1.2"
-    is-class "0.0.4"
     is-plain-object "^2.0.4"
     is-string "^1.0.4"
 
@@ -744,8 +743,8 @@ fs-exists-sync@^0.1.0:
   resolved "https://registry.yarnpkg.com/fs-exists-sync/-/fs-exists-sync-0.1.0.tgz#982d6893af918e72d08dec9e8673ff2b5a8d6add"
 
 fs-extra@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-4.0.0.tgz#414fb4ca2d2170ba0014159d3a8aec3303418d9e"
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-4.0.1.tgz#7fc0c6c8957f983f57f306a24e5b9ddd8d0dd880"
   dependencies:
     graceful-fs "^4.1.2"
     jsonfile "^3.0.0"
@@ -1060,10 +1059,6 @@ is-absolute@^0.2.3:
 is-buffer@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.5.tgz#1f3b26ef613b214b88cbca23cc6c01d87961eecc"
-
-is-class@0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/is-class/-/is-class-0.0.4.tgz#e057451705bb34e39e3e33598c93a9837296b736"
 
 is-dotfile@^1.0.0:
   version "1.0.3"
@@ -2379,8 +2374,8 @@ wbuf@^1.1.0, wbuf@^1.7.2:
     minimalistic-assert "^1.0.0"
 
 which@^1.1.1, which@^1.2.12:
-  version "1.2.14"
-  resolved "https://registry.yarnpkg.com/which/-/which-1.2.14.tgz#9a87c4378f03e827cecaf1acdf56c736c01c14e5"
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/which/-/which-1.3.0.tgz#ff04bdfc010ee547d780bec38e1ac1c2777d253a"
   dependencies:
     isexe "^2.0.0"
 
