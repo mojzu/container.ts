@@ -107,7 +107,6 @@ export class RestifyServer extends ContainerModule {
     RESPONSE_OK: "RestifyServerResponseOk",
     RESPONSE_CLIENT_ERROR: "RestifyServerResponseClientError",
     RESPONSE_SERVER_ERROR: "RestifyServerResponseServerError",
-    // TODO: Telegraf not receiving timing metrics?
     RESPONSE_TIME: "RestifyServerResponseTime",
   };
 
@@ -255,7 +254,7 @@ export class RestifyServer extends ContainerModule {
   protected handlePreRequest(req: IServerRequest, res: IServerResponse, next: restify.Next): void {
     // Create container scope on request.
     req.scope = this.container.createScope();
-    req.scope.registerValue(RestifyServer.METRIC.RESPONSE_TIME, new Date());
+    req.scope.registerValue(RestifyServer.METRIC.RESPONSE_TIME, Date.now());
 
     // Getters for scope values.
     Object.keys(RestifyServer.SCOPE).map((key) => {
@@ -330,7 +329,7 @@ export class RestifyServer extends ContainerModule {
     }
 
     // Emit response time metric.
-    const value = req.scope.resolve<Date>(RestifyServer.METRIC.RESPONSE_TIME);
+    const value = Date.now() - req.scope.resolve<number>(RestifyServer.METRIC.RESPONSE_TIME);
     this.metric.timing(RestifyServer.METRIC.RESPONSE_TIME, value, tags);
   }
 
