@@ -1,7 +1,7 @@
 /// <reference types="node" />
-import { IContainerModuleOpts, ContainerMetricMessage, EMetricType } from "../container";
-import { Validate } from "../lib/validate";
-import { Metric } from "./Metric";
+import { IContainerModuleOpts, ContainerMetricMessage, EMetricType } from "../../container";
+import { Validate } from "../../lib/validate";
+import { Metric } from "../Metric";
 
 // Package statsd-client types are out of date.
 const STATSD = require("statsd-client");

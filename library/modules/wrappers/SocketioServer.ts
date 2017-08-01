@@ -4,8 +4,8 @@ import * as socketio from "socket.io";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/operator/do";
-import { IContainerModuleOpts, ContainerModule } from "../container";
-import { Validate } from "../lib/validate";
+import { IContainerModuleOpts, ContainerModule } from "../../container";
+import { Validate } from "../../lib/validate";
 
 /** SocketIO server information interface. */
 export interface ISocketioServerInformation {

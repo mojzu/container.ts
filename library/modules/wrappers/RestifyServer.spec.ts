@@ -1,6 +1,6 @@
 /// <reference types="jasmine" />
-import { Container, Environment } from "../container";
-import { RESTIFY_SERVER_PORT, ServerController } from "../examples";
+import { Container, Environment } from "../../container";
+import { RESTIFY_SERVER_PORT, ServerController } from "../../examples";
 import { RestifyServer } from "./RestifyServer";
 
 describe("#RestifyServer", () => {

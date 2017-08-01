@@ -10,14 +10,14 @@ import {
   IContainerModuleDepends,
   ContainerModule,
   IMetricTags,
-} from "../container";
+} from "../../container";
 import {
   Validate,
   ISchemaMap,
   ISchemaConstructor,
   buildSchema,
-} from "../lib/validate";
-import { EServerMethod, EServerStatus } from "./Server";
+} from "../../lib/validate";
+import { EServerMethod, EServerStatus } from "../Server";
 
 /** Restify server information interface. */
 export interface IRestifyServerInformation {

@@ -1,8 +1,8 @@
 /// <reference types="node" />
-import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "../container";
-import { Validate } from "../lib/validate";
-import { Process } from "./Process";
-import { Log } from "./Log";
+import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "../../container";
+import { Validate } from "../../lib/validate";
+import { Process } from "../Process";
+import { Log } from "../Log";
 
 // Rollbar does not have defined types.
 const ROLLBAR = require("rollbar");
