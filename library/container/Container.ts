@@ -145,8 +145,7 @@ export class Container {
   /** Send log message of level for module. */
   public sendLog(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, args: any[]): void {
     this._logs.next(new ContainerLogMessage(level, message, metadata, args));
-    // TODO: Default tags including moduleName?
-    this.sendMetric(EMetricType.Increment, `Log${ELogLevel[level]}`, 1, {});
+    this.sendMetric(EMetricType.Increment, `Log${ELogLevel[level]}`, 1, this.logMetadataTags(metadata));
   }
 
   /** Send metric message of type for module. */
@@ -240,6 +239,15 @@ export class Container {
   protected reportModuleState(name: string, state: boolean): void {
     this._modules.value[name] = state;
     this._modules.next(this._modules.value);
+  }
+
+  /** Extract common log metadata for metric tags. */
+  protected logMetadataTags(metadata: ILogMetadata): IMetricTags {
+    const tags: IMetricTags = {};
+    if (metadata.moduleName != null) {
+      tags.moduleName = metadata.moduleName;
+    }
+    return tags;
   }
 
 }
