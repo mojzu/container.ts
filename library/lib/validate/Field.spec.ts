@@ -5,6 +5,8 @@ import {
   IntegerField,
   FloatField,
   PortField,
+  StringField,
+  EmailField,
 } from "./Field";
 
 describe("Field", () => {
@@ -50,11 +52,29 @@ describe("Field", () => {
   });
 
   const floatField = new FloatField();
-  const intergerOrFloatField = integerField.or(floatField);
+  const integerOrFloatField = integerField.or(floatField);
 
   it("#OrField validate", () => {
-    const value = intergerOrFloatField.validate("1.0");
+    const value = integerOrFloatField.validate("1.0");
     expect(value).toEqual(1.0);
+  });
+
+  const stringField = new StringField();
+  const emailField = new EmailField();
+  const stringNotEmailField = stringField.not(emailField);
+
+  it("#NotField validate", () => {
+    const value = stringNotEmailField.validate("foo");
+    expect(value).toEqual("foo");
+  });
+
+  it("#NotField validate fails", () => {
+    try {
+      stringNotEmailField.validate("foo@example.com");
+      fail();
+    } catch (error) {
+      expect(error instanceof ValidateError).toEqual(true);
+    }
   });
 
 });

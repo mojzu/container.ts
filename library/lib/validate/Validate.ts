@@ -31,6 +31,7 @@ export enum EValidateErrorCode {
   InvalidDirectory,
   InvalidAnd,
   InvalidOr,
+  InvalidNot,
   InvalidSchema,
   NodeNotAvailable,
 }

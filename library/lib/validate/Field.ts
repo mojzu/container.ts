@@ -20,30 +20,32 @@ import {
  * Validate method takes string input and returns typed output.
  * Format method takes typed input and returns string output.
  * Optional context available for additional validation/formatting information.
- * TODO: Add NotField wrapper.
  */
 export abstract class Field<T> {
   public abstract validate(value?: string, context?: any): T | null;
   public abstract format(value: T, context?: any): string | null;
-  public and(...fields: Array<Field<T>>): AndField<T> {
+  public and(...fields: Array<Field<T>>): Field<T> {
     return new AndField<T>(this, ...fields);
   }
-  public or(...fields: Array<Field<T>>): OrField<T> {
+  public or(...fields: Array<Field<T>>): Field<T> {
     return new OrField<T>(this, ...fields);
+  }
+  public not(...fields: Array<Field<T>>): Field<T> {
+    return this.and(this, new NotField<T>(...fields));
   }
 }
 
-/**
- * And field wrapper, all input fields used to validate/format values.
- */
-export class AndField<T> extends Field<T> {
-
-  private _fields: Array<Field<T>>;
-
+/** Operator field helper. */
+export abstract class OperatorField<T> extends Field<T> {
+  protected _fields: Array<Field<T>>;
   public constructor(...fields: Array<Field<T>>) {
     super();
     this._fields = fields;
   }
+}
+
+/** And field wrapper, all input fields used to validate/format values. */
+export class AndField<T> extends OperatorField<T> {
 
   public validate(value: string, context?: any): T {
     const validated = this._fields
@@ -69,17 +71,8 @@ export class AndField<T> extends Field<T> {
 
 }
 
-/**
- * Or field wrapper, at least one input field used to validate/format values.
- */
-export class OrField<T> extends Field<T> {
-
-  private _fields: Array<Field<T>>;
-
-  public constructor(...fields: Array<Field<T>>) {
-    super();
-    this._fields = fields;
-  }
+/** Or field wrapper, at least one input field used to validate/format values. */
+export class OrField<T> extends OperatorField<T> {
 
   public validate(value: string, context?: any): T {
     const validated = this._fields
@@ -111,6 +104,45 @@ export class OrField<T> extends Field<T> {
 
     if (formatted == null) {
       throw new ValidateError(EValidateErrorCode.InvalidOr);
+    }
+    return formatted;
+  }
+
+}
+
+/** Not field wrapper, all input fields expected to throw error/fail to format values. */
+export class NotField<T> extends OperatorField<T> {
+
+  public validate(value: string, context?: any): null {
+    const validated = this._fields
+      .map((f) => {
+        try {
+          return f.validate(value, context);
+        } catch (error) {
+          return null;
+        }
+      })
+      .reduce((p, c) => ((p != null) ? p : c), null);
+
+    if (validated != null) {
+      throw new ValidateError(EValidateErrorCode.InvalidNot, validated);
+    }
+    return validated;
+  }
+
+  public format(value: T, context?: any): null {
+    const formatted = this._fields
+      .map((f) => {
+        try {
+          return f.format(value, context);
+        } catch (error) {
+          return null;
+        }
+      })
+      .reduce((p, c) => ((p != null) ? p : c), null);
+
+    if (formatted != null) {
+      throw new ValidateError(EValidateErrorCode.InvalidNot, formatted);
     }
     return formatted;
   }
