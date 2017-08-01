@@ -102,7 +102,7 @@ export class RestifyServer extends ContainerModule {
   public static METRIC = {
     ERROR: "RestifyServerError",
     CONNECTION: "RestifyServerConnection",
-    LISTENING: "RestifyServerError",
+    LISTENING: "RestifyServerListening",
     CLOSE: "RestifyServerClose",
     RESPONSE_OK: "RestifyServerResponseOk",
     RESPONSE_CLIENT_ERROR: "RestifyServerResponseClientError",
