@@ -21,6 +21,7 @@ import {
   buildSchema,
 } from "../../lib/validate";
 import { EServerMethod, EServerStatus } from "../Server";
+// TODO: Refactor when tested.
 
 /** Restify server request wrapper. */
 export interface IServerRequest extends restify.Request {
@@ -190,7 +191,6 @@ export class RestifyServer extends ContainerModule {
     this._server.pre(this.handlePreRequest.bind(this));
 
     // Restify bundled plugin request handler(s).
-    // TODO: Support more Restify bodyParser plugin options.
     this._server.use(cors.actual);
     this._server.use(restify.plugins.acceptParser(this._server.acceptable));
     this._server.use(restify.plugins.dateParser());
@@ -251,8 +251,9 @@ export class RestifyServer extends ContainerModule {
   }
 
   protected handleServerError(error: any): void {
-    this.metric.increment(RestifyServer.METRIC.ERROR);
-    this.log.error(error);
+    const tags = this.collectTags({ error });
+    this.metric.increment(RestifyServer.METRIC.ERROR, 1, tags);
+    this.log.error(error, tags);
   }
 
   protected handleServerConnection(): void {
@@ -270,8 +271,8 @@ export class RestifyServer extends ContainerModule {
   }
 
   protected handlePreRequest(req: IServerRequest, res: IServerResponse, next: restify.Next): void {
-    // TODO: Get metric tags from request.
-    this.metric.increment(RestifyServer.METRIC.REQUESTS);
+    const tags = this.collectTags({ req });
+    this.metric.increment(RestifyServer.METRIC.REQUESTS, 1, tags);
 
     // Create container scope on request.
     req.scope = this.container.createScope();
@@ -314,7 +315,6 @@ export class RestifyServer extends ContainerModule {
     options: IRestifyServerRequestOptions,
     handler: IRestifyServerRouteHandler<T>,
   ): restify.RequestHandler {
-    // TODO: Metric collection on next/complete.
     return (req: IServerRequest, res: IServerResponse, next: restify.Next) => {
       handler(req, res)
         .take(1)
@@ -337,21 +337,8 @@ export class RestifyServer extends ContainerModule {
     };
   }
 
-  protected handleRequestError(error: any, next: restify.Next): void {
-    // TODO: Improve error handling.
-    this.debug(error);
-    next(new errors.InternalServerError(error));
-  }
-
   protected handlePostRequest(req: IServerRequest, res: IServerResponse, route?: restify.Route, error?: any): void {
-    // Metric tags/log metadata.
-    const tags: IMetricTags = { method: req.method, path: req.path(), status: res.statusCode };
-    if (route != null) {
-      tags.name = route.name;
-    }
-    if (error != null) {
-      tags.error = error.name;
-    }
+    const tags = this.collectTags({ req, res, route, error });
 
     // Emit response status code category metric.
     if (res.statusCode < EServerStatus.BAD_REQUEST) {
@@ -369,6 +356,16 @@ export class RestifyServer extends ContainerModule {
     // Emit response time metric.
     const value = Date.now() - req.scope.resolve<number>(RestifyServer.METRIC.RESPONSE_TIME);
     this.metric.timing(RestifyServer.METRIC.RESPONSE_TIME, value, tags);
+  }
+
+  protected handleRequestError(error: any, next: restify.Next): void {
+    // If not already a restify error, wrap in internal server error.
+    if (!(error instanceof errors.HttpError)) {
+      error = new errors.InternalServerError(error);
+    }
+    // TODO: Improve error handling.
+    this.debug(error);
+    next(error);
   }
 
   protected buildRoute<T>(
@@ -413,16 +410,40 @@ export class RestifyServer extends ContainerModule {
     return [routeOptions, routeHandlers];
   }
 
-  protected debugRoute(method: EServerMethod, route: restify.RouteOptions): void {
-    this.debug(`${EServerMethod[method]} NAME="${route.name}" PATH="${route.path}"`);
-  }
-
   /** Join URL segments and remove duplicate '/' characters. */
   protected joinPath(...parts: string[]): string {
     const output = ["/", this.path, "/"];
     output.push(parts.join("/"));
     output.push("/");
     return output.join("/").replace(/(\/\/+)/g, "/");
+  }
+
+  /** Collect metric tags from variable inputs. */
+  protected collectTags(inputs: {
+    req?: IServerRequest;
+    res?: IServerResponse;
+    route?: restify.Route;
+    error?: any;
+  } = {}): IMetricTags {
+    const tags: IMetricTags = {};
+    if (inputs.req != null) {
+      tags.method = inputs.req.method;
+      tags.path = inputs.req.path();
+    }
+    if (inputs.res != null) {
+      tags.status = inputs.res.statusCode;
+    }
+    if (inputs.route != null) {
+      tags.name = inputs.route.name;
+    }
+    if (inputs.error != null) {
+      tags.error = inputs.error.name;
+    }
+    return tags;
+  }
+
+  protected debugRoute(method: EServerMethod, route: restify.RouteOptions): void {
+    this.debug(`${EServerMethod[method]} NAME="${route.name}" PATH="${route.path}"`);
   }
 
 }

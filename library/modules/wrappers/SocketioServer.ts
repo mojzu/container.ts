@@ -10,6 +10,7 @@ import {
   IContainerModuleOpts,
   IContainerModuleDepends,
   ContainerModule,
+  IMetricTags,
 } from "../../container";
 import {
   Validate,
@@ -17,6 +18,7 @@ import {
   ISchemaConstructor,
   buildSchema,
 } from "../../lib/validate";
+// TODO: Refactor when tested.
 
 /** SocketIO socket wrapper. */
 export interface IServerSocket extends SocketIO.Socket {
@@ -76,8 +78,8 @@ export class SocketioServer extends ContainerModule {
     CLOSE: "SocketioServerClose",
     CONNECTION: "SocketioServerConnection",
     DISCONNECT: "SocketioServerDisconnect",
-    CLIENT_ERROR: "SocketioServerClientError",
-    SERVER_ERROR: "SocketioServerServerError",
+    HANDLER_ERROR: "SocketioServerHandlerError",
+    HANDLER_TIME: "SocketioServerHandlerTime",
   };
 
   private _port: number;
@@ -164,13 +166,14 @@ export class SocketioServer extends ContainerModule {
   }
 
   protected handleServerError(error: any): void {
-    this.metric.increment(SocketioServer.METRIC.ERROR);
-    this.log.error(error);
+    const tags = this.collectTags({ error });
+    this.metric.increment(SocketioServer.METRIC.ERROR, 1, tags);
+    this.log.error(error, tags);
   }
 
   protected handleConnection(socket: IServerSocket): void {
-    // TODO: Get metric tags from socket.
-    this.metric.increment(SocketioServer.METRIC.CONNECTION);
+    const tags = this.collectTags({ socket });
+    this.metric.increment(SocketioServer.METRIC.CONNECTION, 1, tags);
 
     // Create container scope on request.
     socket.scope = this.container.createScope();
@@ -183,7 +186,8 @@ export class SocketioServer extends ContainerModule {
   }
 
   protected handleSocketDisconnect(socket: IServerSocket): Observable<void> {
-    this.metric.increment(SocketioServer.METRIC.DISCONNECT);
+    const tags = this.collectTags({ socket });
+    this.metric.increment(SocketioServer.METRIC.DISCONNECT, 1, tags);
     return Observable.empty();
   }
 
@@ -197,7 +201,9 @@ export class SocketioServer extends ContainerModule {
       // Validate request data.
       const data = options.schema.request.validate<T>(requestData);
 
-      // TODO: Metric collection on next/complete.
+      // Handler timing information.
+      socket.scope.registerValue(SocketioServer.METRIC.HANDLER_TIME, Date.now());
+
       handler(socket, data)
         .timeout(options.timeout || SocketioServer.DEFAULT_RESPONSE_TIMEOUT)
         .subscribe({
@@ -207,23 +213,51 @@ export class SocketioServer extends ContainerModule {
               const responseData = options.schema.response.format<T>(response);
               socket.emit(options.event, responseData);
             } catch (error) {
-              this.handleHandlerError(socket, error, SocketioServer.METRIC.SERVER_ERROR)
+              this.handleHandlerError(socket, error)
             }
           },
           error: (error) => {
-            this.handleHandlerError(socket, error, SocketioServer.METRIC.SERVER_ERROR);
+            this.handleHandlerError(socket, error);
+          },
+          complete: () => {
+            this.handleHandlerComplete(socket);
           },
         });
     } catch (error) {
-      this.handleHandlerError(socket, error, SocketioServer.METRIC.CLIENT_ERROR);
+      this.handleHandlerError(socket, error);
     }
   }
 
-  protected handleHandlerError(socket: IServerSocket, error: any, metric: string): void {
-    // TODO: Send error codes to socket?
-    this.metric.increment(metric);
+  protected handleHandlerError(socket: IServerSocket, error: any): void {
+    const tags = this.collectTags({ socket, error });
+    this.metric.increment(SocketioServer.METRIC.HANDLER_ERROR, 1, tags);
+    // TODO: Improve error handling.
     this.debug(error);
     socket.disconnect();
+    this.handleHandlerComplete(socket, error);
+  }
+
+  protected handleHandlerComplete(socket: IServerSocket, error?: any): void {
+    const tags = this.collectTags({ socket, error });
+
+    // Emit handler time metric.
+    const value = Date.now() - socket.scope.resolve<number>(SocketioServer.METRIC.HANDLER_TIME);
+    this.metric.timing(SocketioServer.METRIC.HANDLER_TIME, value, tags);
+  }
+
+  /** Collect metric tags from variable inputs. */
+  protected collectTags(inputs: {
+    socket?: IServerSocket;
+    error?: any;
+  } = {}): IMetricTags {
+    const tags: IMetricTags = {};
+    if (inputs.socket != null) {
+      tags.id = inputs.socket.id;
+    }
+    if (inputs.error != null) {
+      tags.error = inputs.error.name;
+    }
+    return tags;
   }
 
 }
