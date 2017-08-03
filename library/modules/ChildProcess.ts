@@ -46,7 +46,7 @@ export interface IProcessCallOptions {
 }
 
 /** Process call function signature. */
-export type ProcessCallType = (...args: any[]) => Observable<any>;
+export type IProcessCallType = (...args: any[]) => Observable<any>;
 
 /** Process call request message data. */
 export interface IProcessCallRequestData {
@@ -71,7 +71,7 @@ export interface IProcessEventData {
 }
 
 /** Process data types. */
-export type ProcessMessageData = IContainerLogMessage
+export type IProcessMessageData = IContainerLogMessage
   | IProcessCallRequestData
   | IProcessCallResponseData
   | IProcessEventData
@@ -80,7 +80,7 @@ export type ProcessMessageData = IContainerLogMessage
 /** Process message interface. */
 export interface IProcessMessage extends Object {
   type: EProcessMessageType;
-  data: ProcessMessageData;
+  data: IProcessMessageData;
 }
 
 /** Process send method interface. */
@@ -159,7 +159,7 @@ export class ChildProcess extends Process implements IProcessSend {
     try {
       // Retrieve target module and make subscribe call to method.
       const targetMod = mod.container.resolve<any>(data.target);
-      const method: ProcessCallType = targetMod[data.method].bind(targetMod);
+      const method: IProcessCallType = targetMod[data.method].bind(targetMod);
 
       method(...data.args)
         .subscribe({

@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import * as restify from "restify";
+import * as corsMiddlware from "restify-cors-middleware";
 import * as errors from "restify-errors";
 import { AwilixContainer } from "awilix";
 import { Observable } from "rxjs/Observable";
@@ -19,14 +20,6 @@ import {
 } from "../../lib/validate";
 import { EServerMethod, EServerStatus } from "../Server";
 
-/** Restify server information interface. */
-export interface IRestifyServerInformation {
-  name: string;
-  url: string;
-  versions: string[];
-  acceptable: string[];
-}
-
 /** Restify server request wrapper. */
 export interface IServerRequest extends restify.Request {
   scope: AwilixContainer;
@@ -38,8 +31,16 @@ export interface IServerRequest extends restify.Request {
 /** Restify server response wrapper. */
 export interface IServerResponse extends restify.Response { }
 
+/** Restify server information interface. */
+export interface IRestifyServerInformation {
+  name: string;
+  url: string;
+  versions: string[];
+  acceptable: string[];
+}
+
 /** Restify server request schema options. */
-export interface IServerSchemaOptions<T> {
+export interface IRestifyServerSchemaOptions<T> {
   url?: T;
   query?: T;
   body?: T;
@@ -47,24 +48,24 @@ export interface IServerSchemaOptions<T> {
 }
 
 /** Restify server route options. */
-export interface IServerRouteOptions {
+export interface IRestifyServerRouteOptions {
   name: string;
   path: string[];
   version?: string;
   versions?: string[];
-  schema: IServerSchemaOptions<ISchemaMap>;
+  schema: IRestifyServerSchemaOptions<ISchemaMap>;
 }
 
 /** Restify server route handler. */
-export type ServerRouteHandler<T> = (req: IServerRequest, res: IServerResponse) => Promise<T>;
+export type IRestifyServerRouteHandler<T> = (req: IServerRequest, res: IServerResponse) => Promise<T>;
 
 /** Restify server request options. */
-export interface IServerRequestOptions {
-  schema: IServerSchemaOptions<ISchemaConstructor>;
+export interface IRestifyServerRequestOptions {
+  schema: IRestifyServerSchemaOptions<ISchemaConstructor>;
 }
 
 /** Restify server route parts. */
-export type ServerRoute = [restify.RouteOptions, restify.RequestHandler[]];
+export type IRestifyServerRoute = [restify.RouteOptions, restify.RequestHandler[]];
 
 /** Restify server controller abstract class. */
 export abstract class RestifyServerController extends ContainerModule {
@@ -160,6 +161,14 @@ export class RestifyServer extends ContainerModule {
     // Create Restify server with empty name and default version.
     this._server = restify.createServer({ name: "", version: RestifyServer.DEFAULT_VERSION });
 
+    // Configure CORS middleware.
+    // TODO: Restify CORS options configuration.
+    const cors = corsMiddlware({
+      origins: ["*"],
+      allowHeaders: [],
+      exposeHeaders: [],
+    });
+
     // Register server event handler(s).
     this._server.on("error", this.handleServerError.bind(this));
     this._server.on("connection", this.handleServerConnection.bind(this));
@@ -169,11 +178,12 @@ export class RestifyServer extends ContainerModule {
 
     // Pre-routing request handler(s).
     this._server.pre(restify.plugins.pre.sanitizePath());
+    this._server.pre(cors.preflight);
     this._server.pre(this.handlePreRequest.bind(this));
 
     // Restify bundled plugin request handler(s).
     // TODO: Support more Restify bodyParser plugin options.
-    // TODO: CORS middleware with options.
+    this._server.use(cors.actual);
     this._server.use(restify.plugins.acceptParser(this._server.acceptable));
     this._server.use(restify.plugins.dateParser());
     this._server.use(restify.plugins.queryParser({ mapParams: false }));
@@ -197,37 +207,37 @@ export class RestifyServer extends ContainerModule {
     this.handleServerClose();
   }
 
-  public get<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+  public get<T>(options: IRestifyServerRouteOptions, handler: IRestifyServerRouteHandler<T>): void {
     const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.GET, options, handler);
     this._server.get(routeOptions, ...routeHandlers);
   }
 
-  public head<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+  public head<T>(options: IRestifyServerRouteOptions, handler: IRestifyServerRouteHandler<T>): void {
     const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.HEAD, options, handler);
     this._server.head(routeOptions, ...routeHandlers);
   }
 
-  public post<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+  public post<T>(options: IRestifyServerRouteOptions, handler: IRestifyServerRouteHandler<T>): void {
     const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.POST, options, handler);
     this._server.post(routeOptions, ...routeHandlers);
   }
 
-  public put<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+  public put<T>(options: IRestifyServerRouteOptions, handler: IRestifyServerRouteHandler<T>): void {
     const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.PUT, options, handler);
     this._server.put(routeOptions, ...routeHandlers);
   }
 
-  public delete<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+  public delete<T>(options: IRestifyServerRouteOptions, handler: IRestifyServerRouteHandler<T>): void {
     const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.DELETE, options, handler);
     this._server.del(routeOptions, ...routeHandlers);
   }
 
-  public options<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+  public options<T>(options: IRestifyServerRouteOptions, handler: IRestifyServerRouteHandler<T>): void {
     const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.OPTIONS, options, handler);
     this._server.opts(routeOptions, ...routeHandlers);
   }
 
-  public patch<T>(options: IServerRouteOptions, handler: ServerRouteHandler<T>): void {
+  public patch<T>(options: IRestifyServerRouteOptions, handler: IRestifyServerRouteHandler<T>): void {
     const [routeOptions, routeHandlers] = this.buildRoute<T>(EServerMethod.PATCH, options, handler);
     this._server.patch(routeOptions, ...routeHandlers);
   }
@@ -265,7 +275,7 @@ export class RestifyServer extends ContainerModule {
     return next();
   }
 
-  protected handleRequestSchema(options: IServerRequestOptions): restify.RequestHandler {
+  protected handleRequestSchema(options: IRestifyServerRequestOptions): restify.RequestHandler {
     return (req: IServerRequest, res: IServerResponse, next: restify.Next) => {
       try {
         // Perform URL, query and body validation using schemas.
@@ -289,7 +299,7 @@ export class RestifyServer extends ContainerModule {
     };
   }
 
-  protected handleRequest<T>(options: IServerRequestOptions, handler: ServerRouteHandler<T>): restify.RequestHandler {
+  protected handleRequest<T>(options: IRestifyServerRequestOptions, handler: IRestifyServerRouteHandler<T>): restify.RequestHandler {
     return (req: IServerRequest, res: IServerResponse, next: restify.Next) => {
       handler(req, res)
         .then((data) => {
@@ -335,10 +345,10 @@ export class RestifyServer extends ContainerModule {
 
   protected buildRoute<T>(
     method: EServerMethod,
-    options: IServerRouteOptions,
-    handler: ServerRouteHandler<T>,
-  ): ServerRoute {
-    const requestOptions: IServerRequestOptions = {
+    options: IRestifyServerRouteOptions,
+    handler: IRestifyServerRouteHandler<T>,
+  ): IRestifyServerRoute {
+    const requestOptions: IRestifyServerRequestOptions = {
       schema: {
         // Default empty schema for responses.
         response: buildSchema(),

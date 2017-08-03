@@ -21,17 +21,17 @@ export class SchemaError extends Error {
   }
 }
 
-export type SchemaTypes = ISchemaArray | ISchemaMap;
-export type SchemaFields = SchemaTypes | Schema | Field<any>;
+export type ISchemaTypes = ISchemaArray | ISchemaMap;
+export type ISchemaFields = ISchemaTypes | Schema | Field<any>;
 
 /** Schema array type, recursive type. */
 export interface ISchemaArray {
-  [key: number]: SchemaFields;
+  [key: number]: ISchemaFields;
 }
 
 /** Schema map type, recursive type. */
 export interface ISchemaMap {
-  [key: string]: SchemaFields;
+  [key: string]: ISchemaFields;
 }
 
 /** Schema mask type, recursive type. */
@@ -49,11 +49,11 @@ export interface ISchemaMapHandlers {
 
 /** Schema static interface. */
 export interface ISchemaConstructor {
-  SCHEMA: SchemaTypes;
+  SCHEMA: ISchemaTypes;
   new(): Schema;
   isSchema(value: any): boolean;
   map(
-    schema: SchemaTypes,
+    schema: ISchemaTypes,
     mask?: ISchemaMask,
     dataKeys?: Array<number | string>,
     keyRoot?: string,
@@ -64,7 +64,7 @@ export interface ISchemaConstructor {
 }
 
 /** Build schema class from input map. */
-export function buildSchema(schema: SchemaTypes = {}): ISchemaConstructor {
+export function buildSchema(schema: ISchemaTypes = {}): ISchemaConstructor {
   class NewSchema extends Schema {
     public static SCHEMA = schema;
   }
@@ -74,7 +74,7 @@ export function buildSchema(schema: SchemaTypes = {}): ISchemaConstructor {
 export abstract class Schema {
 
   /** Schema array or map, override in child classes. */
-  public static SCHEMA: SchemaTypes = {};
+  public static SCHEMA: ISchemaTypes = {};
 
   /**
    * Returns true if value is a Schema class object.
@@ -90,7 +90,7 @@ export abstract class Schema {
    * Helper for iterating over schema fields.
    */
   public static map(
-    schema: SchemaTypes,
+    schema: ISchemaTypes,
     mask: ISchemaMask | null = null,
     dataKeys: Array<number | string> = [],
     keyRoot = "",
@@ -156,7 +156,7 @@ export abstract class Schema {
     };
     if (Array.isArray(schema)) {
 
-      const schemaArray: SchemaFields[] = schema as any;
+      const schemaArray: ISchemaFields[] = schema as any;
       if (schemaArray[0] === "*") {
         // Wildcard asterisk, map all data indexes to field.
         dataKeys.map((key) => {
