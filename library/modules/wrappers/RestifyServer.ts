@@ -6,6 +6,8 @@ import { AwilixContainer } from "awilix";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/operator/do";
+import "rxjs/add/operator/take";
+import "rxjs/add/operator/timeout";
 import {
   IContainerModuleOpts,
   IContainerModuleDepends,
@@ -54,14 +56,16 @@ export interface IRestifyServerRouteOptions {
   version?: string;
   versions?: string[];
   schema: IRestifyServerSchemaOptions<ISchemaTypes>;
+  timeout?: number;
 }
 
 /** Restify server route handler. */
-export type IRestifyServerRouteHandler<T> = (req: IServerRequest, res: IServerResponse) => Promise<T>;
+export type IRestifyServerRouteHandler<T> = (req: IServerRequest, res: IServerResponse) => Observable<T>;
 
 /** Restify server request options. */
 export interface IRestifyServerRequestOptions {
   schema: IRestifyServerSchemaOptions<ISchemaConstructor>;
+  timeout: number;
 }
 
 /** Restify server route parts. */
@@ -80,6 +84,9 @@ export class RestifyServer extends ContainerModule {
 
   /** Default routes version. */
   public static DEFAULT_VERSION = "1.0.0";
+
+  /** Default route handler timeout. */
+  public static DEFAULT_RESPONSE_TIMEOUT = 10000;
 
   /** Environment variable names. */
   public static ENV = {
@@ -307,20 +314,33 @@ export class RestifyServer extends ContainerModule {
     options: IRestifyServerRequestOptions,
     handler: IRestifyServerRouteHandler<T>,
   ): restify.RequestHandler {
-    // TODO: Add timeout support (use observable instead of promise).
+    // TODO: Metric collection on next/complete.
     return (req: IServerRequest, res: IServerResponse, next: restify.Next) => {
       handler(req, res)
-        .then((data) => {
-          // Apply schema format rules.
-          data = options.schema.response.format<T>(data);
-          res.send(data);
-          next();
-        })
-        .catch((error) => {
-          this.debug(error);
-          next(error);
+        .take(1)
+        .timeout(options.timeout)
+        .subscribe({
+          next: (data) => {
+            try {
+              // Apply schema format rules.
+              data = options.schema.response.format<T>(data);
+              res.send(data);
+              next();
+            } catch (error) {
+              this.handleRequestError(error, next);
+            }
+          },
+          error: (error) => {
+            this.handleRequestError(error, next);
+          },
         });
     };
+  }
+
+  protected handleRequestError(error: any, next: restify.Next): void {
+    // TODO: Improve error handling.
+    this.debug(error);
+    next(new errors.InternalServerError(error));
   }
 
   protected handlePostRequest(req: IServerRequest, res: IServerResponse, route?: restify.Route, error?: any): void {
@@ -361,6 +381,7 @@ export class RestifyServer extends ContainerModule {
         // Default empty schema for responses.
         response: buildSchema(),
       },
+      timeout: options.timeout || RestifyServer.DEFAULT_RESPONSE_TIMEOUT,
     };
 
     // Build request schema classes.

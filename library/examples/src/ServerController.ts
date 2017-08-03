@@ -1,3 +1,5 @@
+import { Observable } from "rxjs/Observable";
+import "rxjs/add/observable/of";
 import { IContainerModuleOpts } from "../../container";
 import { IServerRequest, IServerResponse, RestifyServerController } from "../../modules";
 import { IntegerField, StringField } from "../../lib/validate";
@@ -29,12 +31,10 @@ export class ServerController extends RestifyServerController {
     }, this.getInformation.bind(this));
   }
 
-  protected getInformation(req: IServerRequest, res: IServerResponse): Promise<IServerInformation> {
-    return new Promise((resolve, reject) => {
-      const url = req.urlParameters<IServerInformationUrl>();
-      this.debug(url);
-      resolve({ hello: "world" });
-    });
+  protected getInformation(req: IServerRequest, res: IServerResponse): Observable<IServerInformation> {
+    const url = req.urlParameters<IServerInformationUrl>();
+    this.debug(url);
+    return Observable.of({ hello: "world" });
   }
 
 }
