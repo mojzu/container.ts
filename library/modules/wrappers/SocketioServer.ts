@@ -213,7 +213,7 @@ export class SocketioServer extends ContainerModule {
               const responseData = options.schema.response.format<T>(response);
               socket.emit(options.event, responseData);
             } catch (error) {
-              this.handleHandlerError(socket, error)
+              this.handleHandlerError(socket, error);
             }
           },
           error: (error) => {

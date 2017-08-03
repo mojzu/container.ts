@@ -37,7 +37,7 @@ export class SocketController extends SocketioServerController {
   ): Observable<IServerInformationResponse> {
     this.debug(data);
     return Observable.range(0, 3)
-      .map(() => { return { hello: "world" } });
+      .map(() => ({ hello: "world" }));
   }
 
 }
