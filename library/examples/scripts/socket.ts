@@ -3,6 +3,7 @@ import * as process from "process";
 import { Container, Environment } from "../../container";
 import { Validate } from "../../lib/validate";
 import { Asset, ChildProcess, SocketioServer } from "../../modules";
+import { SocketController } from "../src/SocketController";
 
 // Create environment from process and define variables.
 const ENVIRONMENT = new Environment(process.env)
@@ -16,7 +17,8 @@ const NAME = Validate.isString(ENVIRONMENT.get(ChildProcess.ENV.NAME));
 const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(Asset)
   .registerModule(ChildProcess)
-  .registerModule(SocketioServer);
+  .registerModule(SocketioServer)
+  .registerModule(SocketController);
 
 // Start container modules.
 CONTAINER.start()

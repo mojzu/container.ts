@@ -14,7 +14,7 @@ import {
 } from "../../container";
 import {
   Validate,
-  ISchemaMap,
+  ISchemaTypes,
   ISchemaConstructor,
   buildSchema,
 } from "../../lib/validate";
@@ -53,7 +53,7 @@ export interface IRestifyServerRouteOptions {
   path: string[];
   version?: string;
   versions?: string[];
-  schema: IRestifyServerSchemaOptions<ISchemaMap>;
+  schema: IRestifyServerSchemaOptions<ISchemaTypes>;
 }
 
 /** Restify server route handler. */
@@ -105,6 +105,7 @@ export class RestifyServer extends ContainerModule {
     CONNECTION: "RestifyServerConnection",
     LISTENING: "RestifyServerListening",
     CLOSE: "RestifyServerClose",
+    REQUESTS: "RestifyServerRequests",
     RESPONSE_OK: "RestifyServerResponseOk",
     RESPONSE_CLIENT_ERROR: "RestifyServerResponseClientError",
     RESPONSE_SERVER_ERROR: "RestifyServerResponseServerError",
@@ -262,6 +263,9 @@ export class RestifyServer extends ContainerModule {
   }
 
   protected handlePreRequest(req: IServerRequest, res: IServerResponse, next: restify.Next): void {
+    // TODO: Get metric tags from request.
+    this.metric.increment(RestifyServer.METRIC.REQUESTS);
+
     // Create container scope on request.
     req.scope = this.container.createScope();
     req.scope.registerValue(RestifyServer.METRIC.RESPONSE_TIME, Date.now());
@@ -299,7 +303,11 @@ export class RestifyServer extends ContainerModule {
     };
   }
 
-  protected handleRequest<T>(options: IRestifyServerRequestOptions, handler: IRestifyServerRouteHandler<T>): restify.RequestHandler {
+  protected handleRequest<T>(
+    options: IRestifyServerRequestOptions,
+    handler: IRestifyServerRouteHandler<T>,
+  ): restify.RequestHandler {
+    // TODO: Add timeout support (use observable instead of promise).
     return (req: IServerRequest, res: IServerResponse, next: restify.Next) => {
       handler(req, res)
         .then((data) => {

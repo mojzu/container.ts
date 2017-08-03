@@ -3,7 +3,7 @@ import { IServerRequest, IServerResponse, RestifyServerController } from "../../
 import { IntegerField, StringField } from "../../lib/validate";
 
 export interface IServerInformationUrl {
-  place: string;
+  place: number;
 }
 
 export interface IServerInformation {
