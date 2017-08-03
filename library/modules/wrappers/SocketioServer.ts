@@ -42,7 +42,6 @@ export class SocketioServer extends ContainerModule {
     this._port = Validate.isPort(this.environment.get(SocketioServer.ENV.PORT));
     this.debug(`${SocketioServer.ENV.PORT}="${this.port}"`);
 
-    // TODO: Handle more SocketIO options.
     this._server = http.createServer();
     this._io = socketio(this.server);
 
