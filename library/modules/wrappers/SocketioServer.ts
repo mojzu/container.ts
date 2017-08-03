@@ -39,6 +39,7 @@ export interface ISocketioServerEventOptions<T> {
     request: T;
     response: T;
   };
+  timeout?: number;
 }
 
 /** SocketIO server registered event handlers. */
@@ -60,6 +61,9 @@ export abstract class SocketioServerController extends ContainerModule {
 
 export class SocketioServer extends ContainerModule {
 
+  /** Default event handler timeout. */
+  public static DEFAULT_RESPONSE_TIMEOUT = 10000;
+
   /** Environment variable names. */
   public static ENV = {
     /** SocketIO server port (required). */
@@ -69,6 +73,7 @@ export class SocketioServer extends ContainerModule {
   /** Metric names. */
   public static METRIC = {
     ERROR: "SocketioServerError",
+    CLOSE: "SocketioServerClose",
     CONNECTION: "SocketioServerConnection",
     DISCONNECT: "SocketioServerDisconnect",
     CLIENT_ERROR: "SocketioServerClientError",
@@ -103,8 +108,8 @@ export class SocketioServer extends ContainerModule {
     this._io = socketio(this.server);
 
     // Register server event handlers.
-    this._server.on("error", this.handleServerError.bind(this));
-    this._server.on("connect", this.handleConnection.bind(this));
+    this._io.on("error", this.handleServerError.bind(this));
+    this._io.on("connect", this.handleConnection.bind(this));
 
     // Register default socket handler(s).
     this.registerHandler({
@@ -123,13 +128,11 @@ export class SocketioServer extends ContainerModule {
       });
   }
 
-  public stop(): Observable<void> {
-    const closeCallback = this._server.close.bind(this._server);
-    const close: () => Observable<void> = Observable.bindNodeCallback(closeCallback) as any;
-    return close()
-      .do(() => {
-        this.log.info("SocketioServerStop");
-      });
+  public stop(): void {
+    // Do not wait for server close, causes timeout.
+    this._server.close();
+    this.metric.increment(SocketioServer.METRIC.CLOSE);
+    this.log.info("SocketioServerStop");
   }
 
   public registerHandler<T>(
@@ -153,6 +156,7 @@ export class SocketioServer extends ContainerModule {
         request: requestSchema,
         response: responseSchema,
       },
+      timeout: options.timeout,
     };
 
     // Register wrapped event handler.
@@ -194,17 +198,20 @@ export class SocketioServer extends ContainerModule {
       const data = options.schema.request.validate<T>(requestData);
 
       // TODO: Metric collection on next/complete.
-      // TODO: Check thrown error handling.
-      // TODO: Add timeout support.
       handler(socket, data)
+        .timeout(options.timeout || SocketioServer.DEFAULT_RESPONSE_TIMEOUT)
         .subscribe({
           next: (response) => {
-            const responseData = options.schema.response.format<T>(response);
-            socket.emit(options.event, responseData);
+            try {
+              // Apply schema format rules.
+              const responseData = options.schema.response.format<T>(response);
+              socket.emit(options.event, responseData);
+            } catch (error) {
+              this.handleHandlerError(socket, error, SocketioServer.METRIC.SERVER_ERROR)
+            }
           },
           error: (error) => {
             this.handleHandlerError(socket, error, SocketioServer.METRIC.SERVER_ERROR);
-            this.log.error(error);
           },
         });
     } catch (error) {
