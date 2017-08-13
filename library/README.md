@@ -12,7 +12,7 @@ Clone repository, install dependencies with `yarn install` and run scripts: `yar
 | `distclean` | Remove Node modules and generated documentation.      |
 | `test`      | Run tests using Jasmine and Istanbul.                 |
 | `lint`      | Run TSLint on project.                                |
-| `example`   | Run example script, `yarn run example -- -f modules`. |
+| `example`   | Run example script, `yarn run example -- -f schema`.  |
 | `docs`      | Generate Typedoc documentation.                       |
 | `build`     | Build library for release.                            |
 
