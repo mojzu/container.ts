@@ -2,16 +2,8 @@
 import * as process from "process";
 import { Container, Environment } from "container.ts";
 import { Validate } from "container.ts/lib/validate";
-import {
-  Asset,
-  Process,
-  Script,
-  WinstonLog,
-  RollbarLog,
-  StatsdMetric,
-  RestifyServer,
-  ScriptManagerFactory,
-} from "container.ts/modules";
+import { Asset, Process, Script, ScriptManagerFactory } from "container.ts/modules";
+import { StatsdMetric, RestifyServer, SocketioServer, WinstonLog, RollbarLog } from "./modules";
 import * as constants from "./constants";
 
 // TODO: Command line argument support (minimist, argv).
@@ -24,6 +16,7 @@ const ENVIRONMENT = new Environment(process.env);
 const NAME = Validate.isString(ENVIRONMENT.get(constants.ENV_NAME) || constants.DEFAULT_NAME);
 const STATSD_HOST = ENVIRONMENT.get(StatsdMetric.ENV.HOST) || constants.DEFAULT_STATSD_HOST;
 const RESTIFY_PORT = ENVIRONMENT.get(RestifyServer.ENV.PORT) || constants.DEFAULT_RESTIFY_PORT;
+const SOCKETIO_PORT = ENVIRONMENT.get(RestifyServer.ENV.PORT) || constants.DEFAULT_SOCKETIO_PORT;
 
 // Define application values in environment.
 ENVIRONMENT
@@ -31,7 +24,8 @@ ENVIRONMENT
   .set(Asset.ENV.PATH, constants.DEFAULT_ASSET_PATH)
   .set(Script.ENV.PATH, constants.DEFAULT_SCRIPT_PATH)
   .set(StatsdMetric.ENV.HOST, STATSD_HOST)
-  .set(RestifyServer.ENV.PORT, RESTIFY_PORT);
+  .set(RestifyServer.ENV.PORT, RESTIFY_PORT)
+  .set(SocketioServer.ENV.PORT, SOCKETIO_PORT);
 
 // Create container instance with name and environment.
 // Populate container for dependency injection.
@@ -42,7 +36,8 @@ const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(WinstonLog)
   .registerModule(StatsdMetric)
   .registerModule(ScriptManagerFactory.create([
-    { name: "worker.js" },
+    { name: "server.js" },
+    { name: "socket.js" },
   ]));
 
 // Register additional modules based on environment definitions.
@@ -55,7 +50,7 @@ if (require.main === module) {
   CONTAINER.start()
     .subscribe({
       error: (error) => {
-        process.stderr.write(String(error) + "\n");
+        process.stderr.write(`${error}\n`);
         process.exit(1);
       },
     });

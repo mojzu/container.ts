@@ -10,8 +10,15 @@ const packageJsonDependencies = wutil.packageJsonDependencies();
 
 // Partial RxJS imports must be mapped to module.
 const rxjsDependencies = wutil.mapPartialDependencies("rxjs", [
-  // "rxjs/Observable",
-  // ...
+  "rxjs/Observable",
+  "rxjs/add/observable/empty",
+  "rxjs/add/observable/of",
+  "rxjs/add/observable/range",
+  "rxjs/add/observable/bindNodeCallback",
+  "rxjs/add/operator/do",
+  "rxjs/add/operator/map",
+  "rxjs/add/operator/take",
+  "rxjs/add/operator/timeout",
 ]);
 
 module.exports = {
@@ -19,7 +26,8 @@ module.exports = {
   // Additional scripts bundled with application.
   entry: {
     "dist/main": path.resolve("./src/main.ts"),
-    "dist/scripts/worker": path.resolve("./src/scripts/worker.ts"),
+    "dist/scripts/server": path.resolve("./src/scripts/server.ts"),
+    "dist/scripts/socket": path.resolve("./src/scripts/socket.ts"),
   },
   output: {
     path: path.resolve("./"),

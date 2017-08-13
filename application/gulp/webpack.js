@@ -28,10 +28,10 @@ module.exports = {
   /** Run webpack build. */
   run: (root, done) => {
     const command = ["webpack"];
-    // // TODO: Support production flag when ES2016 uglify works.
-    // if (config.production) {
-    //   command.push("-p");
-    // }
+    // TODO: Fix for uglify plugin errors.
+    if (config.cli.production) {
+      command.push("-p");
+    }
     shell.run(command.join(" "), root, done);
   },
 };

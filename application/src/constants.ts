@@ -9,3 +9,4 @@ export const DEFAULT_SCRIPT_PATH = path.resolve(`${__dirname}/scripts`);
 export const DEFAULT_ASSET_PATH = path.resolve(`${__dirname}/../assets`);
 export const DEFAULT_STATSD_HOST = "localhost";
 export const DEFAULT_RESTIFY_PORT = "4000";
+export const DEFAULT_SOCKETIO_PORT = "4001";
