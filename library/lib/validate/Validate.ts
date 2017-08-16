@@ -1,10 +1,7 @@
 import * as validator from "validator";
 import * as moment from "moment-timezone";
 import { ISO639, ISO3166 } from "./data";
-
-// Conditionally import node for file/directory validators.
-const nodePath = (typeof window === "undefined") ? require("path") : null;
-const nodeFs = (typeof window === "undefined") ? require("fs") : null;
+import { Node } from "./Node";
 
 /**
  * Validation error codes enumeration.
@@ -27,13 +24,13 @@ export enum EValidateErrorCode {
   InvalidUrl,
   InvalidEmail,
   InvalidMongoId,
+  InvalidBuffer,
   InvalidFile,
   InvalidDirectory,
   InvalidAnd,
   InvalidOr,
   InvalidNot,
   InvalidSchema,
-  NodeNotAvailable,
 }
 
 function validateErrorMessage(code: number, value?: any, error?: any): string {
@@ -56,13 +53,6 @@ export class ValidateError extends Error {
     this.stack = error.stack;
     this.message = error.message;
     this.thrownError = thrownError;
-  }
-}
-
-/** Test that node file system is available. */
-function checkNodeAvailable(): void {
-  if ((nodePath == null) && (nodeFs == null)) {
-    throw new ValidateError(EValidateErrorCode.NodeNotAvailable);
   }
 }
 
@@ -144,6 +134,11 @@ export interface IValidateEmailOptions {
   allow_display_name?: boolean;
   allow_utf8_local_part?: boolean;
   require_tld?: boolean;
+}
+
+/** Buffer validation options. */
+export interface IValidateBufferOptions {
+  encoding?: string;
 }
 
 /**
@@ -414,13 +409,28 @@ export class Validate {
     return value;
   }
 
+  public static isBuffer(value = "", options: IValidateBufferOptions = {}): Buffer {
+    let buffer = null;
+
+    try {
+      buffer = Node.buffer.from(value, options.encoding);
+    } catch (error) {
+      throw new ValidateError(EValidateErrorCode.InvalidBuffer, value, error);
+    }
+
+    if (buffer == null) {
+      throw new ValidateError(EValidateErrorCode.InvalidBuffer, value);
+    }
+
+    return buffer;
+  }
+
   public static isFile(value = ""): string {
-    checkNodeAvailable();
     let isFile = false;
 
     try {
-      value = nodePath.resolve(value);
-      isFile = nodeFs.lstatSync(value).isFile();
+      value = Node.path.resolve(value);
+      isFile = Node.fs.lstatSync(value).isFile();
     } catch (error) {
       throw new ValidateError(EValidateErrorCode.InvalidFile, value, error);
     }
@@ -433,12 +443,11 @@ export class Validate {
   }
 
   public static isDirectory(value = ""): string {
-    checkNodeAvailable();
     let isDirectory = false;
 
     try {
-      value = nodePath.resolve(value);
-      isDirectory = nodeFs.lstatSync(value).isDirectory();
+      value = Node.path.resolve(value);
+      isDirectory = Node.fs.lstatSync(value).isDirectory();
     } catch (error) {
       throw new ValidateError(EValidateErrorCode.InvalidDirectory, value, error);
     }

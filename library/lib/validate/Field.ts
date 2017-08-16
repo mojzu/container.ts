@@ -12,6 +12,7 @@ import {
   IValidateDomainOptions,
   IValidateUrlOptions,
   IValidateEmailOptions,
+  IValidateBufferOptions,
   Validate,
 } from "./Validate";
 
@@ -370,6 +371,18 @@ export class MongoIdField extends Field<string> {
   }
   public format(value: string): string {
     return value;
+  }
+}
+
+export class BufferField extends Field<Buffer> {
+  public constructor(private _options: IValidateBufferOptions = {}) {
+    super();
+  }
+  public validate(value: string): Buffer {
+    return Validate.isBuffer(value, this._options);
+  }
+  public format(value: Buffer): string {
+    return value.toString(this._options.encoding);
   }
 }
 
