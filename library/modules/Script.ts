@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import * as assert from "assert";
 import * as path from "path";
 import * as childProcess from "child_process";

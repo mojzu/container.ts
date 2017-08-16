@@ -1,4 +1,3 @@
-// Core modules.
 export * from "./Asset";
 export * from "./ChildProcess";
 export * from "./Log";

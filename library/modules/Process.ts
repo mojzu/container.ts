@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import * as process from "process";
 import * as os from "os";
 import { Observable } from "rxjs/Observable";

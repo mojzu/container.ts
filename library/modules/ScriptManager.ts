@@ -12,8 +12,6 @@ import { IProcessStatus } from "./Process";
 import { Script, ScriptProcess } from "./Script";
 import { ChildProcess } from "./ChildProcess";
 
-// TODO: Script manager options (restart limit, ...).
-
 /** Script manager target interface. */
 export interface IScriptManagerTarget {
   name: string;
@@ -30,6 +28,7 @@ export class ScriptManagerFactory {
 
   /** Create manager classes for target scripts. */
   public static create(scripts: IScriptManagerTarget[]): IContainerModuleConstructor {
+
     class ScriptManager extends ContainerModule implements IScriptManager {
 
       private _script: Script;
@@ -93,6 +92,7 @@ export class ScriptManagerFactory {
       }
 
     }
+
     return ScriptManager;
   }
 
