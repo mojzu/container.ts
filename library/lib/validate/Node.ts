@@ -4,7 +4,7 @@ export const buffer = (typeof window === "undefined") ? require("buffer") : null
 export const path = (typeof window === "undefined") ? require("path") : null;
 export const fs = (typeof window === "undefined") ? require("fs") : null;
 
-export default class Node {
+export class Node {
 
   /** Node buffer module. */
   public static get buffer(): typeof buffer {
@@ -31,3 +31,5 @@ export default class Node {
   }
 
 }
+
+export default Node;
