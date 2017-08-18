@@ -60,6 +60,7 @@ module.exports = {
     // Additional external dependencies added here.
     "container.ts": "commonjs container.ts",
     "container.ts/modules": "commonjs container.ts/modules",
+    "container.ts/lib/error": "commonjs container.ts/lib/error",
     "container.ts/lib/validate": "commonjs container.ts/lib/validate",
   }],
 };
