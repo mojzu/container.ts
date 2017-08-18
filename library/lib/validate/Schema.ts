@@ -1,23 +1,11 @@
+import { ErrorChain } from "../error";
 import { EValidateErrorCode, ValidateError } from "./Validate";
 import { Field } from "./Field";
 
-function schemaErrorMessage(keys: string, error?: any): string {
-  let message = `"${keys}"`;
-  if (error != null) {
-    message += `: ${error}`;
-  }
-  return message;
-}
-
 /** Schema error class. */
-export class SchemaError extends Error {
-  public thrownError?: any;
-  public constructor(keys: string, thrownError?: any) {
-    const error: any = super(schemaErrorMessage(keys, thrownError));
-    this.name = error.name = "SchemaError";
-    this.stack = error.stack;
-    this.message = error.message;
-    this.thrownError = thrownError;
+export class SchemaError extends ErrorChain {
+  public constructor(keys: string, cause?: any) {
+    super({ name: "SchemaError", value: keys }, cause);
   }
 }
 

@@ -14,6 +14,7 @@ import {
   IContainerModuleOpts,
   ContainerModule,
 } from "../container";
+import { ErrorChain } from "../lib/error";
 import { Validate } from "../lib/validate";
 import {
   EProcessMessageType,
@@ -27,6 +28,13 @@ import {
 /** Script process options. */
 export interface IScriptOptions {
   args?: string[];
+}
+
+/** Script error class. */
+export class ScriptError extends ErrorChain {
+  public constructor(target: string, cause?: Error) {
+    super({ name: "ScriptError", value: target }, cause);
+  }
 }
 
 /** Spawned script process interface. */
@@ -71,13 +79,23 @@ export class ScriptProcess implements IProcessSend {
         return Observable.of((value != null) ? value : 1);
       });
 
-    // TODO: Log error if script exits with error code.
-    this._exit.subscribe((code) => this.script.debug(`EXIT="${_target}" CODE="${code}"`));
+    this._exit.subscribe((code) => {
+      this.script.debug(`EXIT="${_target}" CODE="${code}"`);
+
+      // Log error if script exits with error code.
+      if (code !== 0) {
+        const error = new ScriptError(this.target);
+        this.script.log.error(error);
+      }
+    });
 
     // Listen for process error, forward to script logger.
     Observable.fromEvent(_process, "error")
       .takeUntil(this._exit)
-      .subscribe((error: Error) => this.script.log.error(error));
+      .subscribe((error: Error) => {
+        error = new ScriptError(this.target, error);
+        this.script.log.error(error);
+      });
 
     // Listen for and handle process messages.
     this._messages = Observable.fromEvent<IProcessMessage>(_process, "message")

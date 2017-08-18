@@ -7,11 +7,19 @@ import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/operator/do";
 import "rxjs/add/operator/map";
 import { IContainerModuleOpts, ContainerModule } from "../container";
+import { ErrorChain } from "../lib/error";
 import { Validate } from "../lib/validate";
 
 /** Asset files cached when read. */
 export interface IAssetCache {
   [key: string]: Buffer | string;
+}
+
+/** Asset error class. */
+export class AssetError extends ErrorChain {
+  public constructor(name: string, value: string, cause?: Error) {
+    super({ name, value }, cause);
+  }
 }
 
 /** Assets read only files interface. */
@@ -21,6 +29,12 @@ export class Asset extends ContainerModule {
   public static ENV = {
     /** Asset directory path (required). */
     PATH: "ASSET_PATH",
+  };
+
+  /** Error names. */
+  public static ERROR = {
+    READ_FILE: "AssetReadFileError",
+    JSON_PARSE: "AssetJsonParseError",
   };
 
   private _path: string;
@@ -58,7 +72,7 @@ export class Asset extends ContainerModule {
         try {
           return JSON.parse(data);
         } catch (error) {
-          return Observable.throw(error);
+          return Observable.throw(new AssetError(Asset.ERROR.JSON_PARSE, target, error));
         }
       });
   }
@@ -78,7 +92,7 @@ export class Asset extends ContainerModule {
       const readFile: () => Observable<T> = Observable.bindNodeCallback(readFileCallback);
       return readFile();
     } catch (error) {
-      return Observable.throw(error);
+      return Observable.throw(new AssetError(Asset.ERROR.READ_FILE, target, error));
     }
   }
 

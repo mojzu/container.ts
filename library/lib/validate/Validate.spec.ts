@@ -1,4 +1,5 @@
 /// <reference types="jasmine" />
+import { ErrorChain } from "../error";
 import { EValidateErrorCode, ValidateError, Validate } from "./Validate";
 
 describe("Validate", () => {
@@ -11,19 +12,20 @@ describe("Validate", () => {
   it("#ValidateError is instance of Error and ValidateError", () => {
     const error = new ValidateError(EValidateErrorCode.InvalidString);
     expect(error instanceof Error).toEqual(true);
+    expect(error instanceof ErrorChain).toEqual(true);
     expect(error instanceof ValidateError).toEqual(true);
   });
 
   it("#ValidateError has expected properties", () => {
     const error = new ValidateError(EValidateErrorCode.InvalidBoolean);
-    expect(error.name).toEqual("ValidateError");
+    expect(error.name).toEqual("InvalidBoolean");
     expect(error.stack).toBeDefined();
     expect(error.message).toEqual(invalidBoolean);
   });
 
   it("#ValidateError passed thrown error has formatting", () => {
     const error = new ValidateError(EValidateErrorCode.InvalidString, "", new Error("Unknown"));
-    expect(error.name).toEqual("ValidateError");
+    expect(error.name).toEqual("InvalidString");
     expect(error.stack).toBeDefined();
     expect(error.message).toEqual(`${invalidString} "": Error: Unknown`);
   });
@@ -101,8 +103,7 @@ describe("Validate", () => {
       Validate.isString(1 as any);
       fail();
     } catch (error) {
-      expect(error instanceof Error).toEqual(true);
-      expect(error.name).toEqual("ValidateError");
+      expect(error instanceof ValidateError).toEqual(true);
     }
   });
 
@@ -111,8 +112,7 @@ describe("Validate", () => {
       Validate.isString("");
       fail();
     } catch (error) {
-      expect(error instanceof Error).toEqual(true);
-      expect(error.name).toEqual("ValidateError");
+      expect(error instanceof ValidateError).toEqual(true);
     }
   });
 
@@ -121,8 +121,7 @@ describe("Validate", () => {
       Validate.isString("foobar", { max: 3 });
       fail();
     } catch (error) {
-      expect(error instanceof Error).toEqual(true);
-      expect(error.name).toEqual("ValidateError");
+      expect(error instanceof ValidateError).toEqual(true);
       expect(error.message).toEqual(`${invalidString} "foobar"`);
     }
   });
@@ -132,8 +131,7 @@ describe("Validate", () => {
       Validate.isString("baz", { values: ["bar", "foo"] });
       fail();
     } catch (error) {
-      expect(error instanceof Error).toEqual(true);
-      expect(error.name).toEqual("ValidateError");
+      expect(error instanceof ValidateError).toEqual(true);
       expect(error.message).toEqual(`${invalidString} "baz"`);
     }
   });
@@ -149,8 +147,7 @@ describe("Validate", () => {
       Validate.isPort("foo");
       fail();
     } catch (error) {
-      expect(error instanceof Error).toEqual(true);
-      expect(error.name).toEqual("ValidateError");
+      expect(error instanceof ValidateError).toEqual(true);
     }
   });
 
@@ -159,8 +156,7 @@ describe("Validate", () => {
       Validate.isPort("0");
       fail();
     } catch (error) {
-      expect(error instanceof Error).toEqual(true);
-      expect(error.name).toEqual("ValidateError");
+      expect(error instanceof ValidateError).toEqual(true);
     }
   });
 
@@ -192,8 +188,7 @@ describe("Validate", () => {
       Validate.isEmail("bar");
       fail();
     } catch (error) {
-      expect(error instanceof Error).toEqual(true);
-      expect(error.name).toEqual("ValidateError");
+      expect(error instanceof ValidateError).toEqual(true);
     }
   });
 

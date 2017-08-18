@@ -9,7 +9,8 @@ import "rxjs/add/operator/filter";
 import "rxjs/add/operator/timeout";
 import "rxjs/add/operator/takeWhile";
 import { IContainerLogMessage, IContainerModuleOpts, ContainerModule } from "../container";
-import { IProcessStatus, Process } from "./Process";
+import { IErrorChainSerialised, ErrorChain } from "../lib/error";
+import { IProcessStatus, ProcessError, Process } from "./Process";
 
 /** Process message types. */
 export enum EProcessMessageType {
@@ -19,23 +20,6 @@ export enum EProcessMessageType {
   CallResponse,
   Event,
   User,
-}
-
-/** Process error object. */
-export interface IProcessError {
-  name?: string;
-  message?: string;
-  stack?: string;
-}
-
-/** Process error class. */
-export class ProcessError extends Error implements IProcessError {
-  public constructor(name: string, message: string, stack: string) {
-    const error: any = super(message);
-    this.name = error.name = name;
-    this.message = error.message = message;
-    this.stack = error.stack = stack;
-  }
 }
 
 /** Process call method options. */
@@ -59,7 +43,7 @@ export interface IProcessCallRequestData {
 export interface IProcessCallResponseData {
   id: number;
   next?: any;
-  error?: IProcessError;
+  error?: IErrorChainSerialised;
   complete?: boolean;
 }
 
@@ -108,21 +92,13 @@ export class ChildProcess extends Process implements IProcessSend {
   };
 
   /** Extract serialisable error properties to object. */
-  public static serialiseError(error: Error): IProcessError {
-    return {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-    };
+  public static serialiseError(error: Error): IErrorChainSerialised {
+    return new ProcessError(error).serialise();
   }
 
   /** Convert serialised error to error instance. */
-  public static deserialiseError(error: IProcessError): ProcessError {
-    return new ProcessError(
-      error.name || "",
-      error.message || "",
-      error.stack || "",
-    );
+  public static deserialiseError(error: IErrorChainSerialised): ProcessError {
+    return ErrorChain.deserialise(error) || new ProcessError();
   }
 
   /** Send call request to process. */

@@ -1,5 +1,6 @@
 import * as validator from "validator";
 import * as moment from "moment-timezone";
+import { ErrorChain } from "../error";
 import { ISO639, ISO3166 } from "./data";
 import { Node } from "./Node";
 
@@ -33,26 +34,10 @@ export enum EValidateErrorCode {
   InvalidSchema,
 }
 
-function validateErrorMessage(code: number, value?: any, error?: any): string {
-  let message = EValidateErrorCode[code] || "Unknown";
-  if (value != null) {
-    message += ` "${value}"`;
-  }
-  if (error != null) {
-    message += `: ${error}`;
-  }
-  return message;
-}
-
 /** Validate error class. */
-export class ValidateError extends Error {
-  public thrownError?: any;
-  public constructor(code: number, value?: any, thrownError?: any) {
-    const error: any = super(validateErrorMessage(code, value, thrownError));
-    this.name = error.name = "ValidateError";
-    this.stack = error.stack;
-    this.message = error.message;
-    this.thrownError = thrownError;
+export class ValidateError extends ErrorChain {
+  public constructor(code: EValidateErrorCode, value?: any, cause?: Error) {
+    super({ name: EValidateErrorCode[code], value }, cause);
   }
 }
 

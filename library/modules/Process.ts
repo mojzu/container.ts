@@ -5,6 +5,7 @@ import "rxjs/add/observable/of";
 import "rxjs/add/observable/interval";
 import "rxjs/add/operator/switchMap";
 import { IContainerModuleOpts, ContainerModule } from "../container";
+import { ErrorChain } from "../lib/error";
 import { Asset } from "./Asset";
 
 /** Process information interface. */
@@ -34,6 +35,13 @@ export interface IProcessStatus {
   uptime: number;
   cpuUsage: NodeJS.CpuUsage;
   memoryUsage: NodeJS.MemoryUsage;
+}
+
+/** Process error class. */
+export class ProcessError extends ErrorChain {
+  public constructor(cause?: Error) {
+    super({ name: "ProcessError" }, cause);
+  }
 }
 
 /** Node.js process interface. */
@@ -131,7 +139,7 @@ export class Process extends ContainerModule {
       .switchMap(() => this._asset.readJson(Process.ASSET.PROCESS_JSON))
       .catch((error) => {
         // Handle error to read process information file.
-        this.log.error(error);
+        this.log.error(new ProcessError(error));
         return Observable.of({});
       })
       .switchMap((data: IProcess) => {
@@ -165,8 +173,9 @@ export class Process extends ContainerModule {
         next: () => process.exit(0),
         error: (error) => {
           // Try to log error and exit with error code.
+          error = new ProcessError(error);
           this.log.error(error);
-          process.stderr.write(String(error));
+          process.stderr.write(`${error}\n`);
           process.exit(1);
         },
       });

@@ -12,6 +12,7 @@ import "rxjs/add/operator/filter";
 import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/timeout";
+import { ErrorChain } from "../lib/error";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./Log";
 import { EMetricType, IMetricTags, Metric } from "./Metric";
@@ -38,12 +39,9 @@ export interface IContainerModuleState {
 }
 
 /** Container error class. */
-export class ContainerError extends Error {
-  public constructor(message: string) {
-    const error: any = super(message);
-    this.name = error.name = "ContainerError";
-    this.message = error.message;
-    this.stack = error.stack;
+export class ContainerError extends ErrorChain {
+  public constructor(name: string, cause?: Error) {
+    super({ name }, cause);
   }
 }
 
@@ -88,6 +86,12 @@ export class Container {
 
   /** Container reference name used internally by modules. */
   public static NAME = "_container";
+
+  /** Error names. */
+  public static ERROR = {
+    TIMEOUT: "ContainerTimeoutError",
+    DEPENDENCY: "ContainerDependencyError",
+  };
 
   private _environment: Environment;
   private _container: AwilixContainer;
@@ -227,7 +231,7 @@ export class Container {
     // Map TimeoutError to ContainerError.
     return Observable.forkJoin(...observables)
       .timeout(timeout)
-      .catch((error: Error) => Observable.throw(new ContainerError(error.message)))
+      .catch((error: Error) => Observable.throw(new ContainerError(Container.ERROR.TIMEOUT, error)))
       .switchMap(() => {
         const message = state ? "ContainerStart" : "ContainerStop";
         this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
@@ -334,10 +338,14 @@ export class ContainerModule {
 
     // Inject dependency values into instance.
     // Error is thrown by awilix if resolution failed.
-    Object.keys(depends).map((key) => {
-      const target = depends[key];
-      this[key] = opts[target];
-    });
+    try {
+      Object.keys(depends).map((key) => {
+        const target = depends[key];
+        this[key] = opts[target];
+      });
+    } catch (error) {
+      throw new ContainerError(Container.ERROR.DEPENDENCY, error);
+    }
   }
 
   /** Module operational state. */
