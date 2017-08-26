@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -33,24 +33,24 @@
   "dependencies": {
     "@types/debug": "^0.0.30",
     "awilix": "^2.7.0",
-    "debug": "^3.0.0",
+    "debug": "^3.0.1",
     "rxjs": "^5.4.3"
   },
   "optionalDependencies": {
     "@types/moment-timezone": "^0.2.34",
     "moment-timezone": "^0.5.13",
-    "validator": "^8.0.0"
+    "validator": "^8.1.0"
   },
   "devDependencies": {
-    "@types/jasmine": "^2.5.53",
-    "@types/node": "^6.0.87",
+    "@types/jasmine": "^2.5.54",
+    "@types/node": "^6.0.88",
     "@types/validator": "^6.2.2",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-util": "^3.0.8",
     "istanbul": "^0.4.5",
-    "jasmine": "^2.7.0",
-    "tslint": "^5.6.0",
+    "jasmine": "^2.8.0",
+    "tslint": "^5.7.0",
     "typedoc": "^0.8.0",
     "typescript": "^2.5.1"
   }
