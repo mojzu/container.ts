@@ -1,3 +1,4 @@
+import { ErrorChain } from "../lib/error";
 
 /** Log levels defined in RFC5424. */
 export enum ELogLevel {
@@ -12,7 +13,7 @@ export enum ELogLevel {
 }
 
 /** Log message types. */
-export type ILogMessage = string | Error;
+export type ILogMessage = string | Error | ErrorChain;
 
 /** Log metadata type. */
 export interface ILogMetadata extends Object {

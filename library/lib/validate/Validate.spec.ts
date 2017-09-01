@@ -11,7 +11,6 @@ describe("Validate", () => {
 
   it("#ValidateError is instance of Error and ValidateError", () => {
     const error = new ValidateError(EValidateErrorCode.InvalidString);
-    expect(error instanceof Error).toEqual(true);
     expect(error instanceof ErrorChain).toEqual(true);
     expect(error instanceof ValidateError).toEqual(true);
   });

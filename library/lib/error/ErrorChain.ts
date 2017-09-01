@@ -17,7 +17,7 @@ export interface IErrorChainSerialised {
   ErrorChain: IErrorChainItem[];
 }
 
-export class ErrorChain extends Error {
+export class ErrorChain {
 
   /** Error names. */
   public static ERROR = {
@@ -79,11 +79,14 @@ export class ErrorChain extends Error {
     }
   }
 
+  public name: string;
+  public stack?: string;
+  public message?: string;
   public value?: any;
   public cause?: ErrorChain | Error;
 
   public constructor(data: IErrorChain, cause?: ErrorChain | Error) {
-    const error: any = super(ErrorChain.messageConstructor(data, cause));
+    const error = new Error(ErrorChain.messageConstructor(data, cause));
     this.name = error.name = data.name;
     this.stack = error.stack;
     this.message = error.message;

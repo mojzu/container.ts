@@ -93,8 +93,8 @@ export class ScriptProcess implements IProcessSend {
     Observable.fromEvent(_process, "error")
       .takeUntil(this._exit)
       .subscribe((error: Error) => {
-        error = new ScriptError(this.target, error);
-        this.script.log.error(error);
+        const chained = new ScriptError(this.target, error);
+        this.script.log.error(chained);
       });
 
     // Listen for and handle process messages.

@@ -14,7 +14,6 @@ describe("Container", () => {
 
   it("#ContainerError", () => {
     const error = new ContainerError("unknown");
-    expect(error instanceof Error).toEqual(true);
     expect(error instanceof ErrorChain).toEqual(true);
     expect(error instanceof ContainerError).toEqual(true);
   });
