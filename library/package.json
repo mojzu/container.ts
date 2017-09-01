@@ -37,14 +37,14 @@
     "rxjs": "^5.4.3"
   },
   "optionalDependencies": {
-    "@types/moment-timezone": "^0.2.34",
+    "@types/moment-timezone": "^0.2.35",
     "moment-timezone": "^0.5.13",
     "validator": "^8.1.0"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.54",
     "@types/node": "^6.0.88",
-    "@types/validator": "^6.2.2",
+    "@types/validator": "^6.2.3",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-util": "^3.0.8",
@@ -52,6 +52,6 @@
     "jasmine": "^2.8.0",
     "tslint": "^5.7.0",
     "typedoc": "^0.8.0",
-    "typescript": "^2.5.1"
+    "typescript": "^2.5.2"
   }
 }
