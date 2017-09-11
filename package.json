@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -39,7 +39,7 @@
   "optionalDependencies": {
     "@types/moment-timezone": "^0.2.35",
     "moment-timezone": "^0.5.13",
-    "validator": "^8.1.0"
+    "validator": "^8.2.0"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.54",
@@ -51,7 +51,6 @@
     "istanbul": "^0.4.5",
     "jasmine": "^2.8.0",
     "tslint": "^5.7.0",
-    "typedoc": "^0.8.0",
     "typescript": "^2.5.2"
   }
 }

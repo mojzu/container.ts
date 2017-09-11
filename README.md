@@ -13,7 +13,6 @@ Clone repository, install dependencies with `yarn install` and run scripts: `yar
 | `test`      | Run tests using Jasmine and Istanbul.                 |
 | `lint`      | Run TSLint on project.                                |
 | `example`   | Run example script, `yarn run example -- -f schema`.  |
-| `docs`      | Generate Typedoc documentation.                       |
 | `build`     | Build library for release.                            |
 
 Publishing library to NPM/GitHub.
