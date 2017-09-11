@@ -268,6 +268,8 @@ export class Validate {
     }
   }
 
+  // TODO: Locale validator.
+
   public static isTimeZone(value = ""): string {
     try {
       return Validate.isString(value, { values: moment.tz.names() });

@@ -7,6 +7,10 @@
 
 Modular application framework library.
 
+## Dependencies
+
+TODO
+
 ## Developer
 
 Clone repository, install dependencies with `yarn install` and run scripts: `yarn run ...`
