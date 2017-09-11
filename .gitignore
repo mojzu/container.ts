@@ -1,3 +1,11 @@
 # Git ignored files.
 # <https://git-scm.com/docs/gitignore>
-/.deprecated
+/coverage
+/node_modules
+/*.log
+/*.tgz
+*.d.ts
+*.js.map
+*.js
+!gulpfile.js
+!/gulp/**/*.js
