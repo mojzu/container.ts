@@ -1,5 +1,10 @@
 # Container.ts
 
+[![npm](https://img.shields.io/npm/v/container.ts.svg?style=flat-square)](https://www.npmjs.com/package/container.ts)
+[![npm](https://img.shields.io/npm/l/container.ts.svg?style=flat-square)](https://github.com/mojzunet/container.ts/blob/master/LICENCE)
+[![Travis CI](https://img.shields.io/travis/mojzunet/container.ts.svg?style=flat-square)](https://travis-ci.org/mojzunet/container.ts)
+[![Code Climate](https://img.shields.io/codeclimate/coverage/github/mojzunet/container.ts.svg?style=flat-square)](https://codeclimate.com/github/mojzunet/container.ts)
+
 Modular application framework library.
 
 ## Developer
@@ -22,7 +27,9 @@ $ yarn run build && npm publish --access=public
 $ git push origin master --tags
 ```
 
-### References
+Add [Code Climate](https://codeclimate.com/) repository token to [Travis CI](https://travis-ci.org/) in `Settings -> Environment Variables`.
+
+## References
 
 -   [EditorConfig](http://editorconfig.org)
 -   [gitignore](https://git-scm.com/docs/gitignore)
