@@ -173,6 +173,13 @@ describe("Validate", () => {
     expect(country).toEqual("GB");
   });
 
+  // Locale tests.
+
+  it ("#isLocale", () => {
+    const locale = Validate.isLocale("en_GB");
+    expect(locale).toEqual("en_GB");
+  });
+
   // Time zone tests.
 
   it("#isTimeZone", () => {

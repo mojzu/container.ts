@@ -6,6 +6,7 @@ import {
   IValidateIntegerOptions,
   IValidateNumberOptions,
   IValidateStringOptions,
+  IValidateLocaleOptions,
   IValidateDateOptions,
   IValidateDurationOptions,
   IValidateIpOptions,
@@ -287,6 +288,18 @@ export class CountryField extends Field<string> {
 export class TimeZoneField extends Field<string> {
   public validate(value: string): string {
     return Validate.isTimeZone(value);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class LocaleField extends Field<string> {
+  public constructor(private _options: IValidateLocaleOptions = {}) {
+    super();
+  }
+  public validate(value: string): string {
+    return Validate.isLocale(value, this._options);
   }
   public format(value: string): string {
     return value;

@@ -17,6 +17,7 @@ export enum EValidateErrorCode {
   InvalidPort,
   InvalidLanguage,
   InvalidCountry,
+  InvalidLocale,
   InvalidTimeZone,
   InvalidDate,
   InvalidDuration,
@@ -71,6 +72,11 @@ export interface IValidateStringOptions {
   max?: number;
   /** Allowed values for string. */
   values?: string[];
+}
+
+/** Locale validation options. */
+export interface IValidateLocaleOptions {
+  separator?: string;
 }
 
 /** Date validation options. */
@@ -268,7 +274,18 @@ export class Validate {
     }
   }
 
-  // TODO: Locale validator.
+  public static isLocale(value = "", options: IValidateLocaleOptions = {}): string {
+    const separator = options.separator || "_";
+
+    try {
+      const parts = value.split(separator);
+      const language = Validate.isLanguage(parts[0]);
+      const country = Validate.isCountry(parts[1]);
+      return `${language}${separator}${country}`;
+    } catch (error) {
+      throw new ValidateError(EValidateErrorCode.InvalidLocale, value, error);
+    }
+  }
 
   public static isTimeZone(value = ""): string {
     try {

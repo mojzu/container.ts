@@ -9,7 +9,11 @@ Modular application framework library.
 
 ## Dependencies
 
-TODO
+-   [debug](https://www.npmjs.com/package/debug)
+-   [awilix](https://www.npmjs.com/package/awilix)
+-   [rxjs](https://www.npmjs.com/package/rxjs)
+-   [validator](https://www.npmjs.com/package/validator)
+-   [moment-timezone](https://www.npmjs.com/package/moment-timezone)
 
 ## Developer
 
@@ -33,7 +37,7 @@ $ git push origin master --tags
 
 Add [Code Climate](https://codeclimate.com/) repository token to [Travis CI](https://travis-ci.org/) in `Settings -> Environment Variables`.
 
-## References
+### Links
 
 -   [EditorConfig](http://editorconfig.org)
 -   [gitignore](https://git-scm.com/docs/gitignore)

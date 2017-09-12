@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@types/debug": "^0.0.30",
-    "awilix": "^2.7.0",
+    "awilix": "^2.7.1",
     "debug": "^3.0.1",
     "rxjs": "^5.4.3"
   },

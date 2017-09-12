@@ -102,9 +102,9 @@ async@1.x, async@^1.4.0:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
 
-awilix@^2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/awilix/-/awilix-2.7.0.tgz#b440b8fb84652038b5f355703868aba2345b721b"
+awilix@^2.7.1:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/awilix/-/awilix-2.7.1.tgz#0003a7509747cadd87b6975820e21e5218cfe71f"
   dependencies:
     camel-case "^3.0.0"
     glob "^7.1.2"
@@ -1139,8 +1139,8 @@ os-homedir@^1.0.0, os-homedir@^1.0.1:
   resolved "https://registry.yarnpkg.com/os-homedir/-/os-homedir-1.0.2.tgz#ffbc4988336e0e833de0c168c7ef152121aa7fb3"
 
 p-map@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/p-map/-/p-map-1.1.1.tgz#05f5e4ae97a068371bc2a5cc86bfbdbc19c4ae7a"
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/p-map/-/p-map-1.2.0.tgz#e4e94f311eabbc8633a1e79908165fca26241b6b"
 
 parse-filepath@^1.0.1:
   version "1.0.1"
