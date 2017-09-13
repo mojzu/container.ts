@@ -24,9 +24,10 @@ gulp.task("clean", (done) => {
     "container/**/*.d.ts",
     "container/**/*.js",
     "container/**/*.js.map",
-    "examples/**/*.d.ts",
-    "examples/**/*.js",
-    "examples/**/*.js.map",
+    // TODO: Prevent this cleaning application example.
+    // "examples/**/*.d.ts",
+    // "examples/**/*.js",
+    // "examples/**/*.js.map",
     "modules/**/*.d.ts",
     "modules/**/*.js",
     "modules/**/*.js.map",

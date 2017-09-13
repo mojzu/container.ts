@@ -25,6 +25,11 @@ export class ErrorChain {
     DESERIALISE: "DeserialiseError",
   };
 
+  /** Returns true if error instance of Error or ErrorChain */
+  public static isError(error: any): boolean {
+    return (error instanceof Error) || (error instanceof ErrorChain);
+  }
+
   /** Construct error message from data and optional cause. */
   public static messageConstructor(data: IErrorChain, cause?: ErrorChain | Error): string {
     let message = data.name;
