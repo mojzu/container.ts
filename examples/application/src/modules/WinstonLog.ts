@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import * as winston from "winston";
-import { IContainerModuleOpts, ContainerLogMessage, ELogLevel, ILogMessage } from "container.ts";
-// import { ErrorChain } from "container.ts/lib/error";
+import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "container.ts";
+import { ErrorChain } from "container.ts/lib/error";
 import { Log } from "container.ts/modules";
 
 export class WinstonLog extends Log {
@@ -26,17 +26,17 @@ export class WinstonLog extends Log {
   /** Winston handler for incoming log messages. */
   protected handleLog(log: ContainerLogMessage): void {
     const callback = this.handleError.bind(this);
-    const message: ILogMessage = "";
+    let message: string;
 
-    // TODO: Fix this.
-    // // If log message is an Error instance, use message string
-    // // and prepend error object to arguments.
-    // if (ErrorChain.isError(log.message)) {
-    //   message = log.message.message || log.message.name;
-    //   log.args = [log.message].concat(log.args);
-    // } else {
-    //   message = log.message;
-    // }
+    // If log message is an error instance, use message string
+    // and prepend error object to arguments.
+    if (ErrorChain.isError(log.message)) {
+      const error: Error | ErrorChain = log.message as any;
+      message = error.message || error.name;
+      log.args = [error].concat(log.args);
+    } else {
+      message = log.message as any;
+    }
 
     // Map log level to winston log methods.
     switch (log.level) {
