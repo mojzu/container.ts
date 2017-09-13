@@ -1,0 +1,12 @@
+# Git ignored files.
+# <https://git-scm.com/docs/gitignore>
+/.vagrant
+/build
+/coverage
+/dist
+/node_modules
+/*.log
+/*.tgz
+!gulpfile.js
+!webpack.config.js
+!/gulp/**/*.js

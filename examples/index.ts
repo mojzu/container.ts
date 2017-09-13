@@ -1,2 +1,4 @@
 import * as path from "path";
-export const ASSET_PATH = path.resolve(__dirname, "assets");
+
+/** Example assets directory for testing. */
+export const ASSET_PATH = path.resolve(__dirname, "application", "assets");

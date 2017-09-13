@@ -36,7 +36,7 @@ gulp.task("clean", (done) => {
   ], done);
 });
 
-// Clean and delete modules generated documentation.
+// Clean and delete `node_modules` directory.
 gulp.task("distclean", ["clean"], (done) => {
   clean.run(packagePath, ["node_modules"], done);
 });
