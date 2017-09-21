@@ -59,6 +59,73 @@ export function buildSchema(schema: ISchemaTypes = {}): ISchemaConstructor {
   return NewSchema;
 }
 
+interface IMapHandler {
+  mask: ISchemaMask | null;
+  keyRoot: string;
+  handlers: ISchemaMapHandlers;
+  value: any;
+  key: number | string;
+}
+
+const mapHandler = (opts: IMapHandler) => {
+  // Expand key root.
+  const subkeyRoot = `${opts.keyRoot}.${opts.key}`;
+
+  // Handle masked fields if defined.
+  let submask: ISchemaMask | undefined;
+  if (opts.mask != null) {
+    if (!opts.mask[opts.key]) {
+      // Field(s) are masked.
+      return;
+    } else if (typeof opts.mask[opts.key] === "object") {
+      // Subfield mask argument.
+      submask = opts.mask[opts.key] as any;
+    }
+  }
+
+  try {
+    if (Schema.isSchema(opts.value) && (opts.handlers.isSchema != null)) {
+
+      // Value is child schema.
+      const childSchema: any = opts.value;
+      opts.handlers.isSchema(childSchema, opts.key, submask, subkeyRoot);
+
+    } else if ((opts.value instanceof Field) && (opts.handlers.isField != null)) {
+
+      // Value is field class instance.
+      const field: Field<any> = opts.value as any;
+      opts.handlers.isField(field, opts.key);
+
+    } else if (Array.isArray(opts.value) && (opts.handlers.isSchemaArray != null)) {
+
+      // Value is a schema array object.
+      const schemaArray: ISchemaArray = opts.value as any;
+      opts.handlers.isSchemaArray(schemaArray, opts.key, submask, subkeyRoot);
+
+    } else if ((typeof opts.value === "object") && (opts.handlers.isSchemaMap != null)) {
+
+      // Value is schema map object.
+      const schemaMap: ISchemaMap = opts.value as any;
+      opts.handlers.isSchemaMap(schemaMap, opts.key, submask, subkeyRoot);
+
+    } else {
+
+      // Unknown schema field value.
+      throw new ValidateError(EValidateErrorCode.InvalidSchema, opts.value);
+
+    }
+  } catch (error) {
+
+    // Schema error wrapper.
+    if (error instanceof SchemaError) {
+      throw error;
+    } else {
+      throw new SchemaError(subkeyRoot, error);
+    }
+
+  }
+};
+
 export abstract class Schema {
 
   /** Schema array or map, override in child classes. */
@@ -84,76 +151,18 @@ export abstract class Schema {
     keyRoot = "",
     handlers: ISchemaMapHandlers = {},
   ): void {
-    const mapHandler = (value: any, key: number | string) => {
-      // Expand key root.
-      const subkeyRoot = `${keyRoot}.${key}`;
-
-      // Handle masked fields if defined.
-      let submask: ISchemaMask | undefined;
-      if (mask != null) {
-        if (!mask[key]) {
-          // Field(s) are masked.
-          return;
-        } else if (typeof mask[key] === "object") {
-          // Subfield mask argument.
-          submask = mask[key] as any;
-        }
-      }
-
-      try {
-        if (Schema.isSchema(value) && (handlers.isSchema != null)) {
-
-          // Value is child schema.
-          const childSchema: any = value as any;
-          handlers.isSchema(childSchema, key, submask, subkeyRoot);
-
-        } else if ((value instanceof Field) && (handlers.isField != null)) {
-
-          // Value is field class instance.
-          const field: Field<any> = value as any;
-          handlers.isField(field, key);
-
-        } else if (Array.isArray(value) && (handlers.isSchemaArray != null)) {
-
-          // Value is a schema array object.
-          const schemaArray: ISchemaArray = value as any;
-          handlers.isSchemaArray(schemaArray, key, submask, subkeyRoot);
-
-        } else if ((typeof value === "object") && (handlers.isSchemaMap != null)) {
-
-          // Value is schema map object.
-          const schemaMap: ISchemaMap = value as any;
-          handlers.isSchemaMap(schemaMap, key, submask, subkeyRoot);
-
-        } else {
-
-          // Unknown schema field value.
-          throw new ValidateError(EValidateErrorCode.InvalidSchema, value);
-
-        }
-      } catch (error) {
-
-        // Schema error wrapper.
-        if (error instanceof SchemaError) {
-          throw error;
-        } else {
-          throw new SchemaError(subkeyRoot, error);
-        }
-
-      }
-    };
     if (Array.isArray(schema)) {
 
       const schemaArray: ISchemaFields[] = schema as any;
       if (schemaArray[0] === "*") {
         // Wildcard asterisk, map all data indexes to field.
         dataKeys.map((key) => {
-          mapHandler(schemaArray[1], key);
+          mapHandler({ mask, keyRoot, handlers, value: schemaArray[1], key});
         });
       } else {
         // Else for each value in schema array.
         schemaArray.map((value, index) => {
-          mapHandler(value, index);
+          mapHandler({ mask, keyRoot, handlers, value, key: index});
         });
       }
 
@@ -163,12 +172,12 @@ export abstract class Schema {
       if (schemaMap["*"] != null) {
         // If wildcard asterisk is present, map all data keys to field.
         dataKeys.map((key) => {
-          mapHandler(schemaMap["*"], key);
+          mapHandler({ mask, keyRoot, handlers, value: schemaMap["*"], key });
         });
       } else {
         // Else for each key in schema map.
         Object.keys(schemaMap).map((key) => {
-          mapHandler(schemaMap[key], key);
+          mapHandler({ mask, keyRoot, handlers, value: schemaMap[key], key });
         });
       }
 
