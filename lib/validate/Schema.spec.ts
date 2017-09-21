@@ -37,6 +37,10 @@ interface IData {
   wildcardMap?: {
     [key: string]: boolean;
   };
+  // TODO: Any map support.
+  // anyMap?: {
+  //   [key: string]: any;
+  // };
   wildcardArray?: string[];
 }
 
@@ -76,6 +80,10 @@ const dataSchema = buildSchema({
   wildcardMap: {
     "*": booleanField,
   },
+  // // Wildcard any fields.
+  // anyMap: {
+  //   "*": "*",
+  // },
   // Wildcard array fields.
   wildcardArray: ["*", stringField],
 });
@@ -112,6 +120,10 @@ describe("Schema", () => {
       one: "0",
       two: "1",
     },
+    // anyMap: {
+    //   one: 2,
+    //   two: true,
+    // },
     wildcardArray: ["foo", "bar", "baz"],
   };
   const validated = dataSchema.validate<IData>(inputData);
@@ -169,6 +181,17 @@ describe("Schema", () => {
     expect(formatted.wildcardMap.two).toEqual("true");
   });
 
+  // it("#AnyMap", () => {
+  //   expect(validated.anyMap).toBeDefined();
+  //   if (validated.anyMap != null) {
+  //     expect(validated.anyMap.one).toEqual(2);
+  //     expect(validated.anyMap.two).toEqual(true);
+  //   }
+  //   expect(formatted.anyMap).toBeDefined();
+  //   expect(formatted.anyMap.one).toEqual("2");
+  //   expect(formatted.anyMap.two).toEqual("true");
+  // });
+
   it("#WildcardArray", () => {
     expect(validated.wildcardArray).toBeDefined();
     if (validated.wildcardArray != null) {
@@ -205,6 +228,7 @@ describe("Schema", () => {
     expect(masked.childSchema.stringField).toEqual("foo");
     expect(masked.arrayOuter).toBeUndefined();
     expect(masked.wildcardMap).toBeUndefined();
+    // expect(masked.anyMap).toBeUndefined();
     expect(masked.wildcardArray).toBeUndefined();
   });
 

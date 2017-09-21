@@ -99,6 +99,8 @@ export class ErrorChain {
     this.cause = cause;
   }
 
+  public toString(): string { return this.message || ""; }
+
   public serialise(): IErrorChainSerialised {
     try {
       // Serialise this error object.

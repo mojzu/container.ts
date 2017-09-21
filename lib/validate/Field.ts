@@ -222,6 +222,15 @@ export class FloatField extends Field<number> {
   }
 }
 
+export class HexadecimalField extends Field<number> {
+  public validate(value: string): number {
+    return Validate.isHexadecimal(value);
+  }
+  public format(value: number): string {
+    return String(value);
+  }
+}
+
 export class StringField extends Field<string> {
   public constructor(private _options: IValidateStringOptions = {}) {
     super();
@@ -381,6 +390,15 @@ export class EmailField extends Field<string> {
 export class MongoIdField extends Field<string> {
   public validate(value: string): string {
     return Validate.isMongoId(value);
+  }
+  public format(value: string): string {
+    return value;
+  }
+}
+
+export class HexColourField extends Field<string> {
+  public validate(value: string): string {
+    return Validate.isHexColour(value);
   }
   public format(value: string): string {
     return value;
