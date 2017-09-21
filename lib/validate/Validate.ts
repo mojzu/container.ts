@@ -9,8 +9,9 @@ import { Node } from "./Node";
  */
 export enum EValidateErrorCode {
   InvalidBoolean,
-  InvalidFloat,
   InvalidInteger,
+  InvalidFloat,
+  InvalidHexadecimal,
   InvalidString,
   InvalidAscii,
   InvalidBase64,
@@ -26,6 +27,7 @@ export enum EValidateErrorCode {
   InvalidUrl,
   InvalidEmail,
   InvalidMongoId,
+  InvalidHexColour,
   InvalidBuffer,
   InvalidFile,
   InvalidDirectory,
@@ -59,7 +61,6 @@ export interface IValidateIntegerOptions extends IValidateNumberOptions {
   allow_leading_zeroes?: boolean;
   lt?: number;
   gt?: number;
-  radix?: number;
 }
 
 /** String validation options. */
@@ -72,6 +73,10 @@ export interface IValidateStringOptions {
   max?: number;
   /** Allowed values for string. */
   values?: string[];
+  /** Require upper case characters. */
+  uppercase?: boolean;
+  /** Require lower case characters. */
+  lowercase?: boolean;
 }
 
 /** Locale validation options. */
@@ -147,7 +152,6 @@ export class Validate {
   }
 
   public static isInteger(value = "", options: IValidateIntegerOptions = {}): number {
-    const radix = options.radix || 10;
     let isInt = false;
 
     try {
@@ -160,7 +164,7 @@ export class Validate {
       throw new ValidateError(EValidateErrorCode.InvalidInteger, value);
     }
 
-    return parseInt(value, radix);
+    return parseInt(value, 10);
   }
 
   public static isFloat(value = "", options: IValidateNumberOptions = {}): number {
@@ -179,11 +183,29 @@ export class Validate {
     return parseFloat(value);
   }
 
+  public static isHexadecimal(value = ""): number {
+    let isHexadecimal = false;
+
+    try {
+      isHexadecimal = validator.isHexadecimal(value);
+    } catch (error) {
+      throw new ValidateError(EValidateErrorCode.InvalidHexadecimal, value, error);
+    }
+
+    if (!isHexadecimal) {
+      throw new ValidateError(EValidateErrorCode.InvalidHexadecimal, value);
+    }
+
+    return parseInt(value, 16);
+  }
+
   public static isString(value = "", options: IValidateStringOptions = {}): string {
     const emptyIsAllowed = !!options.empty;
     const min = options.min || 1;
     const max = options.max;
     const values = options.values || [];
+    const uppercase = options.uppercase || false;
+    const lowercase = options.lowercase || false;
 
     let isEmpty = false;
     let isValid = false;
@@ -199,6 +221,17 @@ export class Validate {
       // Check in array if provided.
       if (values.length > 0) {
         inArray = validator.isIn(value, values);
+      }
+      // Check if uppercase/lowercase if required.
+      if (uppercase) {
+        if (!validator.isUppercase(value)) {
+          isValid = false;
+        }
+      }
+      if (lowercase) {
+        if (!validator.isLowercase(value)) {
+          isValid = false;
+        }
       }
     } catch (error) {
       throw new ValidateError(EValidateErrorCode.InvalidString, value, error);
@@ -408,6 +441,22 @@ export class Validate {
 
     if (!isMongoId) {
       throw new ValidateError(EValidateErrorCode.InvalidMongoId, value);
+    }
+
+    return value;
+  }
+
+  public static isHexColour(value = ""): string {
+    let isHexColour = false;
+
+    try {
+      isHexColour = validator.isHexColor(value);
+    } catch (error) {
+      throw new ValidateError(EValidateErrorCode.InvalidHexColour, value, error);
+    }
+
+    if (!isHexColour) {
+      throw new ValidateError(EValidateErrorCode.InvalidHexColour, value);
     }
 
     return value;
