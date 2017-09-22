@@ -4,7 +4,7 @@ import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import "rxjs/add/observable/interval";
 import "rxjs/add/operator/switchMap";
-import { IContainerModuleOpts, ContainerModule } from "../container";
+import { IContainerModuleDependencies, ContainerModule } from "../container";
 import { ErrorChain } from "../lib/error";
 import { Asset } from "./Asset";
 
@@ -122,8 +122,12 @@ export class Process extends ContainerModule {
     };
   }
 
-  public constructor(name: string, opts: IContainerModuleOpts) {
-    super(name, opts, { _asset: Asset.name });
+  public get dependencies(): IContainerModuleDependencies {
+    return { _asset: Asset.name };
+  }
+
+  public setup(): void {
+    super.setup();
 
     // Default production version value.
     this._version = "0.0.0-production";

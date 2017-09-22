@@ -3,7 +3,7 @@ import { Subject } from "rxjs/Subject";
 import "rxjs/add/operator/takeUntil";
 import "rxjs/add/operator/map";
 import {
-  IContainerModuleOpts,
+  IContainerModuleDependencies,
   IContainerModuleConstructor,
   ContainerModule,
 } from "../container";
@@ -35,11 +35,11 @@ export class ScriptManagerFactory {
       private _workers: Array<ScriptProcess | null> = [];
       private _unsubscribe = new Subject<void>();
 
-      public get workers(): Array<ScriptProcess | null> { return this._workers; }
-
-      public constructor(name: string, opts: IContainerModuleOpts) {
-        super(name, opts, { _script: Script.name });
+      public get dependencies(): IContainerModuleDependencies {
+        return { _script: Script.name };
       }
+
+      public get workers(): Array<ScriptProcess | null> { return this._workers; }
 
       public start(): void {
         scripts.map((script, index) => this.startWorker(script, index));

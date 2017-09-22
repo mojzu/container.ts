@@ -11,7 +11,6 @@ import "rxjs/add/operator/takeUntil";
 import {
   IContainerLogMessage,
   IContainerMetricMessage,
-  IContainerModuleOpts,
   ContainerModule,
 } from "../container";
 import { ErrorChain } from "../lib/error";
@@ -174,8 +173,8 @@ export class Script extends ContainerModule {
 
   public get path(): string { return this._path; }
 
-  public constructor(name: string, opts: IContainerModuleOpts) {
-    super(name, opts);
+  public setup(): void {
+    super.setup();
 
     // Get script directory path from environment.
     const scriptPath = path.resolve(this.environment.get(Script.ENV.PATH));

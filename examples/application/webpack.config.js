@@ -19,6 +19,7 @@ const containerDependencies = {
 // Partial RxJS imports must be mapped to module.
 const rxjsDependencies = wutil.mapPartialDependencies("rxjs", [
   // "rxjs/Observable",
+  // ...
 ]);
 
 module.exports = {

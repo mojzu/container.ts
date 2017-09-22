@@ -1,14 +1,9 @@
-import {
-  IContainerModuleOpts,
-  IContainerModuleDepends,
-  ContainerModule,
-  ContainerMetricMessage,
-} from "../container";
+import { ContainerModule, ContainerMetricMessage } from "../container";
 
 export abstract class Metric extends ContainerModule {
 
-  public constructor(name: string, opts: IContainerModuleOpts, depends?: IContainerModuleDepends) {
-    super(name, opts, depends);
+  public setup(): void {
+    super.setup();
 
     // Subscribe to container metric messages.
     this.container.metrics

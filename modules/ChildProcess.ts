@@ -8,7 +8,7 @@ import "rxjs/add/operator/mergeMap";
 import "rxjs/add/operator/filter";
 import "rxjs/add/operator/timeout";
 import "rxjs/add/operator/takeWhile";
-import { IContainerLogMessage, IContainerModuleOpts, ContainerModule } from "../container";
+import { IContainerLogMessage, ContainerModule } from "../container";
 import { IErrorChainSerialised, ErrorChain } from "../lib/error";
 import { IProcessStatus, ProcessError, Process } from "./Process";
 
@@ -230,8 +230,8 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Events received from parent process. */
   public get events(): Observable<IProcessEventData> { return this._events; }
 
-  public constructor(name: string, opts: IContainerModuleOpts) {
-    super(name, opts);
+  public setup(): void {
+    super.setup();
 
     // Listen for and handle messages from parent process.
     this._messages

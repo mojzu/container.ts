@@ -29,7 +29,7 @@ export interface IContainerModuleConstructor {
 }
 
 /** Container module dependencies. */
-export interface IContainerModuleDepends {
+export interface IContainerModuleDependencies {
   [key: string]: string;
 }
 
@@ -325,10 +325,13 @@ export class ContainerModule {
   /** Module debug interface. */
   public get debug(): Debug.IDebugger { return this._debug; }
 
+  /** Module dependencies hook, override if required. */
+  public get dependencies(): IContainerModuleDependencies { return {}; }
+
   /** Incrementing counter for unique identifiers. */
   protected get identifier(): number { return ++this._identifier; }
 
-  public constructor(name: string, opts: IContainerModuleOpts, depends: IContainerModuleDepends = {}) {
+  public constructor(name: string, opts: IContainerModuleOpts) {
     // Set name, resolve container instance and construct log, debug instances.
     this._name = name;
     this._container = opts[Container.NAME];
@@ -339,14 +342,20 @@ export class ContainerModule {
     // Inject dependency values into instance.
     // Error is thrown by awilix if resolution failed.
     try {
-      Object.keys(depends).map((key) => {
-        const target = depends[key];
+      Object.keys(this.dependencies).map((key) => {
+        const target = this.dependencies[key];
         this[key] = opts[target];
       });
     } catch (error) {
       throw new ContainerError(Container.ERROR.DEPENDENCY, error);
     }
+
+    // Call setup hook.
+    this.setup();
   }
+
+  /** Module setup hook, override if required. */
+  public setup(): void { }
 
   /** Module operational state. */
   public start(): void | Observable<void> {
