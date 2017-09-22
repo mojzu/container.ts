@@ -1,4 +1,8 @@
-import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "container.ts";
+import {
+  IContainerModuleDependencies,
+  ContainerLogMessage,
+  ELogLevel,
+} from "container.ts";
 import { Validate } from "container.ts/lib/validate";
 import { Process, Log } from "container.ts/modules";
 
@@ -17,11 +21,15 @@ export class RollbarLog extends Log {
     REPORT_LEVEL: "ROLLBAR_REPORT_LEVEL",
   };
 
+  public get dependencies(): IContainerModuleDependencies {
+    return { _process: Process.name };
+  }
+
   private _process: Process;
   private _rollbar: any;
 
-  public constructor(name: string, opts: IContainerModuleOpts) {
-    super(name, opts, { _process: Process.name });
+  public setup(): void {
+    super.setup();
 
     // Get access token from environment.
     const accessToken = Validate.isString(this.environment.get(RollbarLog.ENV.ACCESS_TOKEN));

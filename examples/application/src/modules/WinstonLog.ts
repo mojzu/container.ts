@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import * as winston from "winston";
-import { IContainerModuleOpts, ContainerLogMessage, ELogLevel } from "container.ts";
+import { ContainerLogMessage, ELogLevel } from "container.ts";
 import { ErrorChain } from "container.ts/lib/error";
 import { Log } from "container.ts/modules";
 
@@ -8,8 +8,8 @@ export class WinstonLog extends Log {
 
   private _logger: winston.LoggerInstance;
 
-  public constructor(name: string, opts: IContainerModuleOpts) {
-    super(name, opts);
+  public setup(): void {
+    super.setup();
 
     // Construct Winston logger with console transport.
     this._logger = new winston.Logger({

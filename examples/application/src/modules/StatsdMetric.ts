@@ -1,4 +1,4 @@
-import { IContainerModuleOpts, ContainerMetricMessage, EMetricType } from "container.ts";
+import { ContainerMetricMessage, EMetricType } from "container.ts";
 import { Validate } from "container.ts/lib/validate";
 import { Metric } from "container.ts/modules";
 import * as StatsdClient from "statsd-client";
@@ -15,8 +15,8 @@ export class StatsdMetric extends Metric {
 
   private _statsd: any;
 
-  public constructor(name: string, opts: IContainerModuleOpts) {
-    super(name, opts);
+  public setup(): void {
+    super.setup();
 
     // Get host and port environment values.
     const host = Validate.isString(this.environment.get(StatsdMetric.ENV.HOST));
