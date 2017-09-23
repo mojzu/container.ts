@@ -55,7 +55,7 @@ export interface ISchemaConstructor {
 /** Build schema class from input map. */
 export function buildSchema(schema: ISchemaTypes = {}): ISchemaConstructor {
   class NewSchema extends Schema {
-    public static SCHEMA = schema;
+    public static readonly SCHEMA = schema;
   }
   return NewSchema;
 }
@@ -63,7 +63,7 @@ export function buildSchema(schema: ISchemaTypes = {}): ISchemaConstructor {
 export abstract class Schema {
 
   /** Schema array or map, override in child classes. */
-  public static SCHEMA: ISchemaTypes = {};
+  public static readonly SCHEMA: ISchemaTypes = {};
 
   /**
    * Returns true if value is a Schema class object.

@@ -75,19 +75,19 @@ export interface IProcessSend {
 export class ChildProcess extends Process implements IProcessSend {
 
   /** Default call method timeout (10s). */
-  public static DEFAULT_TIMEOUT = 10000;
+  public static readonly DEFAULT_TIMEOUT = 10000;
 
   /** Default interval to send status events (1m). */
-  public static DEFAULT_STATUS_INTERVAL = 60000;
+  public static readonly DEFAULT_STATUS_INTERVAL = 60000;
 
   /** Environment variable names. */
-  public static ENV = {
+  public static readonly ENV = {
     /** Application log level (default info). */
     NAME: "CHILD_PROCESS_NAME",
   };
 
   /** Class event names. */
-  public static EVENT = {
+  public static readonly EVENT = {
     STATUS: "status",
   };
 

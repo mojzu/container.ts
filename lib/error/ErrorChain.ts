@@ -20,7 +20,7 @@ export interface IErrorChainSerialised {
 export class ErrorChain {
 
   /** Error names. */
-  public static ERROR = {
+  public static readonly ERROR = {
     SERIALISE: "SerialiseError",
     DESERIALISE: "DeserialiseError",
   };

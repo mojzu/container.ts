@@ -26,13 +26,13 @@ export class AssetError extends ErrorChain {
 export class Asset extends ContainerModule {
 
   /** Environment variable names. */
-  public static ENV = {
+  public static readonly ENV = {
     /** Asset directory path (required). */
     PATH: "ASSET_PATH",
   };
 
   /** Error names. */
-  public static ERROR = {
+  public static readonly ERROR = {
     READ_FILE: "AssetReadFileError",
     JSON_PARSE: "AssetJsonParseError",
   };

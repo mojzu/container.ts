@@ -164,7 +164,7 @@ export class ScriptProcess implements IProcessSend {
 export class Script extends ContainerModule {
 
   /** Environment variable names. */
-  public static ENV = {
+  public static readonly ENV = {
     /** Script directory path (required). */
     PATH: "SCRIPT_PATH",
   };

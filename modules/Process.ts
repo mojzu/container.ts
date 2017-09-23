@@ -48,21 +48,21 @@ export class ProcessError extends ErrorChain {
 export class Process extends ContainerModule {
 
   /** Default interval to log process metrics (1m). */
-  public static DEFAULT_METRIC_INTERVAL = 60000;
+  public static readonly DEFAULT_METRIC_INTERVAL = 60000;
 
   /** Asset file names. */
-  public static ASSET = {
+  public static readonly ASSET = {
     /** Process information asset file. */
     PROCESS_JSON: "process.json",
   };
 
   /** Log names. */
-  public static LOG = {
+  public static readonly LOG = {
     INFORMATION: "ProcessInformation",
   };
 
   /** Metric names. */
-  public static METRIC = {
+  public static readonly METRIC = {
     USER_CPU_USAGE: "ProcessUserCpuUsage",
     SYSTEM_CPU_USAGE: "ProcessSystemCpuUsage",
     RSS_MEMORY_USAGE: "ProcessRssMemoryUsage",

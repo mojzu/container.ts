@@ -85,10 +85,10 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
 export class Container {
 
   /** Container reference name used internally by modules. */
-  public static NAME = "_container";
+  public static readonly NAME = "_container";
 
   /** Error names. */
-  public static ERROR = {
+  public static readonly ERROR = {
     TIMEOUT: "ContainerTimeoutError",
     DEPENDENCY: "ContainerDependencyError",
   };
