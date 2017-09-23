@@ -37,10 +37,7 @@ interface IData {
   wildcardMap?: {
     [key: string]: boolean;
   };
-  // TODO: Any map support.
-  // anyMap?: {
-  //   [key: string]: any;
-  // };
+  any?: any;
   wildcardArray?: string[];
 }
 
@@ -80,10 +77,8 @@ const dataSchema = buildSchema({
   wildcardMap: {
     "*": booleanField,
   },
-  // // Wildcard any fields.
-  // anyMap: {
-  //   "*": "*",
-  // },
+  // Wildcard any field.
+  any: "*",
   // Wildcard array fields.
   wildcardArray: ["*", stringField],
 });
@@ -120,10 +115,10 @@ describe("Schema", () => {
       one: "0",
       two: "1",
     },
-    // anyMap: {
-    //   one: 2,
-    //   two: true,
-    // },
+    any: {
+      one: 2,
+      two: true,
+    },
     wildcardArray: ["foo", "bar", "baz"],
   };
   const validated = dataSchema.validate<IData>(inputData);
@@ -181,16 +176,17 @@ describe("Schema", () => {
     expect(formatted.wildcardMap.two).toEqual("true");
   });
 
-  // it("#AnyMap", () => {
-  //   expect(validated.anyMap).toBeDefined();
-  //   if (validated.anyMap != null) {
-  //     expect(validated.anyMap.one).toEqual(2);
-  //     expect(validated.anyMap.two).toEqual(true);
-  //   }
-  //   expect(formatted.anyMap).toBeDefined();
-  //   expect(formatted.anyMap.one).toEqual("2");
-  //   expect(formatted.anyMap.two).toEqual("true");
-  // });
+  it("#Any", () => {
+    expect(validated.any).toBeDefined();
+    if (validated.any != null) {
+      expect(validated.any.one).toEqual(2);
+      expect(validated.any.two).toEqual(true);
+    }
+    // Wildcard any fields have no formatting rules.
+    expect(formatted.any).toBeDefined();
+    expect(formatted.any.one).toEqual(2);
+    expect(formatted.any.two).toEqual(true);
+  });
 
   it("#WildcardArray", () => {
     expect(validated.wildcardArray).toBeDefined();
@@ -228,7 +224,7 @@ describe("Schema", () => {
     expect(masked.childSchema.stringField).toEqual("foo");
     expect(masked.arrayOuter).toBeUndefined();
     expect(masked.wildcardMap).toBeUndefined();
-    // expect(masked.anyMap).toBeUndefined();
+    expect(masked.any).toBeUndefined();
     expect(masked.wildcardArray).toBeUndefined();
   });
 

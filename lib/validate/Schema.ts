@@ -257,6 +257,11 @@ export abstract class Schema {
         const schemaMap: ISchemaMap = value as any;
         handlers.isSchemaMap(inp, out, schemaMap, key, submask, subkeyRoot);
 
+      } else if ((typeof value === "string") && (value === "*")) {
+
+        // Wildcard asterisk, accept all data.
+        out[key] = inp[key];
+
       } else {
 
         // Unknown schema field value.
