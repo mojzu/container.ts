@@ -29,10 +29,10 @@ export interface ISchemaMask {
 
 /** Schema map callback handlers. */
 export interface ISchemaMapHandlers {
-  isSchemaArray?: (array: ISchemaArray, key: number | string, mask?: ISchemaMask, keyRoot?: string) => void;
-  isSchemaMap?: (map: ISchemaMap, key: number | string, mask?: ISchemaMask, keyRoot?: string) => void;
-  isSchema?: (schema: ISchemaConstructor, key: number | string, mask?: ISchemaMask, keyRoot?: string) => void;
-  isField?: (field: Field<any>, key: number | string) => void;
+  isSchemaArray?: (i: any, o: any, array: ISchemaArray, k: number | string, m?: ISchemaMask, kr?: string) => void;
+  isSchemaMap?: (i: any, o: any, map: ISchemaMap, k: number | string, m?: ISchemaMask, kr?: string) => void;
+  isSchema?: (i: any, o: any, schema: ISchemaConstructor, k: number | string, m?: ISchemaMask, kr?: string) => void;
+  isField?: (i: any, o: any, field: Field<any>, k: number | string) => void;
 }
 
 /** Schema static interface. */
@@ -41,6 +41,7 @@ export interface ISchemaConstructor {
   new(): Schema;
   isSchema(value: any): boolean;
   map(
+    inp: any, out: any,
     schema: ISchemaTypes,
     mask?: ISchemaMask,
     dataKeys?: Array<number | string>,
@@ -58,73 +59,6 @@ export function buildSchema(schema: ISchemaTypes = {}): ISchemaConstructor {
   }
   return NewSchema;
 }
-
-interface IMapHandler {
-  mask: ISchemaMask | null;
-  keyRoot: string;
-  handlers: ISchemaMapHandlers;
-  value: any;
-  key: number | string;
-}
-
-const mapHandler = (opts: IMapHandler) => {
-  // Expand key root.
-  const subkeyRoot = `${opts.keyRoot}.${opts.key}`;
-
-  // Handle masked fields if defined.
-  let submask: ISchemaMask | undefined;
-  if (opts.mask != null) {
-    if (!opts.mask[opts.key]) {
-      // Field(s) are masked.
-      return;
-    } else if (typeof opts.mask[opts.key] === "object") {
-      // Subfield mask argument.
-      submask = opts.mask[opts.key] as any;
-    }
-  }
-
-  try {
-    if (Schema.isSchema(opts.value) && (opts.handlers.isSchema != null)) {
-
-      // Value is child schema.
-      const childSchema: any = opts.value;
-      opts.handlers.isSchema(childSchema, opts.key, submask, subkeyRoot);
-
-    } else if ((opts.value instanceof Field) && (opts.handlers.isField != null)) {
-
-      // Value is field class instance.
-      const field: Field<any> = opts.value as any;
-      opts.handlers.isField(field, opts.key);
-
-    } else if (Array.isArray(opts.value) && (opts.handlers.isSchemaArray != null)) {
-
-      // Value is a schema array object.
-      const schemaArray: ISchemaArray = opts.value as any;
-      opts.handlers.isSchemaArray(schemaArray, opts.key, submask, subkeyRoot);
-
-    } else if ((typeof opts.value === "object") && (opts.handlers.isSchemaMap != null)) {
-
-      // Value is schema map object.
-      const schemaMap: ISchemaMap = opts.value as any;
-      opts.handlers.isSchemaMap(schemaMap, opts.key, submask, subkeyRoot);
-
-    } else {
-
-      // Unknown schema field value.
-      throw new ValidateError(EValidateErrorCode.InvalidSchema, opts.value);
-
-    }
-  } catch (error) {
-
-    // Schema error wrapper.
-    if (error instanceof SchemaError) {
-      throw error;
-    } else {
-      throw new SchemaError(subkeyRoot, error);
-    }
-
-  }
-};
 
 export abstract class Schema {
 
@@ -145,6 +79,7 @@ export abstract class Schema {
    * Helper for iterating over schema fields.
    */
   public static map(
+    inp: any, out: any,
     schema: ISchemaTypes,
     mask: ISchemaMask | null = null,
     dataKeys: Array<number | string> = [],
@@ -157,12 +92,12 @@ export abstract class Schema {
       if (schemaArray[0] === "*") {
         // Wildcard asterisk, map all data indexes to field.
         dataKeys.map((key) => {
-          mapHandler({ mask, keyRoot, handlers, value: schemaArray[1], key});
+          Schema.mapHandler(inp, out, mask, keyRoot, handlers, schemaArray[1], key);
         });
       } else {
         // Else for each value in schema array.
         schemaArray.map((value, index) => {
-          mapHandler({ mask, keyRoot, handlers, value, key: index});
+          Schema.mapHandler(inp, out, mask, keyRoot, handlers, value, index);
         });
       }
 
@@ -172,12 +107,12 @@ export abstract class Schema {
       if (schemaMap["*"] != null) {
         // If wildcard asterisk is present, map all data keys to field.
         dataKeys.map((key) => {
-          mapHandler({ mask, keyRoot, handlers, value: schemaMap["*"], key });
+          Schema.mapHandler(inp, out, mask, keyRoot, handlers, schemaMap["*"], key);
         });
       } else {
         // Else for each key in schema map.
         Object.keys(schemaMap).map((key) => {
-          mapHandler({ mask, keyRoot, handlers, value: schemaMap[key], key });
+          Schema.mapHandler(inp, out, mask, keyRoot, handlers, schemaMap[key], key);
         });
       }
 
@@ -192,42 +127,7 @@ export abstract class Schema {
    */
   public static validate<T>(data: any, mask?: ISchemaMask, _keyRoot = "", _schema = this.SCHEMA): T {
     const validated: any = Array.isArray(_schema) ? [] : {};
-
-    Schema.map(_schema, mask, Object.keys(data || {}), _keyRoot, {
-      isSchemaArray: (array, key, submask, keyRoot) => {
-        // Make recursive call for internal data arrays.
-        // Only assign output if array has length.
-        const output = Schema.validate<any[]>(data[key], submask, keyRoot, array);
-        if (output.length > 0) {
-          validated[key] = output;
-        }
-      },
-      isSchemaMap: (map, key, submask, keyRoot) => {
-        // Make recursive call for internal data maps.
-        // Only assign output if at least one field validated.
-        const output = Schema.validate(data[key], submask, keyRoot, map);
-        if (Object.keys(output).length > 0) {
-          validated[key] = output;
-        }
-      },
-      isSchema: (schema, key, submask, keyRoot) => {
-        // Call static method of child schema.
-        // Only assign output if at least one field validated.
-        const output = schema.validate(data[key], submask, keyRoot);
-        if (Object.keys(output).length > 0) {
-          validated[key] = output;
-        }
-      },
-      isField: (field, key) => {
-        // Call validate method of field.
-        // Only assign output if defined.
-        const output = field.validate(data[key]);
-        if (output != null) {
-          validated[key] = output;
-        }
-      },
-    });
-
+    Schema.map(data, validated, _schema, mask, Object.keys(data || {}), _keyRoot, Schema.validateMapHandlers);
     return validated;
   }
 
@@ -238,39 +138,141 @@ export abstract class Schema {
    */
   public static format<T>(data: T, mask?: ISchemaMask, _keyRoot = "", _schema = this.SCHEMA): any {
     const formatted: any = Array.isArray(_schema) ? [] : {};
-
-    Schema.map(_schema, mask, Object.keys(data || {}), _keyRoot, {
-      isSchemaArray: (array, key, submask, keyRoot) => {
-        // Make recursive call for internal data arrays.
-        const output = Schema.format<any[]>(data[key], submask, keyRoot, array);
-        if (output.length > 0) {
-          formatted[key] = output;
-        }
-      },
-      isSchemaMap: (map, key, submask, keyRoot) => {
-        // Make recursive call for internal data maps.
-        const output = Schema.format(data[key], submask, keyRoot, map);
-        if (Object.keys(output).length > 0) {
-          formatted[key] = output;
-        }
-      },
-      isSchema: (schema, key, submask, keyRoot) => {
-        // Call static method if child schema.
-        const output = schema.format(data[key], submask, keyRoot);
-        if (Object.keys(output).length > 0) {
-          formatted[key] = output;
-        }
-      },
-      isField: (field, key) => {
-        // Call format method of field.
-        const output = field.format(data[key]);
-        if (output != null) {
-          formatted[key] = output;
-        }
-      },
-    });
-
+    Schema.map(data, formatted, _schema, mask, Object.keys(data || {}), _keyRoot, Schema.formatMapHandlers);
     return formatted;
+  }
+
+  protected static readonly validateMapHandlers: ISchemaMapHandlers = {
+    isSchemaArray: (inp, out, array, key, submask, keyRoot) => {
+      // Make recursive call for internal data arrays.
+      // Only assign output if array has length.
+      const output = Schema.validate<any[]>(inp[key], submask, keyRoot, array);
+      if (output.length > 0) {
+        out[key] = output;
+      }
+    },
+    isSchemaMap: (inp, out, map, key, submask, keyRoot) => {
+      // Make recursive call for internal data maps.
+      // Only assign output if at least one field validated.
+      const output = Schema.validate(inp[key], submask, keyRoot, map);
+      if (Object.keys(output).length > 0) {
+        out[key] = output;
+      }
+    },
+    isSchema: (inp, out, schema, key, submask, keyRoot) => {
+      // Call static method of child schema.
+      // Only assign output if at least one field validated.
+      const output = schema.validate(inp[key], submask, keyRoot);
+      if (Object.keys(output).length > 0) {
+        out[key] = output;
+      }
+    },
+    isField: (inp, out, field, key) => {
+      // Call validate method of field.
+      // Only assign output if defined.
+      const output = field.validate(inp[key]);
+      if (output != null) {
+        out[key] = output;
+      }
+    },
+  };
+
+  protected static readonly formatMapHandlers: ISchemaMapHandlers = {
+    isSchemaArray: (inp, out, array, key, submask, keyRoot) => {
+      // Make recursive call for internal data arrays.
+      const output = Schema.format<any[]>(inp[key], submask, keyRoot, array);
+      if (output.length > 0) {
+        out[key] = output;
+      }
+    },
+    isSchemaMap: (inp, out, map, key, submask, keyRoot) => {
+      // Make recursive call for internal data maps.
+      const output = Schema.format(inp[key], submask, keyRoot, map);
+      if (Object.keys(output).length > 0) {
+        out[key] = output;
+      }
+    },
+    isSchema: (inp, out, schema, key, submask, keyRoot) => {
+      // Call static method if child schema.
+      const output = schema.format(inp[key], submask, keyRoot);
+      if (Object.keys(output).length > 0) {
+        out[key] = output;
+      }
+    },
+    isField: (inp, out, field, key) => {
+      // Call format method of field.
+      const output = field.format(inp[key]);
+      if (output != null) {
+        out[key] = output;
+      }
+    },
+  };
+
+  /** Internal schema map handler. */
+  protected static mapHandler(
+    inp: any, out: any,
+    mask: ISchemaMask | null,
+    keyRoot: string,
+    handlers: ISchemaMapHandlers,
+    value: any,
+    key: number | string,
+  ) {
+    // Expand key root.
+    const subkeyRoot = `${keyRoot}.${key}`;
+
+    // Handle masked fields if defined.
+    let submask: ISchemaMask | undefined;
+    if (mask != null) {
+      if (!mask[key]) {
+        // Field(s) are masked.
+        return;
+      } else if (typeof mask[key] === "object") {
+        // Subfield mask argument.
+        submask = mask[key] as any;
+      }
+    }
+
+    try {
+      if (Schema.isSchema(value) && (!!handlers.isSchema)) {
+
+        // Value is child schema.
+        const childSchema: any = value;
+        handlers.isSchema(inp, out, childSchema, key, submask, subkeyRoot);
+
+      } else if ((value instanceof Field) && (!!handlers.isField)) {
+
+        // Value is field class instance.
+        const field: Field<any> = value as any;
+        handlers.isField(inp, out, field, key);
+
+      } else if (Array.isArray(value) && (!!handlers.isSchemaArray)) {
+
+        // Value is a schema array object.
+        const schemaArray: ISchemaArray = value as any;
+        handlers.isSchemaArray(inp, out, schemaArray, key, submask, subkeyRoot);
+
+      } else if ((typeof value === "object") && (!!handlers.isSchemaMap)) {
+
+        // Value is schema map object.
+        const schemaMap: ISchemaMap = value as any;
+        handlers.isSchemaMap(inp, out, schemaMap, key, submask, subkeyRoot);
+
+      } else {
+
+        // Unknown schema field value.
+        throw new ValidateError(EValidateErrorCode.InvalidSchema, value);
+
+      }
+    } catch (error) {
+
+      // Schema error wrapper.
+      if (error instanceof SchemaError) {
+        throw error;
+      } else {
+        throw new SchemaError(subkeyRoot, error);
+      }
+
+    }
   }
 
 }
