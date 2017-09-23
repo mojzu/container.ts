@@ -6,7 +6,7 @@
   version "0.0.30"
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-0.0.30.tgz#dc1e40f7af3b9c815013a7860e6252f6352a84df"
 
-"@types/jasmine@^2.5.54":
+"@types/jasmine@^2.6.0":
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.6.0.tgz#997b41a27752b4850af2683bc4a8d8222c25bd02"
 
@@ -28,7 +28,7 @@
   version "0.1.31"
   resolved "https://registry.yarnpkg.com/@types/statsd-client/-/statsd-client-0.1.31.tgz#a1f89db5bcf902090866384543417aa24fa5eede"
 
-"@types/winston@^2.3.5":
+"@types/winston@^2.3.6":
   version "2.3.6"
   resolved "https://registry.yarnpkg.com/@types/winston/-/winston-2.3.6.tgz#0f0954b9e16abd40598dc6e9cc2ea43044237997"
   dependencies:
@@ -547,9 +547,9 @@ constants-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
 
-container.ts@^0.24.0:
-  version "0.24.0"
-  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.24.0.tgz#875bedac650ba777f0d520fc0c9f3b6b5c02bfe0"
+container.ts@^0.25.0:
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.25.0.tgz#a93eae378ec585d6cb817b313b9926733e3e8269"
   dependencies:
     "@types/debug" "^0.0.30"
     awilix "^2.7.1"
@@ -2787,7 +2787,7 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^2.0.0"
     inherits "^2.0.1"
 
-rollbar@^2.2.7:
+rollbar@^2.2.8:
   version "2.2.8"
   resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.2.8.tgz#83fa127eece554f945753bad6951d8d48b92f227"
   dependencies:
@@ -3363,7 +3363,7 @@ webpack-sources@^1.0.1:
     source-list-map "^2.0.0"
     source-map "~0.5.3"
 
-webpack@^3.5.6:
+webpack@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-3.6.0.tgz#a89a929fbee205d35a4fa2cc487be9cbec8898bc"
   dependencies:
