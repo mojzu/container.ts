@@ -112,8 +112,6 @@ export class Process extends ContainerModule {
   }
 
   public setup(): void {
-    super.setup();
-
     // Set process title.
     Process.setTitle(this.options.name);
     this.debug(`TITLE="${this.title}"`);

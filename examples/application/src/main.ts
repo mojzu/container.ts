@@ -2,8 +2,8 @@
 import * as process from "process";
 import { Container, Environment } from "container.ts";
 import { Validate } from "container.ts/lib/validate";
-import { Asset, Process, Script } from "container.ts/modules";
-import { StatsdMetric, WinstonLog, RollbarLog } from "./modules";
+import { Asset, Script } from "container.ts/modules";
+import { MainProcess, StatsdMetric, WinstonLog, RollbarLog } from "./modules";
 import * as constants from "./constants";
 
 // TODO: Command line argument support (minimist, argv).
@@ -27,7 +27,7 @@ ENVIRONMENT
 // Populate container for dependency injection.
 const CONTAINER = new Container(NAME, ENVIRONMENT)
   .registerModule(Asset)
-  .registerModule(Process)
+  .registerModule(MainProcess)
   .registerModule(Script)
   .registerModule(WinstonLog)
   .registerModule(StatsdMetric);

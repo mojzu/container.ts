@@ -4,7 +4,8 @@ import {
   ELogLevel,
 } from "container.ts";
 import { Validate } from "container.ts/lib/validate";
-import { Process, Log } from "container.ts/modules";
+import { Log } from "container.ts/modules";
+import { MainProcess } from "./MainProcess";
 
 // Rollbar does not have defined types.
 const ROLLBAR = require("rollbar");
@@ -22,10 +23,10 @@ export class RollbarLog extends Log {
   };
 
   public get dependencies(): IContainerModuleDependencies {
-    return { _process: Process.name };
+    return { _process: MainProcess.name };
   }
 
-  private _process: Process;
+  private _process: MainProcess;
   private _rollbar: any;
 
   public setup(): void {

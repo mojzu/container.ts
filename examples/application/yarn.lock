@@ -547,13 +547,13 @@ constants-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
 
-container.ts@^0.25.0:
-  version "0.25.0"
-  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.25.0.tgz#a93eae378ec585d6cb817b313b9926733e3e8269"
+container.ts@^0.26.0:
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.26.0.tgz#58f401b27b834587ae3be9ef4e6dfc46e7cdb434"
   dependencies:
     "@types/debug" "^0.0.30"
     awilix "^2.7.1"
-    debug "^3.0.1"
+    debug "^3.1.0"
     rxjs "^5.4.3"
   optionalDependencies:
     "@types/moment-timezone" "^0.2.35"
@@ -654,9 +654,9 @@ debug@2.6.8, debug@^2.2.0:
   dependencies:
     ms "2.0.0"
 
-debug@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-3.0.1.tgz#0564c612b521dc92d9f2988f0549e34f9c98db64"
+debug@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
   dependencies:
     ms "2.0.0"
 
