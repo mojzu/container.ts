@@ -20,7 +20,7 @@ export interface IScriptManagerTarget {
 }
 
 /** Script manager module interface. */
-export interface IScriptManager {
+export interface IScriptManager extends ContainerModule {
   workers: Array<ScriptProcess | null>;
 }
 

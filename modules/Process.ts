@@ -4,14 +4,14 @@ import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import "rxjs/add/observable/interval";
 import "rxjs/add/operator/switchMap";
-import { IContainerModuleDependencies, ContainerModule } from "../container";
+import { ContainerModule } from "../container";
 import { ErrorChain } from "../lib/error";
-import { Asset } from "./Asset";
 
 /** Process information interface. */
-export interface IProcess {
+export interface IProcessOptions {
   name?: string;
   version?: string;
+  nodeEnvironment?: "development" | "production";
 }
 
 /** Process runtime information interface. */
@@ -50,12 +50,6 @@ export class Process extends ContainerModule {
   /** Default interval to log process metrics (1m). */
   public static readonly DEFAULT_METRIC_INTERVAL = 60000;
 
-  /** Asset file names. */
-  public static readonly ASSET = {
-    /** Process information asset file. */
-    PROCESS_JSON: "process.json",
-  };
-
   /** Log names. */
   public static readonly LOG = {
     INFORMATION: "ProcessInformation",
@@ -82,20 +76,15 @@ export class Process extends ContainerModule {
     return process.title;
   }
 
-  private _asset: Asset;
   private _version: string;
+  private _nodeEnvironment: string;
 
   public get title(): string { return Process.title; }
+  public get version(): string { return this._version; }
+  public get nodeEnvironment(): string { return this._nodeEnvironment; }
 
-  public get version(): string {
-    const parts = this._version.split("-");
-    return parts[0] || "0.0.0";
-  }
-
-  public get nodeEnvironment(): string {
-    const parts = this._version.split("-");
-    return parts[1] || "production";
-  }
+  /** Override in subclass to set process title/version. */
+  public get options(): IProcessOptions { return {}; }
 
   public get information(): IProcessInformation {
     return {
@@ -122,15 +111,20 @@ export class Process extends ContainerModule {
     };
   }
 
-  public get dependencies(): IContainerModuleDependencies {
-    return { _asset: Asset.name };
-  }
-
   public setup(): void {
     super.setup();
 
-    // Default production version value.
-    this._version = "0.0.0-production";
+    // Set process title.
+    Process.setTitle(this.options.name);
+    this.debug(`TITLE="${this.title}"`);
+
+    // Set process verion string.
+    this._version = this.options.version || "0.0.0";
+    this.debug(`VERSION="${this.version}"`);
+
+    // Set process node environment.
+    this._nodeEnvironment = this.options.nodeEnvironment || "production";
+    this.debug(`NODE_ENV="${this.nodeEnvironment}"`);
 
     // Process metrics on interval.
     Observable.interval(Process.DEFAULT_METRIC_INTERVAL)
@@ -138,34 +132,13 @@ export class Process extends ContainerModule {
   }
 
   /** Try to read process information asset file, handle process events. */
-  public start(): Observable<void> {
-    return this.container.waitStarted(Asset.name)
-      .switchMap(() => this._asset.readJson(Process.ASSET.PROCESS_JSON))
-      .catch((error) => {
-        // Handle error to read process information file.
-        this.log.error(new ProcessError(error));
-        return Observable.of({});
-      })
-      .switchMap((data: IProcess) => {
+  public start(): void {
+    // Log process information.
+    this.log.info(Process.LOG.INFORMATION, this.information);
 
-        // Set process title.
-        Process.setTitle(data.name);
-        this.debug(`TITLE="${this.title}"`);
-
-        // Read process verion string.
-        this._version = data.version || this._version;
-        this.debug(`VERSION="${this.version}"`);
-        this.debug(`ENVIRONMENT="${this.nodeEnvironment}"`);
-
-        // Log process information.
-        this.log.info(Process.LOG.INFORMATION, this.information);
-
-        // Process stop event handlers.
-        process.on("SIGTERM", this.handleStop.bind(this, "SIGTERM"));
-        process.on("SIGINT", this.handleStop.bind(this, "SIGINT"));
-
-        return Observable.of(undefined);
-      });
+    // Process stop event handlers.
+    process.on("SIGTERM", this.handleStop.bind(this, "SIGTERM"));
+    process.on("SIGINT", this.handleStop.bind(this, "SIGINT"));
   }
 
   /** Stop container when process termination event received. */
