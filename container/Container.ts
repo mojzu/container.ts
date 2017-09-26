@@ -93,6 +93,12 @@ export class Container {
     DEPENDENCY: "ContainerDependencyError",
   };
 
+  /** Log names. */
+  public static readonly LOG = {
+    START: "ContainerStart",
+    STOP: "ContainerStop",
+  };
+
   private _environment: Environment;
   private _container: AwilixContainer;
   private _modules = new BehaviorSubject<IContainerModuleState>({});
@@ -227,22 +233,30 @@ export class Container {
       // Filter to array of observables.
       .filter((o) => (o != null)) as any;
 
+    // Nothing to wait for.
+    if (observables.length === 0) {
+      return this.setModulesStateDone(state);
+    }
+
     // Wait for modules to signal state.
     // Map TimeoutError to ContainerError.
     return Observable.forkJoin(...observables)
       .timeout(timeout)
       .catch((error: Error) => Observable.throw(new ContainerError(Container.ERROR.TIMEOUT, error)))
-      .switchMap(() => {
-        const message = state ? "ContainerStart" : "ContainerStop";
-        this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
-        return Observable.of(undefined);
-      });
+      .switchMap(() => this.setModulesStateDone(state));
   }
 
   /** Update and report module state via internal subject. */
   protected reportModuleState(name: string, state: boolean): void {
     this._modules.value[name] = state;
     this._modules.next(this._modules.value);
+  }
+
+  /** Module states are set. */
+  protected setModulesStateDone(state: boolean): Observable<void> {
+    const message = state ? Container.LOG.START : Container.LOG.STOP;
+    this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
+    return Observable.of(undefined);
   }
 
   /** Extract common log metadata for metric tags. */
