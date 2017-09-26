@@ -32,7 +32,7 @@
   "dependencies": {
     "@types/debug": "^0.0.30",
     "awilix": "^2.7.1",
-    "debug": "^3.0.1",
+    "debug": "^3.1.0",
     "rxjs": "^5.4.3"
   },
   "optionalDependencies": {
@@ -43,7 +43,7 @@
   "devDependencies": {
     "@types/jasmine": "^2.6.0",
     "@types/node": "^6.0.88",
-    "@types/validator": "^6.2.3",
+    "@types/validator": "^6.3.0",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-util": "^3.0.8",
