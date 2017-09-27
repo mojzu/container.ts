@@ -5,6 +5,8 @@ import * as StatsdClient from "statsd-client";
 
 export class StatsdMetric extends Metric {
 
+  public static readonly NAME: string = "StatsdMetric";
+
   /** Environment variable names. */
   public static ENV = {
     /** StatsD server host (required). */

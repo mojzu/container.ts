@@ -547,9 +547,9 @@ constants-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
 
-container.ts@^0.26.0:
-  version "0.26.0"
-  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.26.0.tgz#58f401b27b834587ae3be9ef4e6dfc46e7cdb434"
+container.ts@^0.27.0:
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.27.0.tgz#ffce25c9d8cc042ad8c76174abc26648f99649b9"
   dependencies:
     "@types/debug" "^0.0.30"
     awilix "^2.7.1"
@@ -3204,8 +3204,8 @@ type-check@~0.3.2:
     prelude-ls "~1.1.2"
 
 typescript@^2.5.2:
-  version "2.5.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.2.tgz#038a95f7d9bbb420b1bf35ba31d4c5c1dd3ffe34"
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.3.tgz#df3dcdc38f3beb800d4bc322646b04a3f6ca7f0d"
 
 uglify-js@^2.6, uglify-js@^2.8.29:
   version "2.8.29"

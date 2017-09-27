@@ -12,6 +12,8 @@ const ROLLBAR = require("rollbar");
 
 export class RollbarLog extends Log {
 
+  public static readonly NAME: string = "RollbarLog";
+
   /** Environment variable names. */
   public static ENV = {
     /** Application log level (default info). */

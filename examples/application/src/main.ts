@@ -8,6 +8,7 @@ import * as constants from "./constants";
 
 // TODO: Command line argument support (minimist, argv).
 // TODO: Variable log/data directories.
+// TODO: Switch webpack/gulp with fuse-box?
 
 // Create environment instance using process environment.
 const ENVIRONMENT = new Environment(process.env);
@@ -26,15 +27,15 @@ ENVIRONMENT
 // Create container instance with name and environment.
 // Populate container for dependency injection.
 const CONTAINER = new Container(NAME, ENVIRONMENT)
-  .registerModule(Asset)
-  .registerModule(MainProcess)
-  .registerModule(Script)
-  .registerModule(WinstonLog)
-  .registerModule(StatsdMetric);
+  .registerModule(Asset.NAME, Asset)
+  .registerModule(MainProcess.NAME, MainProcess)
+  .registerModule(Script.NAME, Script)
+  .registerModule(WinstonLog.NAME, WinstonLog)
+  .registerModule(StatsdMetric.NAME, StatsdMetric);
 
 // Register additional modules based on environment definitions.
 if (!!ENVIRONMENT.get(RollbarLog.ENV.ACCESS_TOKEN)) {
-  CONTAINER.registerModule(RollbarLog);
+  CONTAINER.registerModule(RollbarLog.NAME, RollbarLog);
 }
 
 // Start container modules.

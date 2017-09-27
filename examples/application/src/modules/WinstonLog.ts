@@ -6,6 +6,8 @@ import { Log } from "container.ts/modules";
 
 export class WinstonLog extends Log {
 
+  public static readonly NAME: string = "WinstonLog";
+
   private _logger: winston.LoggerInstance;
 
   public setup(): void {
