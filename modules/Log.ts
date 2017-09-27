@@ -3,6 +3,9 @@ import { Validate } from "../lib/validate";
 
 export abstract class Log extends ContainerModule {
 
+  /** Default module name. */
+  public static readonly NAME: string = "Log";
+
   /** Environment variable names. */
   public static readonly ENV = {
     /** Application log level (default info). */

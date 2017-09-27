@@ -4,6 +4,7 @@ export const buffer = (typeof window === "undefined") ? require("buffer") : null
 export const path = (typeof window === "undefined") ? require("path") : null;
 export const fs = (typeof window === "undefined") ? require("fs") : null;
 
+// TODO: Separate into subdirectory.
 export class Node {
 
   /** Node buffer module. */

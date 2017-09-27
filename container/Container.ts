@@ -1,5 +1,12 @@
 import * as Debug from "debug";
-import { AwilixContainer, createContainer, ResolutionMode, Lifetime } from "awilix";
+import {
+  AwilixContainer,
+  createContainer,
+  ResolutionMode,
+  RegistrationOptions,
+  Lifetime,
+  RegisterNameAndFunctionPair,
+} from "awilix";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import { BehaviorSubject } from "rxjs/BehaviorSubject";
@@ -24,7 +31,6 @@ export interface IContainerModuleOpts {
 
 /** Container module constructor interface. */
 export interface IContainerModuleConstructor {
-  name: string;
   new(name: string, opts: IContainerModuleOpts): ContainerModule;
 }
 
@@ -85,7 +91,7 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
 export class Container {
 
   /** Container reference name used internally by modules. */
-  public static readonly NAME = "_container";
+  public static readonly REFERENCE = "_container";
 
   /** Error names. */
   public static readonly ERROR = {
@@ -124,7 +130,7 @@ export class Container {
   public constructor(private _name: string, environment = new Environment()) {
     this._environment = environment;
     this._container = createContainer({ resolutionMode: ResolutionMode.PROXY });
-    this.registerValue<Container>(Container.NAME, this);
+    this.registerValue<Container>(Container.REFERENCE, this);
   }
 
   /** Create scoped container. */
@@ -133,11 +139,15 @@ export class Container {
   }
 
   /** Register a module in container, has singleton lifetime by default. */
-  public registerModule<T extends IContainerModuleConstructor>(instance: T, lifetime = Lifetime.SINGLETON): Container {
-    const options = {};
-    options[instance.name] = [this.makeModule.bind(this, instance.name, instance), { lifetime }];
-    this._container.registerFunction(options);
-    this.reportModuleState(instance.name, false);
+  public registerModule<T extends IContainerModuleConstructor>(
+    name: string, instance: T,
+    options: RegistrationOptions = { lifetime: Lifetime.SINGLETON },
+  ): Container {
+    const functionOptions: RegisterNameAndFunctionPair = {
+      [name]: [this.makeModule.bind(this, name, instance), options],
+    };
+    this._container.registerFunction(functionOptions);
+    this.reportModuleState(name, false);
     return this;
   }
 
@@ -311,6 +321,9 @@ export class ContainerModuleMetric extends Metric {
 /** Base class for container class modules with dependency injection. */
 export class ContainerModule {
 
+  /** Default module name. */
+  public static readonly NAME: string = "ContainerModule";
+
   private _container: Container;
   private _name: string;
   private _log: ContainerModuleLog;
@@ -348,7 +361,7 @@ export class ContainerModule {
   public constructor(name: string, opts: IContainerModuleOpts) {
     // Set name, resolve container instance and construct log, debug instances.
     this._name = name;
-    this._container = opts[Container.NAME];
+    this._container = opts[Container.REFERENCE];
     this._log = new ContainerModuleLog(this._container, this.namespace);
     this._metric = new ContainerModuleMetric(this._container, this.namespace);
     this._debug = Debug(this.namespace);

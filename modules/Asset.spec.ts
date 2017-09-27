@@ -9,9 +9,9 @@ describe("Asset", () => {
     .set(Asset.ENV.PATH, ASSET_PATH);
 
   const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModule(Asset);
+    .registerModule(Asset.NAME, Asset);
 
-  const ASSET = CONTAINER.resolve<Asset>(Asset.name);
+  const ASSET = CONTAINER.resolve<Asset>(Asset.NAME);
 
   beforeAll((done) => {
     CONTAINER.start()
@@ -31,7 +31,7 @@ describe("Asset", () => {
 
   it("#Asset", () => {
     expect(ASSET).toBeDefined();
-    expect(ASSET.name).toEqual(Asset.name);
+    expect(ASSET.name).toEqual(Asset.NAME);
     expect(ASSET.path).toBeDefined();
     expect(ASSET.cache).toEqual({});
   });

@@ -47,6 +47,9 @@ export class ProcessError extends ErrorChain {
 /** Node.js process interface. */
 export class Process extends ContainerModule {
 
+  /** Default module name. */
+  public static readonly NAME: string = "Process";
+
   /** Default interval to log process metrics (1m). */
   public static readonly DEFAULT_METRIC_INTERVAL = 60000;
 

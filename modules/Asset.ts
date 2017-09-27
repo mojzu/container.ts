@@ -25,6 +25,9 @@ export class AssetError extends ErrorChain {
 /** Assets read only files interface. */
 export class Asset extends ContainerModule {
 
+  /** Default module name. */
+  public static readonly NAME: string = "Asset";
+
   /** Environment variable names. */
   public static readonly ENV = {
     /** Asset directory path (required). */

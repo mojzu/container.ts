@@ -74,6 +74,9 @@ export interface IProcessSend {
 
 export class ChildProcess extends Process implements IProcessSend {
 
+  /** Default module name. */
+  public static readonly NAME: string = "ChildProcess";
+
   /** Default call method timeout (10s). */
   public static readonly DEFAULT_TIMEOUT = 10000;
 

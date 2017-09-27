@@ -24,12 +24,16 @@ export interface IScriptManager extends ContainerModule {
   workers: Array<ScriptProcess | null>;
 }
 
+// TODO: Make abstract class instead of factory.
 export class ScriptManagerFactory {
 
   /** Create manager classes for target scripts. */
   public static create(scripts: IScriptManagerTarget[]): IContainerModuleConstructor {
 
     class ScriptManager extends ContainerModule implements IScriptManager {
+
+      /** Default module name. */
+      public static readonly NAME: string = "ScriptManager";
 
       private _script: Script;
       private _workers: Array<ScriptProcess | null> = [];

@@ -163,6 +163,9 @@ export class ScriptProcess implements IProcessSend {
 /** Node.js scripts interface. */
 export class Script extends ContainerModule {
 
+  /** Default module name. */
+  public static readonly NAME: string = "Script";
+
   /** Environment variable names. */
   public static readonly ENV = {
     /** Script directory path (required). */

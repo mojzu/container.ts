@@ -5,6 +5,7 @@ import { Log } from "./Log";
 type ITestLogCallback = (log: ContainerLogMessage) => void;
 
 class TestLog extends Log {
+  public static readonly NAME: string = "TestLog";
   protected handleLog(log: ContainerLogMessage): void {
     const callback: ITestLogCallback = log.args[0];
     if (callback != null) {
@@ -16,11 +17,10 @@ class TestLog extends Log {
 describe("Log", () => {
 
   const NAME = "Test";
-
   const CONTAINER = new Container(NAME)
-    .registerModule(TestLog);
+    .registerModule(TestLog.NAME, TestLog);
 
-  const LOG = CONTAINER.resolve<TestLog>(TestLog.name);
+  const LOG = CONTAINER.resolve<TestLog>(TestLog.NAME);
 
   beforeAll((done) => {
     CONTAINER.start()
@@ -40,7 +40,7 @@ describe("Log", () => {
 
   it("#TestLog", () => {
     expect(LOG).toBeDefined();
-    expect(LOG.name).toEqual(TestLog.name);
+    expect(LOG.name).toEqual(TestLog.NAME);
   });
 
   it("#TestLog#emergency", (done) => {
@@ -51,7 +51,7 @@ describe("Log", () => {
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
-      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLog.name}`);
+      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLog.NAME}`);
       done();
     });
   });
@@ -64,7 +64,7 @@ describe("Log", () => {
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
-      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLog.name}`);
+      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLog.NAME}`);
       done();
     });
   });
