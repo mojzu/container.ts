@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "0.26.0",
+  "version": "0.27.0",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -50,6 +50,6 @@
     "istanbul": "^0.4.5",
     "jasmine": "^2.8.0",
     "tslint": "^5.7.0",
-    "typescript": "^2.5.2"
+    "typescript": "^2.5.3"
   }
 }
