@@ -10,9 +10,9 @@
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.6.0.tgz#997b41a27752b4850af2683bc4a8d8222c25bd02"
 
-"@types/moment-timezone@^0.2.35":
-  version "0.2.35"
-  resolved "https://registry.yarnpkg.com/@types/moment-timezone/-/moment-timezone-0.2.35.tgz#3fbbcb035e66aa5589a9198a6eec8d4dd9a701a5"
+"@types/moment-timezone@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@types/moment-timezone/-/moment-timezone-0.5.0.tgz#44af00d6af2ab2d0227d83a5906d0212d3c4b08f"
   dependencies:
     moment ">=2.14.0"
 
@@ -226,14 +226,12 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
-awilix@^2.7.1:
-  version "2.7.1"
-  resolved "https://registry.yarnpkg.com/awilix/-/awilix-2.7.1.tgz#0003a7509747cadd87b6975820e21e5218cfe71f"
+awilix@^2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/awilix/-/awilix-2.8.1.tgz#ed58a6d2d2f6aaf9c4b03a7e7e9c02fcd99f0078"
   dependencies:
     camel-case "^3.0.0"
     glob "^7.1.2"
-    is-plain-object "^2.0.4"
-    is-string "^1.0.4"
 
 aws-sign2@~0.6.0:
   version "0.6.0"
@@ -547,18 +545,18 @@ constants-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
 
-container.ts@^0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.27.0.tgz#ffce25c9d8cc042ad8c76174abc26648f99649b9"
+container.ts@^0.28.0:
+  version "0.28.0"
+  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.28.0.tgz#a6927d49f26389751aa831d04897597e8a16a133"
   dependencies:
     "@types/debug" "^0.0.30"
-    awilix "^2.7.1"
+    awilix "^2.8.1"
     debug "^3.1.0"
     rxjs "^5.4.3"
   optionalDependencies:
-    "@types/moment-timezone" "^0.2.35"
+    "@types/moment-timezone" "^0.5.0"
     moment-timezone "^0.5.13"
-    validator "^8.2.0"
+    validator "^9.0.0"
 
 core-js@^2.4.0:
   version "2.5.1"
@@ -1637,7 +1635,7 @@ is-path-inside@^1.0.0:
   dependencies:
     path-is-inside "^1.0.1"
 
-is-plain-object@^2.0.3, is-plain-object@^2.0.4:
+is-plain-object@^2.0.3:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.4.tgz#2c163b3fafb1b606d9d17928f05c2a1c38e07677"
   dependencies:
@@ -1666,10 +1664,6 @@ is-relative@^0.2.1:
 is-stream@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/is-stream/-/is-stream-1.1.0.tgz#12d4a3dd4e68e0b79ceb8dbc84173ae80d91ca44"
-
-is-string@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/is-string/-/is-string-1.0.4.tgz#cc3a9b69857d621e963725a24caeec873b826e64"
 
 is-symbol@^1.0.1:
   version "1.0.1"
@@ -3203,7 +3197,7 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typescript@^2.5.2:
+typescript@^2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.3.tgz#df3dcdc38f3beb800d4bc322646b04a3f6ca7f0d"
 
@@ -3302,9 +3296,9 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
 
-validator@^8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/validator/-/validator-8.2.0.tgz#3c1237290e37092355344fef78c231249dab77b9"
+validator@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-9.0.0.tgz#6c1ef955e007af704adea86ae8a76da84a6c172e"
 
 verror@1.10.0:
   version "1.10.0"
