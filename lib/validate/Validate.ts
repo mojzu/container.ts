@@ -2,7 +2,6 @@ import * as validator from "validator";
 import * as moment from "moment-timezone";
 import { ErrorChain } from "../error";
 import { ISO639, ISO3166 } from "./data";
-import { Node } from "./Node";
 
 /**
  * Validation error codes enumeration.
@@ -28,9 +27,6 @@ export enum EValidateErrorCode {
   InvalidEmail,
   InvalidMongoId,
   InvalidHexColour,
-  InvalidBuffer,
-  InvalidFile,
-  InvalidDirectory,
   InvalidAnd,
   InvalidOr,
   InvalidNot,
@@ -130,11 +126,6 @@ export interface IValidateEmailOptions {
   allow_display_name?: boolean;
   allow_utf8_local_part?: boolean;
   require_tld?: boolean;
-}
-
-/** Buffer validation options. */
-export interface IValidateBufferOptions {
-  encoding?: string;
 }
 
 /**
@@ -456,57 +447,6 @@ export class Validate {
     }
 
     if (!isHexColour) {
-      throw new ValidateError(EValidateErrorCode.InvalidHexColour, value);
-    }
-
-    return value;
-  }
-
-  public static isBuffer(value = "", options: IValidateBufferOptions = {}): Buffer {
-    let buffer = null;
-
-    try {
-      buffer = Node.buffer.from(value, options.encoding);
-    } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidBuffer, value, error);
-    }
-
-    if (buffer == null) {
-      throw new ValidateError(EValidateErrorCode.InvalidBuffer, value);
-    }
-
-    return buffer;
-  }
-
-  public static isFile(value = ""): string {
-    let isFile = false;
-
-    try {
-      value = Node.path.resolve(value);
-      isFile = Node.fs.lstatSync(value).isFile();
-    } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidFile, value, error);
-    }
-
-    if (!isFile) {
-      throw new ValidateError(EValidateErrorCode.InvalidFile, value);
-    }
-
-    return value;
-  }
-
-  public static isDirectory(value = ""): string {
-    let isDirectory = false;
-
-    try {
-      value = Node.path.resolve(value);
-      isDirectory = Node.fs.lstatSync(value).isDirectory();
-    } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidDirectory, value, error);
-    }
-
-    if (!isDirectory) {
-      throw new ValidateError(EValidateErrorCode.InvalidDirectory, value);
     }
 
     return value;

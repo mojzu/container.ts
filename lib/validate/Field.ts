@@ -13,7 +13,6 @@ import {
   IValidateDomainOptions,
   IValidateUrlOptions,
   IValidateEmailOptions,
-  IValidateBufferOptions,
   Validate,
 } from "./Validate";
 
@@ -399,36 +398,6 @@ export class MongoIdField extends Field<string> {
 export class HexColourField extends Field<string> {
   public validate(value: string): string {
     return Validate.isHexColour(value);
-  }
-  public format(value: string): string {
-    return value;
-  }
-}
-
-export class BufferField extends Field<Buffer> {
-  public constructor(private _options: IValidateBufferOptions = {}) {
-    super();
-  }
-  public validate(value: string): Buffer {
-    return Validate.isBuffer(value, this._options);
-  }
-  public format(value: Buffer): string {
-    return value.toString(this._options.encoding);
-  }
-}
-
-export class FileField extends Field<string> {
-  public validate(value: string): string {
-    return Validate.isFile(value);
-  }
-  public format(value: string): string {
-    return value;
-  }
-}
-
-export class DirectoryField extends Field<string> {
-  public validate(value: string): string {
-    return Validate.isDirectory(value);
   }
   public format(value: string): string {
     return value;
