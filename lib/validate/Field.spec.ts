@@ -1,6 +1,6 @@
 /// <reference types="jasmine" />
-import { ValidateError } from "./Validate";
 import {
+  FieldError,
   OptionalField,
   IntegerField,
   FloatField,
@@ -47,7 +47,7 @@ describe("Field", () => {
       integerAndPortField.validate("123456789");
       fail();
     } catch (error) {
-      expect(error instanceof ValidateError).toEqual(true);
+      expect(error instanceof FieldError).toEqual(true);
     }
   });
 
@@ -73,7 +73,7 @@ describe("Field", () => {
       stringNotEmailField.validate("foo@example.com");
       fail();
     } catch (error) {
-      expect(error instanceof ValidateError).toEqual(true);
+      expect(error instanceof FieldError).toEqual(true);
     }
   });
 

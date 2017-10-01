@@ -31,8 +31,8 @@ export enum EValidateError {
 
 /** Validate error class. */
 export class ValidateError extends ErrorChain {
-  public constructor(code: EValidateErrorCode, value?: any, cause?: Error) {
-    super({ name: EValidateErrorCode[code], value }, cause);
+  public constructor(code: EValidateError, value?: any, cause?: Error) {
+    super({ name: EValidateError[code], value }, cause);
   }
 }
 

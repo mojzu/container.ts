@@ -20,6 +20,7 @@ export enum EFieldError {
   InvalidAnd,
   InvalidOr,
   InvalidNot,
+  InvalidOptional,
 }
 
 /** Field error class. */
@@ -62,23 +63,31 @@ export abstract class OperatorField<T> extends Field<T> {
 export class AndField<T> extends OperatorField<T> {
 
   public validate(value: string, context?: any): T {
-    const validated = this._fields
-      .map((f) => f.validate(value, context))
-      .reduce((p, c) => ((p != null) ? p : c), null);
-
+    let validated: T | null;
+    try {
+      validated = this._fields
+        .map((f) => f.validate(value, context))
+        .reduce((p, c) => ((p != null) ? p : c), null);
+    } catch (error) {
+      throw new FieldError(EFieldError.InvalidAnd, value, error);
+    }
     if (validated == null) {
-      throw new FieldError(EFieldError.InvalidAnd);
+      throw new FieldError(EFieldError.InvalidAnd, value);
     }
     return validated;
   }
 
   public format(value: T, context?: any): string {
-    const formatted = this._fields
-      .map((f) => f.format(value, context))
-      .reduce((p, c) => ((p != null) ? p : c), null);
-
+    let formatted: string | null;
+    try {
+      formatted = this._fields
+        .map((f) => f.format(value, context))
+        .reduce((p, c) => ((p != null) ? p : c), null);
+    } catch (error) {
+      throw new FieldError(EFieldError.InvalidAnd, value, error);
+    }
     if (formatted == null) {
-      throw new FieldError(EFieldError.InvalidAnd);
+      throw new FieldError(EFieldError.InvalidAnd, value);
     }
     return formatted;
   }
@@ -89,16 +98,20 @@ export class AndField<T> extends OperatorField<T> {
 export class OrField<T> extends OperatorField<T> {
 
   public validate(value: string, context?: any): T {
-    const validated = this._fields
-      .map((f) => {
-        try {
-          return f.validate(value, context);
-        } catch (error) {
-          return null;
-        }
-      })
-      .reduce((p, c) => ((p != null) ? p : c), null);
-
+    let validated: T | null;
+    try {
+      validated = this._fields
+        .map((f) => {
+          try {
+            return f.validate(value, context);
+          } catch (error) {
+            return null;
+          }
+        })
+        .reduce((p, c) => ((p != null) ? p : c), null);
+    } catch (error) {
+      throw new FieldError(EFieldError.InvalidOr, value, error);
+    }
     if (validated == null) {
       throw new FieldError(EFieldError.InvalidOr);
     }
@@ -106,16 +119,20 @@ export class OrField<T> extends OperatorField<T> {
   }
 
   public format(value: T, context?: any): string {
-    const formatted = this._fields
-      .map((f) => {
-        try {
-          return f.format(value, context);
-        } catch (error) {
-          return null;
-        }
-      })
-      .reduce((p, c) => ((p != null) ? p : c), null);
-
+    let formatted: string | null;
+    try {
+      formatted = this._fields
+        .map((f) => {
+          try {
+            return f.format(value, context);
+          } catch (error) {
+            return null;
+          }
+        })
+        .reduce((p, c) => ((p != null) ? p : c), null);
+    } catch (error) {
+      throw new FieldError(EFieldError.InvalidOr, value, error);
+    }
     if (formatted == null) {
       throw new FieldError(EFieldError.InvalidOr);
     }
@@ -128,16 +145,20 @@ export class OrField<T> extends OperatorField<T> {
 export class NotField<T> extends OperatorField<T> {
 
   public validate(value: string, context?: any): null {
-    const validated = this._fields
-      .map((f) => {
-        try {
-          return f.validate(value, context);
-        } catch (error) {
-          return null;
-        }
-      })
-      .reduce((p, c) => ((p != null) ? p : c), null);
-
+    let validated: T | null;
+    try {
+      validated = this._fields
+        .map((f) => {
+          try {
+            return f.validate(value, context);
+          } catch (error) {
+            return null;
+          }
+        })
+        .reduce((p, c) => ((p != null) ? p : c), null);
+    } catch (error) {
+      throw new FieldError(EFieldError.InvalidNot, value, error);
+    }
     if (validated != null) {
       throw new FieldError(EFieldError.InvalidNot, validated);
     }
@@ -145,16 +166,20 @@ export class NotField<T> extends OperatorField<T> {
   }
 
   public format(value: T, context?: any): null {
-    const formatted = this._fields
-      .map((f) => {
-        try {
-          return f.format(value, context);
-        } catch (error) {
-          return null;
-        }
-      })
-      .reduce((p, c) => ((p != null) ? p : c), null);
-
+    let formatted: string | null;
+    try {
+      formatted = this._fields
+        .map((f) => {
+          try {
+            return f.format(value, context);
+          } catch (error) {
+            return null;
+          }
+        })
+        .reduce((p, c) => ((p != null) ? p : c), null);
+    } catch (error) {
+      throw new FieldError(EFieldError.InvalidNot, value, error);
+    }
     if (formatted != null) {
       throw new FieldError(EFieldError.InvalidNot, formatted);
     }
@@ -177,23 +202,31 @@ export class OptionalField<T> extends Field<T> {
   }
 
   public validate(value?: string, context?: any): T | null {
-    if (value == null) {
-      if (this._formatDefault == null) {
-        return null;
+    try {
+      if (value == null) {
+        if (this._formatDefault == null) {
+          return null;
+        }
+        return this._field.validate(this._formatDefault, context);
       }
-      return this._field.validate(this._formatDefault, context);
+      return this._field.validate(value, context);
+    } catch (error) {
+      throw new FieldError(EFieldError.InvalidOptional, value, error);
     }
-    return this._field.validate(value, context);
   }
 
   public format(value?: T, context?: any): string | null {
-    if (value == null) {
-      if (this._default == null) {
-        return null;
+    try {
+      if (value == null) {
+        if (this._default == null) {
+          return null;
+        }
+        return this._field.format(this._default, context);
       }
-      return this._field.format(this._default, context);
+      return this._field.format(value, context);
+    } catch (error) {
+      throw new FieldError(EFieldError.InvalidOptional, value, error);
     }
-    return this._field.format(value, context);
   }
 
 }

@@ -14,7 +14,7 @@ import {
   ContainerModule,
 } from "../container";
 import { ErrorChain } from "../lib/error";
-import { Validate } from "../lib/validate";
+import { NodeValidate } from "../lib/node-validate";
 import {
   EProcessMessageType,
   IProcessCallOptions,
@@ -183,7 +183,7 @@ export class Script extends ContainerModule {
     const scriptPath = path.resolve(this.environment.get(Script.ENV.PATH));
 
     assert(scriptPath != null, "Scripts path is undefined");
-    this._path = Validate.isDirectory(scriptPath);
+    this._path = NodeValidate.isDirectory(scriptPath);
     this.debug(`${Script.ENV.PATH}="${this.path}"`);
   }
 
@@ -203,7 +203,7 @@ export class Script extends ContainerModule {
     };
 
     // Check script file exists.
-    const filePath = Validate.isFile(path.resolve(this.path, target));
+    const filePath = NodeValidate.isFile(path.resolve(this.path, target));
     const process = childProcess.fork(filePath, forkArgs, forkOptions);
     return new ScriptProcess(this, `${target}.${identifier}`, process, options);
   }

@@ -8,7 +8,7 @@ import "rxjs/add/operator/do";
 import "rxjs/add/operator/map";
 import { ContainerModule } from "../container";
 import { ErrorChain } from "../lib/error";
-import { Validate } from "../lib/validate";
+import { NodeValidate } from "../lib/node-validate";
 
 /** Asset files cached when read. */
 export interface IAssetCache {
@@ -51,7 +51,7 @@ export class Asset extends ContainerModule {
 
     // Get asset directory path from environment.
     const assetPath = path.resolve(this.environment.get(Asset.ENV.PATH));
-    this._path = Validate.isDirectory(assetPath);
+    this._path = NodeValidate.isDirectory(assetPath);
     this.debug(`${Asset.ENV.PATH}="${this.path}"`);
   }
 
@@ -90,7 +90,7 @@ export class Asset extends ContainerModule {
 
     try {
       // Check file exists, read file contents asynchronously.
-      const filePath = Validate.isFile(path.resolve(this.path, target));
+      const filePath = NodeValidate.isFile(path.resolve(this.path, target));
       const readFileCallback = fs.readFile.bind(this, filePath, encoding);
       const readFile: () => Observable<T> = Observable.bindNodeCallback(readFileCallback);
       return readFile();
