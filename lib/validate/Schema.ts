@@ -1,5 +1,4 @@
 import { ErrorChain } from "../error";
-import { EValidateErrorCode, ValidateError } from "./Validate";
 import { Field } from "./Field";
 
 /** Schema error class. */
@@ -265,7 +264,7 @@ export abstract class Schema {
       } else {
 
         // Unknown schema field value.
-        throw new ValidateError(EValidateErrorCode.InvalidSchema, value);
+        throw new SchemaError(subkeyRoot, value);
 
       }
     } catch (error) {

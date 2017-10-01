@@ -1,29 +1,29 @@
 /// <reference types="jasmine" />
 import { ErrorChain } from "../error";
-import { EValidateErrorCode, ValidateError, Validate } from "./Validate";
+import { EValidateError, ValidateError, Validate } from "./Validate";
 
 describe("Validate", () => {
 
-  const invalidBoolean = EValidateErrorCode[EValidateErrorCode.InvalidBoolean];
-  const invalidString = EValidateErrorCode[EValidateErrorCode.InvalidString];
+  const invalidBoolean = EValidateError[EValidateError.InvalidBoolean];
+  const invalidString = EValidateError[EValidateError.InvalidString];
 
   // Error tests.
 
   it("#ValidateError is instance of Error and ValidateError", () => {
-    const error = new ValidateError(EValidateErrorCode.InvalidString);
+    const error = new ValidateError(EValidateError.InvalidString);
     expect(error instanceof ErrorChain).toEqual(true);
     expect(error instanceof ValidateError).toEqual(true);
   });
 
   it("#ValidateError has expected properties", () => {
-    const error = new ValidateError(EValidateErrorCode.InvalidBoolean);
+    const error = new ValidateError(EValidateError.InvalidBoolean);
     expect(error.name).toEqual("InvalidBoolean");
     expect(error.stack).toBeDefined();
     expect(error.message).toEqual(invalidBoolean);
   });
 
   it("#ValidateError passed thrown error has formatting", () => {
-    const error = new ValidateError(EValidateErrorCode.InvalidString, "", new Error("Unknown"));
+    const error = new ValidateError(EValidateError.InvalidString, "", new Error("Unknown"));
     expect(error.name).toEqual("InvalidString");
     expect(error.stack).toBeDefined();
     expect(error.message).toEqual(`${invalidString} "": Error: Unknown`);

@@ -1,7 +1,6 @@
 import * as moment from "moment-timezone";
+import { ErrorChain } from "../error";
 import {
-  EValidateErrorCode,
-  ValidateError,
   IValidateBooleanOptions,
   IValidateIntegerOptions,
   IValidateNumberOptions,
@@ -15,6 +14,20 @@ import {
   IValidateEmailOptions,
   Validate,
 } from "./Validate";
+
+/** Field error codes. */
+export enum EFieldError {
+  InvalidAnd,
+  InvalidOr,
+  InvalidNot,
+}
+
+/** Field error class. */
+export class FieldError extends ErrorChain {
+  public constructor(code: EFieldError, value?: any, cause?: Error) {
+    super({ name: EFieldError[code], value }, cause);
+  }
+}
 
 /**
  * Fields have validate and format methods.
@@ -54,7 +67,7 @@ export class AndField<T> extends OperatorField<T> {
       .reduce((p, c) => ((p != null) ? p : c), null);
 
     if (validated == null) {
-      throw new ValidateError(EValidateErrorCode.InvalidAnd);
+      throw new FieldError(EFieldError.InvalidAnd);
     }
     return validated;
   }
@@ -65,7 +78,7 @@ export class AndField<T> extends OperatorField<T> {
       .reduce((p, c) => ((p != null) ? p : c), null);
 
     if (formatted == null) {
-      throw new ValidateError(EValidateErrorCode.InvalidAnd);
+      throw new FieldError(EFieldError.InvalidAnd);
     }
     return formatted;
   }
@@ -87,7 +100,7 @@ export class OrField<T> extends OperatorField<T> {
       .reduce((p, c) => ((p != null) ? p : c), null);
 
     if (validated == null) {
-      throw new ValidateError(EValidateErrorCode.InvalidOr);
+      throw new FieldError(EFieldError.InvalidOr);
     }
     return validated;
   }
@@ -104,7 +117,7 @@ export class OrField<T> extends OperatorField<T> {
       .reduce((p, c) => ((p != null) ? p : c), null);
 
     if (formatted == null) {
-      throw new ValidateError(EValidateErrorCode.InvalidOr);
+      throw new FieldError(EFieldError.InvalidOr);
     }
     return formatted;
   }
@@ -126,7 +139,7 @@ export class NotField<T> extends OperatorField<T> {
       .reduce((p, c) => ((p != null) ? p : c), null);
 
     if (validated != null) {
-      throw new ValidateError(EValidateErrorCode.InvalidNot, validated);
+      throw new FieldError(EFieldError.InvalidNot, validated);
     }
     return validated;
   }
@@ -143,7 +156,7 @@ export class NotField<T> extends OperatorField<T> {
       .reduce((p, c) => ((p != null) ? p : c), null);
 
     if (formatted != null) {
-      throw new ValidateError(EValidateErrorCode.InvalidNot, formatted);
+      throw new FieldError(EFieldError.InvalidNot, formatted);
     }
     return formatted;
   }

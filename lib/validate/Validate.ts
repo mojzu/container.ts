@@ -4,9 +4,9 @@ import { ErrorChain } from "../error";
 import { ISO639, ISO3166 } from "./data";
 
 /**
- * Validation error codes enumeration.
+ * Validation error codes.
  */
-export enum EValidateErrorCode {
+export enum EValidateError {
   InvalidBoolean,
   InvalidInteger,
   InvalidFloat,
@@ -27,10 +27,6 @@ export enum EValidateErrorCode {
   InvalidEmail,
   InvalidMongoId,
   InvalidHexColour,
-  InvalidAnd,
-  InvalidOr,
-  InvalidNot,
-  InvalidSchema,
 }
 
 /** Validate error class. */
@@ -138,7 +134,7 @@ export class Validate {
     try {
       return validator.toBoolean(value, strict);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidBoolean, value, error);
+      throw new ValidateError(EValidateError.InvalidBoolean, value, error);
     }
   }
 
@@ -148,11 +144,11 @@ export class Validate {
     try {
       isInt = validator.isInt(value, options);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidInteger, value, error);
+      throw new ValidateError(EValidateError.InvalidInteger, value, error);
     }
 
     if (!isInt) {
-      throw new ValidateError(EValidateErrorCode.InvalidInteger, value);
+      throw new ValidateError(EValidateError.InvalidInteger, value);
     }
 
     return parseInt(value, 10);
@@ -164,11 +160,11 @@ export class Validate {
     try {
       isFloat = validator.isFloat(value, options);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidFloat, value, error);
+      throw new ValidateError(EValidateError.InvalidFloat, value, error);
     }
 
     if (!isFloat) {
-      throw new ValidateError(EValidateErrorCode.InvalidFloat, value);
+      throw new ValidateError(EValidateError.InvalidFloat, value);
     }
 
     return parseFloat(value);
@@ -180,11 +176,11 @@ export class Validate {
     try {
       isHexadecimal = validator.isHexadecimal(value);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidHexadecimal, value, error);
+      throw new ValidateError(EValidateError.InvalidHexadecimal, value, error);
     }
 
     if (!isHexadecimal) {
-      throw new ValidateError(EValidateErrorCode.InvalidHexadecimal, value);
+      throw new ValidateError(EValidateError.InvalidHexadecimal, value);
     }
 
     return parseInt(value, 16);
@@ -225,14 +221,14 @@ export class Validate {
         }
       }
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidString, value, error);
+      throw new ValidateError(EValidateError.InvalidString, value, error);
     }
 
     const notInArray = (values.length > 0) && !inArray;
     const notValid = !(emptyIsAllowed && isEmpty) && !isValid;
 
     if (notInArray || notValid) {
-      throw new ValidateError(EValidateErrorCode.InvalidString, value);
+      throw new ValidateError(EValidateError.InvalidString, value);
     }
 
     return value;
@@ -246,11 +242,11 @@ export class Validate {
       isAscii = validator.isAscii(value);
       ascii = Validate.isString(value, options);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidAscii, value, error);
+      throw new ValidateError(EValidateError.InvalidAscii, value, error);
     }
 
     if (!isAscii) {
-      throw new ValidateError(EValidateErrorCode.InvalidAscii, value);
+      throw new ValidateError(EValidateError.InvalidAscii, value);
     }
 
     return ascii;
@@ -264,11 +260,11 @@ export class Validate {
       isBase64 = validator.isBase64(value);
       base64 = Validate.isString(value, options);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidBase64, value, error);
+      throw new ValidateError(EValidateError.InvalidBase64, value, error);
     }
 
     if (!isBase64) {
-      throw new ValidateError(EValidateErrorCode.InvalidBase64, value);
+      throw new ValidateError(EValidateError.InvalidBase64, value);
     }
 
     return base64;
@@ -278,7 +274,7 @@ export class Validate {
     try {
       return Validate.isInteger(value, { min: 0x1, max: 0xFFFF });
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidPort, value, error);
+      throw new ValidateError(EValidateError.InvalidPort, value, error);
     }
   }
 
@@ -286,7 +282,7 @@ export class Validate {
     try {
       return Validate.isString(value.toLowerCase(), { min: 2, max: 2, values: ISO639 });
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidLanguage, value, error);
+      throw new ValidateError(EValidateError.InvalidLanguage, value, error);
     }
   }
 
@@ -294,7 +290,7 @@ export class Validate {
     try {
       return Validate.isString(value.toUpperCase(), { min: 2, max: 2, values: ISO3166 });
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidCountry, value, error);
+      throw new ValidateError(EValidateError.InvalidCountry, value, error);
     }
   }
 
@@ -307,7 +303,7 @@ export class Validate {
       const country = Validate.isCountry(parts[1]);
       return `${language}${separator}${country}`;
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidLocale, value, error);
+      throw new ValidateError(EValidateError.InvalidLocale, value, error);
     }
   }
 
@@ -315,7 +311,7 @@ export class Validate {
     try {
       return Validate.isString(value, { values: moment.tz.names() });
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidTimeZone, value, error);
+      throw new ValidateError(EValidateError.InvalidTimeZone, value, error);
     }
   }
 
@@ -327,11 +323,11 @@ export class Validate {
     try {
       date = moment.tz(value, format, timezone);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidDate, value, error);
+      throw new ValidateError(EValidateError.InvalidDate, value, error);
     }
 
     if (!date.isValid()) {
-      throw new ValidateError(EValidateErrorCode.InvalidDate, value);
+      throw new ValidateError(EValidateError.InvalidDate, value);
     }
 
     return date;
@@ -342,7 +338,7 @@ export class Validate {
     try {
       return moment.duration(value, unit);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidDuration, value, error);
+      throw new ValidateError(EValidateError.InvalidDuration, value, error);
     }
   }
 
@@ -353,11 +349,11 @@ export class Validate {
     try {
       isIp = validator.isIP(value, version);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidIp, value, error);
+      throw new ValidateError(EValidateError.InvalidIp, value, error);
     }
 
     if (!isIp) {
-      throw new ValidateError(EValidateErrorCode.InvalidIp, value);
+      throw new ValidateError(EValidateError.InvalidIp, value);
     }
 
     return value;
@@ -369,11 +365,11 @@ export class Validate {
     try {
       isDomain = validator.isFQDN(value, options);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidDomain, value, error);
+      throw new ValidateError(EValidateError.InvalidDomain, value, error);
     }
 
     if (!isDomain) {
-      throw new ValidateError(EValidateErrorCode.InvalidDomain, value);
+      throw new ValidateError(EValidateError.InvalidDomain, value);
     }
 
     return value;
@@ -385,11 +381,11 @@ export class Validate {
     try {
       isUrl = validator.isURL(value, options);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidUrl, value, error);
+      throw new ValidateError(EValidateError.InvalidUrl, value, error);
     }
 
     if (!isUrl) {
-      throw new ValidateError(EValidateErrorCode.InvalidUrl, value);
+      throw new ValidateError(EValidateError.InvalidUrl, value);
     }
 
     return value;
@@ -405,17 +401,17 @@ export class Validate {
       if (normalise) {
         const normalisedEmail = validator.normalizeEmail(value, options);
         if (!normalisedEmail) {
-          throw new ValidateError(EValidateErrorCode.InvalidEmail, value);
+          throw new ValidateError(EValidateError.InvalidEmail, value);
         }
         email = normalisedEmail;
       }
       isEmail = validator.isEmail(email, options);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidEmail, value, error);
+      throw new ValidateError(EValidateError.InvalidEmail, value, error);
     }
 
     if (!isEmail) {
-      throw new ValidateError(EValidateErrorCode.InvalidEmail, value);
+      throw new ValidateError(EValidateError.InvalidEmail, value);
     }
 
     return email;
@@ -427,11 +423,11 @@ export class Validate {
     try {
       isMongoId = validator.isMongoId(value);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidMongoId, value, error);
+      throw new ValidateError(EValidateError.InvalidMongoId, value, error);
     }
 
     if (!isMongoId) {
-      throw new ValidateError(EValidateErrorCode.InvalidMongoId, value);
+      throw new ValidateError(EValidateError.InvalidMongoId, value);
     }
 
     return value;
@@ -443,10 +439,11 @@ export class Validate {
     try {
       isHexColour = validator.isHexColor(value);
     } catch (error) {
-      throw new ValidateError(EValidateErrorCode.InvalidHexColour, value, error);
+      throw new ValidateError(EValidateError.InvalidHexColour, value, error);
     }
 
     if (!isHexColour) {
+      throw new ValidateError(EValidateError.InvalidHexColour, value);
     }
 
     return value;
