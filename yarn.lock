@@ -10,9 +10,9 @@
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.6.0.tgz#997b41a27752b4850af2683bc4a8d8222c25bd02"
 
-"@types/moment-timezone@^0.2.35":
-  version "0.2.35"
-  resolved "https://registry.yarnpkg.com/@types/moment-timezone/-/moment-timezone-0.2.35.tgz#3fbbcb035e66aa5589a9198a6eec8d4dd9a701a5"
+"@types/moment-timezone@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@types/moment-timezone/-/moment-timezone-0.5.0.tgz#44af00d6af2ab2d0227d83a5906d0212d3c4b08f"
   dependencies:
     moment ">=2.14.0"
 
@@ -102,14 +102,12 @@ async@1.x, async@^1.4.0:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
 
-awilix@^2.7.1:
-  version "2.7.1"
-  resolved "https://registry.yarnpkg.com/awilix/-/awilix-2.7.1.tgz#0003a7509747cadd87b6975820e21e5218cfe71f"
+awilix@^2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/awilix/-/awilix-2.8.1.tgz#ed58a6d2d2f6aaf9c4b03a7e7e9c02fcd99f0078"
   dependencies:
     camel-case "^3.0.0"
     glob "^7.1.2"
-    is-plain-object "^2.0.4"
-    is-string "^1.0.4"
 
 babel-code-frame@^6.22.0:
   version "6.26.0"
@@ -711,7 +709,7 @@ is-path-inside@^1.0.0:
   dependencies:
     path-is-inside "^1.0.1"
 
-is-plain-object@^2.0.3, is-plain-object@^2.0.4:
+is-plain-object@^2.0.3:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.4.tgz#2c163b3fafb1b606d9d17928f05c2a1c38e07677"
   dependencies:
@@ -730,10 +728,6 @@ is-relative@^0.2.1:
   resolved "https://registry.yarnpkg.com/is-relative/-/is-relative-0.2.1.tgz#d27f4c7d516d175fb610db84bbeef23c3bc97aa5"
   dependencies:
     is-unc-path "^0.1.1"
-
-is-string@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/is-string/-/is-string-1.0.4.tgz#cc3a9b69857d621e963725a24caeec873b826e64"
 
 is-unc-path@^0.1.1:
   version "0.1.2"
@@ -1459,7 +1453,7 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typescript@^2.5.2:
+typescript@^2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.3.tgz#df3dcdc38f3beb800d4bc322646b04a3f6ca7f0d"
 
@@ -1502,9 +1496,9 @@ v8flags@^2.0.2:
   dependencies:
     user-home "^1.1.1"
 
-validator@^8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/validator/-/validator-8.2.0.tgz#3c1237290e37092355344fef78c231249dab77b9"
+validator@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-9.0.0.tgz#6c1ef955e007af704adea86ae8a76da84a6c172e"
 
 vinyl-fs@^0.3.0:
   version "0.3.14"
