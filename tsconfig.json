@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["es2016", "dom"],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
     "module": "commonjs",
     "declaration": true,
     "sourceMap": true,
@@ -11,15 +14,15 @@
     "noUnusedLocals": true,
     "noImplicitReturns": true,
     "suppressImplicitAnyIndexErrors": true,
-    "preserveConstEnums": true,
     "moduleResolution": "node",
-    "typeRoots": ["./node_modules/@types"],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
   },
-  "include": ["**/*.ts"],
+  "include": [
+    "./src/**/*.ts"
+  ],
   "exclude": [
-    "node_modules",
-    "examples/application"
+    "./node_modules"
   ]
 }

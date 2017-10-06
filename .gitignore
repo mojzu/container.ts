@@ -1,5 +1,6 @@
 # Git ignored files.
 # <https://git-scm.com/docs/gitignore>
+/.fusebox
 /coverage
 /node_modules
 /*.log
@@ -7,5 +8,4 @@
 *.d.ts
 *.js.map
 *.js
-!gulpfile.js
-!/gulp/**/*.js
+!fuse.js

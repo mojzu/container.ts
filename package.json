@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -14,20 +14,17 @@
     "/container/**/!(*.spec).d.ts",
     "/container/**/!(*.spec).js",
     "/container/**/!(*.spec).js.map",
-    "/modules/**/!(*.spec).d.ts",
-    "/modules/**/!(*.spec).js",
-    "/modules/**/!(*.spec).js.map",
     "/lib/**/!(*.spec).d.ts",
     "/lib/**/!(*.spec).js",
     "/lib/**/!(*.spec).js.map"
   ],
   "scripts": {
-    "clean": "gulp clean",
-    "distclean": "gulp distclean",
-    "test": "gulp test",
-    "lint": "gulp lint",
-    "example": "gulp example",
-    "build": "gulp build"
+    "clean": "node fuse clean",
+    "distclean": "node fuse distclean",
+    "lint": "node fuse lint",
+    "test": "node fuse test",
+    "example": "node fuse example",
+    "dist": "node fuse dist"
   },
   "dependencies": {
     "@types/debug": "^0.0.30",
@@ -44,10 +41,13 @@
     "@types/jasmine": "^2.6.0",
     "@types/node": "^6.0.88",
     "@types/validator": "^6.3.0",
+    "child-process-promise": "^2.2.1",
     "del": "^3.0.0",
-    "fuse-box": "^2.2.31",
+    "fuse-box": "^2.3.3",
     "istanbul": "^0.4.5",
     "jasmine": "^2.8.0",
+    "minimist": "^1.2.0",
+    "ts-node": "^3.3.0",
     "tslint": "^5.7.0",
     "typescript": "^2.5.3"
   }

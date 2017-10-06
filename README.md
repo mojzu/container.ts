@@ -26,12 +26,12 @@ Clone repository, install dependencies with `yarn install` and run scripts: `yar
 | `test`      | Run tests using Jasmine and Istanbul.             |
 | `lint`      | Run TSLint on project.                            |
 | `example`   | Run example script, `yarn run example -f schema`. |
-| `build`     | Build library for release.                        |
+| `dist`      | Build library for release.                        |
 
 Publishing library to NPM/GitHub.
 
 ```Shell
-$ yarn run build && npm publish --access=public
+$ yarn run dist && npm publish --access=public
 $ git push origin master --tags
 ```
 
@@ -53,6 +53,13 @@ Add [Code Climate](https://codeclimate.com/) repository token to [Travis CI](htt
 -   [TSLint](https://palantir.github.io/tslint/)
 -   [Yarn](https://yarnpkg.com/en/docs/cli/)
 -   [pkg](https://github.com/zeit/pkg)
+-   [Neon](https://github.com/neon-bindings/neon)
+-   [Rollbar](https://rollbar.com/)
+-   [winston](https://github.com/winstonjs/winston)
+-   [Airbrake](https://airbrake.io/)
+-   [Loggly](https://www.loggly.com/)
+-   [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/)
+-   [Datadog](https://www.datadoghq.com/)
 
 Set the Git commit message template.
 
