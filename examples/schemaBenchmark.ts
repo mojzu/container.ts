@@ -1,5 +1,5 @@
 // tslint:disable:no-console
-import * as validate from "../lib/validate";
+import * as validate from "../src/lib/validate";
 
 interface IData {
   booleanField: boolean;

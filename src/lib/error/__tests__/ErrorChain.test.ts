@@ -1,5 +1,4 @@
-/// <reference types="jasmine" />
-import { ErrorChain } from "./ErrorChain";
+import { ErrorChain } from "../ErrorChain";
 
 describe("ErrorChain", () => {
 

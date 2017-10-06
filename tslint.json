@@ -10,9 +10,6 @@
     "no-empty-interface": false,
     "no-var-requires": false,
     "object-literal-sort-keys": false,
-    "ordered-imports": [
-      false
-    ],
     "variable-name": [
       true,
       "ban-keywords",

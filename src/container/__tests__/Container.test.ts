@@ -1,14 +1,13 @@
-/// <reference types="jasmine" />
 import { Subject } from "rxjs/Subject";
-import { ErrorChain } from "../lib/error";
-import { Environment } from "./Environment";
+import { ErrorChain } from "../../lib/error";
 import {
-  ContainerError,
   Container,
+  ContainerError,
   ContainerModule,
   ContainerModuleLog,
   ContainerModuleMetric,
-} from "./Container";
+} from "../Container";
+import { Environment } from "../Environment";
 
 describe("Container", () => {
 

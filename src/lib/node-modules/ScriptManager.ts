@@ -1,16 +1,16 @@
+import "rxjs/add/operator/map";
+import "rxjs/add/operator/takeUntil";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
-import "rxjs/add/operator/takeUntil";
-import "rxjs/add/operator/map";
 import {
-  IContainerModuleDependencies,
-  IContainerModuleConstructor,
   ContainerModule,
+  IContainerModuleConstructor,
+  IContainerModuleDependencies,
 } from "../../container";
 import { Validate } from "../validate";
+import { ChildProcess } from "./ChildProcess";
 import { IProcessStatus } from "./Process";
 import { Script, ScriptProcess } from "./Script";
-import { ChildProcess } from "./ChildProcess";
 
 /** Script manager target interface. */
 export interface IScriptManagerTarget {

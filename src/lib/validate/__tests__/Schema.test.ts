@@ -1,6 +1,5 @@
-/// <reference types="jasmine" />
-import { buildSchema } from "./Schema";
-import { OptionalField, BooleanField, StringField } from "./Field";
+import { BooleanField, OptionalField, StringField } from "../Field";
+import { buildSchema } from "../Schema";
 
 const booleanField = new BooleanField();
 const stringField = new StringField();

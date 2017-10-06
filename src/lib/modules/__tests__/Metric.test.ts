@@ -1,6 +1,5 @@
-/// <reference types="jasmine" />
-import { ContainerMetricMessage, Container } from "../../container";
-import { Metric } from "./Metric";
+import { Container, ContainerMetricMessage } from "../../../container";
+import { Metric } from "../Metric";
 
 class TestMetric extends Metric {
   public static readonly NAME: string = "TestMetric";

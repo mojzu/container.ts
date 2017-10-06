@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import * as process from "process";
-import * as validate from "../lib/validate";
+import * as validate from "../src/lib/validate";
 
 // Define data interface for schema.
 interface IGroup {

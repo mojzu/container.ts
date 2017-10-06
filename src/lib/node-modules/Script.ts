@@ -1,27 +1,28 @@
 import * as assert from "assert";
-import * as path from "path";
 import * as childProcess from "child_process";
-import { Observable } from "rxjs/Observable";
-import { Subject } from "rxjs/Subject";
-import "rxjs/add/observable/of";
+import * as path from "path";
 import "rxjs/add/observable/fromEvent";
+import "rxjs/add/observable/of";
 import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/takeUntil";
+import { Observable } from "rxjs/Observable";
+import { Subject } from "rxjs/Subject";
 import {
+  ContainerModule,
   IContainerLogMessage,
   IContainerMetricMessage,
-  ContainerModule,
+  IContainerModuleOpts,
 } from "../../container";
 import { ErrorChain } from "../error";
 import { NodeValidate } from "../node-validate";
 import {
+  ChildProcess,
   EProcessMessageType,
   IProcessCallOptions,
   IProcessEventData,
   IProcessMessage,
   IProcessSend,
-  ChildProcess,
 } from "./ChildProcess";
 
 /** Script process options. */
@@ -176,8 +177,8 @@ export class Script extends ContainerModule {
 
   public get path(): string { return this._path; }
 
-  public setup(): void {
-    super.setup();
+  public constructor(name: string, opts: IContainerModuleOpts) {
+    super(name, opts);
 
     // Get script directory path from environment.
     const scriptPath = path.resolve(this.environment.get(Script.ENV.PATH));

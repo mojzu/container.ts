@@ -1,16 +1,16 @@
 import * as process from "process";
-import { Observable } from "rxjs/Observable";
-import { Subject } from "rxjs/Subject";
 import "rxjs/add/observable/fromEvent";
 import "rxjs/add/observable/interval";
+import "rxjs/add/operator/filter";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
-import "rxjs/add/operator/filter";
-import "rxjs/add/operator/timeout";
 import "rxjs/add/operator/takeWhile";
-import { IContainerLogMessage, ContainerModule } from "../../container";
-import { IErrorChainSerialised, ErrorChain } from "../error";
-import { IProcessStatus, ProcessError, Process } from "./Process";
+import "rxjs/add/operator/timeout";
+import { Observable } from "rxjs/Observable";
+import { Subject } from "rxjs/Subject";
+import { ContainerModule, IContainerLogMessage, IContainerModuleOpts } from "../../container";
+import { ErrorChain, IErrorChainSerialised } from "../error";
+import { IProcessStatus, Process, ProcessError } from "./Process";
 
 /** Process message types. */
 export enum EProcessMessageType {
@@ -233,8 +233,8 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Events received from parent process. */
   public get events(): Observable<IProcessEventData> { return this._events; }
 
-  public setup(): void {
-    super.setup();
+  public constructor(name: string, opts: IContainerModuleOpts) {
+    super(name, opts);
 
     // Listen for and handle messages from parent process.
     this._messages

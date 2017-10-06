@@ -2,16 +2,16 @@ import * as moment from "moment-timezone";
 import { ErrorChain } from "../error";
 import {
   IValidateBooleanOptions,
+  IValidateDateOptions,
+  IValidateDomainOptions,
+  IValidateDurationOptions,
+  IValidateEmailOptions,
   IValidateIntegerOptions,
+  IValidateIpOptions,
+  IValidateLocaleOptions,
   IValidateNumberOptions,
   IValidateStringOptions,
-  IValidateLocaleOptions,
-  IValidateDateOptions,
-  IValidateDurationOptions,
-  IValidateIpOptions,
-  IValidateDomainOptions,
   IValidateUrlOptions,
-  IValidateEmailOptions,
   Validate,
 } from "./Validate";
 

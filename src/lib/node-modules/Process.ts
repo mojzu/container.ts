@@ -1,10 +1,10 @@
-import * as process from "process";
 import * as os from "os";
-import { Observable } from "rxjs/Observable";
-import "rxjs/add/observable/of";
+import * as process from "process";
 import "rxjs/add/observable/interval";
+import "rxjs/add/observable/of";
 import "rxjs/add/operator/switchMap";
-import { ContainerModule } from "../../container";
+import { Observable } from "rxjs/Observable";
+import { ContainerModule, IContainerModuleOpts } from "../../container";
 import { ErrorChain } from "../error";
 
 /** Process information interface. */
@@ -114,7 +114,9 @@ export class Process extends ContainerModule {
     };
   }
 
-  public setup(): void {
+  public constructor(name: string, opts: IContainerModuleOpts) {
+    super(name, opts);
+
     // Set process title.
     Process.setTitle(this.options.name);
     this.debug(`TITLE="${this.title}"`);

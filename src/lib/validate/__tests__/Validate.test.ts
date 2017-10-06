@@ -1,6 +1,5 @@
-/// <reference types="jasmine" />
-import { ErrorChain } from "../error";
-import { EValidateError, ValidateError, Validate } from "./Validate";
+import { ErrorChain } from "../../error";
+import { EValidateError, Validate, ValidateError } from "../Validate";
 
 describe("Validate", () => {
 

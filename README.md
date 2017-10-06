@@ -23,7 +23,7 @@ Clone repository, install dependencies with `yarn install` and run scripts: `yar
 | ----------- | ------------------------------------------------- |
 | `clean`     | Clean compiled files.                             |
 | `distclean` | Remove Node modules.                              |
-| `test`      | Run tests using Jasmine and Istanbul.             |
+| `test`      | Run tests using Jest.                             |
 | `lint`      | Run TSLint on project.                            |
 | `example`   | Run example script, `yarn run example -f schema`. |
 | `dist`      | Build library for release.                        |
@@ -47,8 +47,7 @@ Add [Code Climate](https://codeclimate.com/) repository token to [Travis CI](htt
 -   [LICENCE](https://help.github.com/articles/licensing-a-repository/)
 -   [package.json](https://docs.npmjs.com/files/package.json)
 -   [README](https://help.github.com/articles/about-readmes/)
--   [Jasmine](https://jasmine.github.io/)
--   [Istanbul](http://gotwarlost.github.io/istanbul/)
+-   [Jest](https://facebook.github.io/jest/)
 -   [tsconfig.json](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
 -   [TSLint](https://palantir.github.io/tslint/)
 -   [Yarn](https://yarnpkg.com/en/docs/cli/)

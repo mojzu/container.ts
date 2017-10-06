@@ -1,24 +1,24 @@
-import * as Debug from "debug";
 import {
   AwilixContainer,
   createContainer,
-  ResolutionMode,
-  RegistrationOptions,
   Lifetime,
   RegisterNameAndFunctionPair,
+  RegistrationOptions,
+  ResolutionMode,
 } from "awilix";
-import { Observable } from "rxjs/Observable";
-import { Subject } from "rxjs/Subject";
-import { BehaviorSubject } from "rxjs/BehaviorSubject";
+import * as Debug from "debug";
+import "rxjs/add/observable/forkJoin";
 import "rxjs/add/observable/of";
 import "rxjs/add/observable/throw";
-import "rxjs/add/observable/forkJoin";
 import "rxjs/add/operator/catch";
 import "rxjs/add/operator/do";
 import "rxjs/add/operator/filter";
 import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/timeout";
+import { BehaviorSubject } from "rxjs/BehaviorSubject";
+import { Observable } from "rxjs/Observable";
+import { Subject } from "rxjs/Subject";
 import { ErrorChain } from "../lib/error";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./Log";
@@ -376,13 +376,7 @@ export class ContainerModule {
     } catch (error) {
       throw new ContainerError(Container.ERROR.DEPENDENCY, error);
     }
-
-    // Call setup hook.
-    this.setup();
   }
-
-  /** Module setup hook, override if required. */
-  public setup(): void { }
 
   /** Module operational state. */
   public start(): void | Observable<void> {

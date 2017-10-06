@@ -1,5 +1,4 @@
-/// <reference types="jasmine" />
-import { EMetricType, IMetricTags, Metric } from "./Metric";
+import { EMetricType, IMetricTags, Metric } from "../Metric";
 
 let _CALLBACK: any = null;
 

@@ -1,7 +1,7 @@
-import * as validator from "validator";
 import * as moment from "moment-timezone";
+import * as validator from "validator";
 import { ErrorChain } from "../error";
-import { ISO639, ISO3166 } from "./data";
+import { ISO3166, ISO639 } from "./data";
 
 /**
  * Validation error codes.

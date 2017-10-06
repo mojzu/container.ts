@@ -1,9 +1,9 @@
 "use strict";
 const process = require("process");
 const path = require("path");
+const childProcess = require("child_process");
 const del = require("del");
 const argv = require("minimist")(process.argv.slice(2));
-const { exec } = require("child-process-promise");
 const { Sparky } = require("fuse-box");
 
 // Library package path and file.
@@ -19,18 +19,11 @@ function clean(root, targetPaths) {
 // Execute command as child process.
 // Adds Node binaries directory to PATH for usability.
 function shell(command) {
-  return exec(command, {
+  childProcess.execSync(command, {
+    stdio: [null, process.stdout, process.stderr],
     env: { PATH: `${process.env.PATH}:${path.resolve("./node_modules/.bin")}` },
-  })
-    .then((result) => {
-      if (result.stderr != null) {
-        process.stderr.write(`${result.stderr}\n`);
-      }
-      if (result.stdout != null) {
-        process.stdout.write(`${result.stdout}\n`);
-      }
-      return result;
-    });
+  });
+  return Promise.resolve();
 }
 
 // Clean compiled files.
@@ -43,9 +36,6 @@ Sparky.task("clean", () => {
     "index.d.ts",
     "index.js.map",
     "index.js",
-    "test.d.ts",
-    "test.js.map",
-    "test.js",
     // Sub-package files.
     "container",
     "lib",
@@ -68,8 +58,8 @@ Sparky.task("lint", () => {
 });
 
 // Run tests with coverage reporting.
-Sparky.task("test", ["tsc"], () => {
-  return shell("istanbul cover test.js -x \"**/*.spec.js\"");
+Sparky.task("test", ["clean"], () => {
+  return shell("jest --coverage");
 });
 
 // Run example.
@@ -79,6 +69,6 @@ Sparky.task("example", () => {
 });
 
 // Build library for distribution.
-Sparky.task("dist", ["lint", "test"], () => {
+Sparky.task("dist", ["lint", "test", "tsc"], () => {
   return shell("npm pack");
 });

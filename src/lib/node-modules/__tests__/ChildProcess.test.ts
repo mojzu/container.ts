@@ -1,26 +1,26 @@
-/// <reference types="jasmine" />
-import { Container, Environment } from "../../container";
-import { IProcessOptions, Process } from "./Process";
+import { Container, Environment } from "../../../container";
+import { ChildProcess } from "../ChildProcess";
+import { IProcessOptions } from "../Process";
 
-class TestProcess extends Process {
-  public static readonly NAME: string = "TestProcess";
+class TestChildProcess extends ChildProcess {
+  public static readonly NAME: string = "TestChildProcess";
   public get options(): IProcessOptions {
     return {
-      name: "test-process",
+      name: "test-child-process",
       version: "1.2.3",
       nodeEnvironment: "development",
     };
   }
 }
 
-describe("Process", () => {
+describe("ChildProcess", () => {
 
   const ENVIRONMENT = new Environment();
 
   const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModule(TestProcess.NAME, TestProcess);
+    .registerModule(TestChildProcess.NAME, TestChildProcess);
 
-  const PROCESS = CONTAINER.resolve<TestProcess>(TestProcess.NAME);
+  const PROCESS = CONTAINER.resolve<TestChildProcess>(TestChildProcess.NAME);
 
   beforeAll((done) => {
     CONTAINER.start()
@@ -38,9 +38,9 @@ describe("Process", () => {
       });
   });
 
-  it("#Process", () => {
+  it("#ChildProcess", () => {
     expect(PROCESS).toBeDefined();
-    expect(PROCESS.name).toEqual(TestProcess.NAME);
+    expect(PROCESS.name).toEqual(TestChildProcess.NAME);
     expect(PROCESS.version).toEqual("1.2.3");
     expect(PROCESS.nodeEnvironment).toEqual("development");
   });

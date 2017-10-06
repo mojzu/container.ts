@@ -1,12 +1,12 @@
-import * as path from "path";
 import * as fs from "fs";
-import { Observable } from "rxjs/Observable";
+import * as path from "path";
+import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/observable/of";
 import "rxjs/add/observable/throw";
-import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/operator/do";
 import "rxjs/add/operator/map";
-import { ContainerModule } from "../../container";
+import { Observable } from "rxjs/Observable";
+import { ContainerModule, IContainerModuleOpts } from "../../container";
 import { ErrorChain } from "../error";
 import { NodeValidate } from "../node-validate";
 
@@ -46,8 +46,8 @@ export class Asset extends ContainerModule {
   public get path(): string { return this._path; }
   public get cache(): IAssetCache { return this._cache; }
 
-  public setup(): void {
-    super.setup();
+  public constructor(name: string, opts: IContainerModuleOpts) {
+    super(name, opts);
 
     // Get asset directory path from environment.
     const assetPath = path.resolve(this.environment.get(Asset.ENV.PATH));

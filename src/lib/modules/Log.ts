@@ -1,4 +1,4 @@
-import { ContainerModule, ContainerLogMessage, ELogLevel } from "../../container";
+import { ContainerLogMessage, ContainerModule, ELogLevel, IContainerModuleOpts } from "../../container";
 import { Validate } from "../validate";
 
 export abstract class Log extends ContainerModule {
@@ -16,8 +16,8 @@ export abstract class Log extends ContainerModule {
 
   protected get level(): ELogLevel { return this._level; }
 
-  public setup(): void {
-    super.setup();
+  public constructor(name: string, opts: IContainerModuleOpts) {
+    super(name, opts);
 
     // Get log level from environment or fall back on default.
     const rawLevel = Validate.isString(this.environment.get(Log.ENV.LEVEL) || "info");

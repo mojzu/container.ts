@@ -1,13 +1,12 @@
-/// <reference types="jasmine" />
 import {
+  EmailField,
   FieldError,
-  OptionalField,
-  IntegerField,
   FloatField,
+  IntegerField,
+  OptionalField,
   PortField,
   StringField,
-  EmailField,
-} from "./Field";
+} from "../Field";
 
 describe("Field", () => {
 
