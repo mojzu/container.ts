@@ -11,7 +11,7 @@ import { ErrorChain } from "../error";
 export interface IProcessOptions {
   name?: string;
   version?: string;
-  nodeEnvironment?: "development" | "production";
+  nodeEnvironment?: string;
 }
 
 /** Process runtime information interface. */
