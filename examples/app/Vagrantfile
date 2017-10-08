@@ -1,0 +1,38 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-16.04"
+
+  # Telegraf UDP socket.
+  config.vm.network "forwarded_port", guest: 8125, host: 8125, host_ip: "127.0.0.1", protocol: "udp"
+
+  # Chronograf server.
+  config.vm.network "forwarded_port", guest: 8888, host: 8888, host_ip: "127.0.0.1", protocol: "tcp"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+
+    # # Docker, Docker Compose install.
+    # apt-get update
+    # apt-get -y install linux-image-extra-$(uname -r) linux-image-extra-virtual
+    # apt-get -y install apt-transport-https ca-certificates curl software-properties-common python-pip
+    # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    # add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    # apt-get update
+    # apt-get -y install docker-ce=17.06.0~ce-0~ubuntu
+    # pip install --upgrade pip docker-compose==1.14.0
+
+    # Telegraf, InfluxDB, Chronograf - Install and configure.
+    curl -sL https://repos.influxdata.com/influxdb.key | apt-key add -
+    source /etc/lsb-release
+    echo "deb https://repos.influxdata.com/${DISTRIB_ID,,} ${DISTRIB_CODENAME} stable" | tee /etc/apt/sources.list.d/influxdb.list
+    apt-get -y update
+    apt-get -y install influxdb telegraf
+    wget https://dl.influxdata.com/chronograf/releases/chronograf_1.3.8.1_amd64.deb -q -O /tmp/chronograf.deb
+    dpkg -i /tmp/chronograf.deb
+    cp /vagrant/vagrant/telegraf_statsd.conf /etc/telegraf/telegraf.d/statsd.conf
+    systemctl start influxdb telegraf chronograf
+
+  SHELL
+end
