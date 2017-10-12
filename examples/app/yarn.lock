@@ -12,9 +12,13 @@
   dependencies:
     moment ">=2.14.0"
 
-"@types/node@*", "@types/node@^6.0.89":
+"@types/node@*":
   version "6.0.89"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.89.tgz#154be0e6a823760cd6083aa8c48f952e2e63e0b0"
+
+"@types/node@^8.0.34":
+  version "8.0.34"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.34.tgz#55f801fa2ddb2a40dd6dfc15ecfe1dde9c129fe9"
 
 "@types/statsd-client@^0.1.31":
   version "0.1.31"
@@ -462,9 +466,9 @@ console-polyfill@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/console-polyfill/-/console-polyfill-0.3.0.tgz#84900902a18c47a5eba932be75fa44d23e8af861"
 
-container.ts@^0.30.0:
-  version "0.30.0"
-  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.30.0.tgz#f22e553ffcdad5f5e5fe09651c163f32f29db498"
+container.ts@^0.32.0:
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.32.0.tgz#a63b8632aaf9997af2700e57724132cb417e5b8f"
   dependencies:
     "@types/debug" "^0.0.30"
     awilix "^2.8.1"
