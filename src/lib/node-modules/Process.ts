@@ -117,17 +117,11 @@ export class Process extends ContainerModule {
   public constructor(name: string, opts: IContainerModuleOpts) {
     super(name, opts);
 
-    // Set process title.
+    // Set process title, version and environment.
     Process.setTitle(this.options.name);
-    this.debug(`TITLE="${this.title}"`);
-
-    // Set process verion string.
     this._version = this.options.version || "0.0.0";
-    this.debug(`VERSION="${this.version}"`);
-
-    // Set process node environment.
     this._nodeEnvironment = this.options.nodeEnvironment || "production";
-    this.debug(`NODE_ENV="${this.nodeEnvironment}"`);
+    this.debug(`TITLE="${this.title}" VERSION="${this.version}" NODE_ENV="${this.nodeEnvironment}"`);
 
     // Process metrics on interval.
     Observable.interval(Process.DEFAULT_METRIC_INTERVAL)
