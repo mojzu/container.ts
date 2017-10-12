@@ -1,7 +1,7 @@
 
 /** Environment variables object. */
 export interface IEnvironmentVariables {
-  [key: string]: string;
+  [key: string]: string | undefined;
 }
 
 /** Environment variables class. */

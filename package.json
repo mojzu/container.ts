@@ -39,13 +39,13 @@
   },
   "devDependencies": {
     "@types/jest": "^21.1.2",
-    "@types/node": "^6.0.89",
+    "@types/node": "^8.0.34",
     "@types/validator": "^6.3.0",
     "del": "^3.0.0",
     "fuse-box": "^2.3.3",
     "jest": "^21.2.1",
     "minimist": "^1.2.0",
-    "ts-jest": "^21.1.0",
+    "ts-jest": "^21.1.2",
     "ts-node": "^3.3.0",
     "tslint": "^5.7.0",
     "typescript": "^2.5.3"
