@@ -9,10 +9,10 @@ import "rxjs/add/operator/takeUntil";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import {
-  ContainerModule,
   IContainerLogMessage,
   IContainerMetricMessage,
-  IContainerModuleOpts,
+  IModuleOpts,
+  Module,
 } from "../../container";
 import { ErrorChain } from "../error";
 import { NodeValidate } from "../node-validate";
@@ -40,38 +40,27 @@ export class ScriptError extends ErrorChain {
 /** Spawned script process interface. */
 export class ScriptProcess implements IProcessSend {
 
-  private _exit: Observable<number | string>;
-  private _messages: Observable<IProcessMessage>;
-  private _events = new Subject<IProcessEventData>();
-  private _identifier = 0;
+  public readonly exit: Observable<number | string>;
+  public readonly messages: Observable<IProcessMessage>;
+  public readonly events = new Subject<IProcessEventData>();
 
-  public get script(): Script { return this._script; }
-  public get target(): string { return this._target; }
-  public get process(): childProcess.ChildProcess { return this._process; }
-  public get options(): IScriptOptions { return this._options; }
+  public get connected(): boolean { return this.process.connected; }
 
-  public get exit(): Observable<number | string> { return this._exit; }
-  public get messages(): Observable<IProcessMessage> { return this._messages; }
-  public get events(): Observable<IProcessEventData> { return this._events; }
-
-  public get connected(): boolean { return this._process.connected; }
-
-  /** Incrementing counter for unique identifiers. */
-  protected get identifier(): number { return ++this._identifier; }
+  protected currentIdentifier = 0;
 
   public constructor(
-    private _script: Script,
-    private _target: string,
-    private _process: childProcess.ChildProcess,
-    private _options: IScriptOptions = {},
+    public readonly script: Script,
+    public readonly target: string,
+    public readonly process: childProcess.ChildProcess,
+    public readonly options: IScriptOptions = {},
   ) {
-    this.script.debug(`FORK="${_target}"`);
+    this.script.debug(`FORK="${target}"`);
 
     // Accumulate multiple callback arguments into array.
     const accumulator = (...args: any[]) => args;
 
     // Listen for process exit, reduce code/signal for next argument.
-    this._exit = Observable.fromEvent(_process, "exit", accumulator)
+    this.exit = Observable.fromEvent(process, "exit", accumulator)
       .take(1)
       .switchMap((args: [number | null, string | null]) => {
         const [code, signal] = args;
@@ -79,8 +68,8 @@ export class ScriptProcess implements IProcessSend {
         return Observable.of((value != null) ? value : 1);
       });
 
-    this._exit.subscribe((code) => {
-      this.script.debug(`EXIT="${_target}" CODE="${code}"`);
+    this.exit.subscribe((code) => {
+      this.script.debug(`EXIT="${target}" CODE="${code}"`);
 
       // Log error if script exits with error code.
       if (code !== 0) {
@@ -90,18 +79,18 @@ export class ScriptProcess implements IProcessSend {
     });
 
     // Listen for process error, forward to script logger.
-    Observable.fromEvent(_process, "error")
-      .takeUntil(this._exit)
+    Observable.fromEvent(process, "error")
+      .takeUntil(this.exit)
       .subscribe((error: Error) => {
         const chained = new ScriptError(this.target, error);
         this.script.log.error(chained);
       });
 
     // Listen for and handle process messages.
-    this._messages = Observable.fromEvent<IProcessMessage>(_process, "message")
-      .takeUntil(this._exit);
+    this.messages = Observable.fromEvent<IProcessMessage>(process, "message")
+      .takeUntil(this.exit);
 
-    this._messages
+    this.messages
       .subscribe((message) => this.handleMessage(message));
   }
 
@@ -118,7 +107,7 @@ export class ScriptProcess implements IProcessSend {
 
   /** Make call to module.method in child process. */
   public call<T>(target: string, method: string, options: IProcessCallOptions = {}): Observable<T> {
-    return ChildProcess.sendCallRequest<T>(this, this.script, target, method, this.identifier, options);
+    return ChildProcess.sendCallRequest<T>(this, this.script, target, method, this.nextIdentifier, options);
   }
 
   /** Send event with optional data to child process. */
@@ -130,6 +119,9 @@ export class ScriptProcess implements IProcessSend {
   public listen<T>(name: string): Observable<T> {
     return ChildProcess.listenForEvent<T>(this.events, name);
   }
+
+  /** Incrementing counter for unique identifiers. */
+  protected get nextIdentifier(): number { return ++this.currentIdentifier; }
 
   /** Handle messages received from child process. */
   protected handleMessage(message: IProcessMessage): void {
@@ -153,7 +145,7 @@ export class ScriptProcess implements IProcessSend {
       // Send event on internal event bus.
       case EProcessMessageType.Event: {
         const event: IProcessEventData = message.data;
-        this._events.next(event);
+        this.events.next(event);
         break;
       }
     }
@@ -162,7 +154,7 @@ export class ScriptProcess implements IProcessSend {
 }
 
 /** Node.js scripts interface. */
-export class Script extends ContainerModule {
+export class Script extends Module {
 
   /** Default module name. */
   public static readonly NAME: string = "Script";
@@ -173,18 +165,16 @@ export class Script extends ContainerModule {
     PATH: "SCRIPT_PATH",
   };
 
-  private _path: string;
+  public readonly path: string;
 
-  public get path(): string { return this._path; }
-
-  public constructor(name: string, opts: IContainerModuleOpts) {
+  public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
     // Get script directory path from environment.
     const scriptPath = path.resolve(this.environment.get(Script.ENV.PATH));
 
     assert(scriptPath != null, "Scripts path is undefined");
-    this._path = NodeValidate.isDirectory(scriptPath);
+    this.path = NodeValidate.isDirectory(scriptPath);
     this.debug(`${Script.ENV.PATH}="${this.path}"`);
   }
 
@@ -192,11 +182,10 @@ export class Script extends ContainerModule {
   public fork(target: string, options: IScriptOptions = {}): ScriptProcess {
     const forkArgs = options.args || [];
     const forkEnv = this.environment.copy();
-    const identifier = this.identifier;
 
     // Use container environment when spawning processes.
     // Override name value to prepend application namespace.
-    const name = `${this.namespace}.${target}.${identifier}`;
+    const name = `${this.namespace}.${target}`;
     forkEnv.set(ChildProcess.ENV.NAME, name);
 
     const forkOptions: childProcess.ForkOptions = {
@@ -206,7 +195,7 @@ export class Script extends ContainerModule {
     // Check script file exists.
     const filePath = NodeValidate.isFile(path.resolve(this.path, target));
     const process = childProcess.fork(filePath, forkArgs, forkOptions);
-    return new ScriptProcess(this, `${target}.${identifier}`, process, options);
+    return new ScriptProcess(this, `${target}`, process, options);
   }
 
 }

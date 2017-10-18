@@ -1,7 +1,7 @@
-import { ContainerLogMessage, ContainerModule, ELogLevel, IContainerModuleOpts } from "../../container";
+import { ContainerLogMessage, ELogLevel, IModuleOpts, Module } from "../../container";
 import { Validate } from "../validate";
 
-export abstract class Log extends ContainerModule {
+export abstract class Log extends Module {
 
   /** Default module name. */
   public static readonly NAME: string = "Log";
@@ -12,16 +12,14 @@ export abstract class Log extends ContainerModule {
     LEVEL: "LOG_LEVEL",
   };
 
-  private _level: ELogLevel;
+  protected readonly level: ELogLevel;
 
-  protected get level(): ELogLevel { return this._level; }
-
-  public constructor(name: string, opts: IContainerModuleOpts) {
+  public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
     // Get log level from environment or fall back on default.
     const rawLevel = Validate.isString(this.environment.get(Log.ENV.LEVEL) || "info");
-    this._level = this.parseLevel(rawLevel);
+    this.level = this.parseLevel(rawLevel);
     this.debug(`${Log.ENV.LEVEL}="${ELogLevel[this.level]}"`);
 
     // Subscribe to container log messages filtered by level.

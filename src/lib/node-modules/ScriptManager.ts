@@ -3,9 +3,9 @@ import "rxjs/add/operator/takeUntil";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import {
-  ContainerModule,
-  IContainerModuleConstructor,
-  IContainerModuleDependencies,
+  IModuleConstructor,
+  IModuleDependencies,
+  Module,
 } from "../../container";
 import { Validate } from "../validate";
 import { ChildProcess } from "./ChildProcess";
@@ -20,7 +20,7 @@ export interface IScriptManagerTarget {
 }
 
 /** Script manager module interface. */
-export interface IScriptManager extends ContainerModule {
+export interface IScriptManager extends Module {
   workers: Array<ScriptProcess | null>;
 }
 
@@ -28,22 +28,21 @@ export interface IScriptManager extends ContainerModule {
 export class ScriptManagerFactory {
 
   /** Create manager classes for target scripts. */
-  public static create(scripts: IScriptManagerTarget[]): IContainerModuleConstructor {
+  public static create(scripts: IScriptManagerTarget[]): IModuleConstructor {
 
-    class ScriptManager extends ContainerModule implements IScriptManager {
+    class ScriptManager extends Module implements IScriptManager {
 
       /** Default module name. */
       public static readonly NAME: string = "ScriptManager";
 
-      private _script: Script;
-      private _workers: Array<ScriptProcess | null> = [];
-      private _unsubscribe = new Subject<void>();
+      public readonly workers: Array<ScriptProcess | null> = [];
 
-      public get dependencies(): IContainerModuleDependencies {
-        return { _script: Script.name };
+      protected readonly script: Script;
+      protected readonly unsubscribe = new Subject<void>();
+
+      public get dependencies(): IModuleDependencies {
+        return { script: Script.name };
       }
-
-      public get workers(): Array<ScriptProcess | null> { return this._workers; }
 
       public start(): void {
         scripts.map((script, index) => this.startWorker(script, index));
@@ -51,10 +50,10 @@ export class ScriptManagerFactory {
 
       public stop(): void | Observable<void> {
         const observables: Array<Observable<any>> = [];
-        this._unsubscribe.next();
+        this.unsubscribe.next();
 
         // Wait for worker processes to exit if connected.
-        for (const worker of this._workers) {
+        for (const worker of this.workers) {
           if ((worker != null) && worker.connected) {
             observables.push(worker.exit);
           }
@@ -67,17 +66,17 @@ export class ScriptManagerFactory {
 
       protected startWorker(script: IScriptManagerTarget, index: number): void {
         const uptimeLimit = this.validUptimeLimit(script.uptimeLimit);
-        const worker = this._script.fork(script.name);
-        this._workers[index] = worker;
+        const worker = this.script.fork(script.name);
+        this.workers[index] = worker;
 
         // Handle process restarts.
         worker.exit
-          .takeUntil(this._unsubscribe)
+          .takeUntil(this.unsubscribe)
           .subscribe((code) => this.startWorker(script, index));
 
         // Track process uptime.
         worker.listen<IProcessStatus>(ChildProcess.EVENT.STATUS)
-          .takeUntil(this._unsubscribe)
+          .takeUntil(this.unsubscribe)
           .subscribe((status) => {
             // Restart worker process if uptime limit exceeded.
             if ((uptimeLimit != null) && (status.uptime > uptimeLimit)) {

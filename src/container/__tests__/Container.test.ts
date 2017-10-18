@@ -1,13 +1,8 @@
 import { Subject } from "rxjs/Subject";
 import { ErrorChain } from "../../lib/error";
-import {
-  Container,
-  ContainerError,
-  ContainerModule,
-  ContainerModuleLog,
-  ContainerModuleMetric,
-} from "../Container";
+import { Container, ContainerError } from "../Container";
 import { Environment } from "../Environment";
+import { Module, ModuleLog, ModuleMetric } from "../Module";
 
 describe("Container", () => {
 
@@ -22,7 +17,7 @@ describe("Container", () => {
     const container = new Container(name);
     expect(container.name).toEqual(name);
     expect(container.environment instanceof Environment).toEqual(true);
-    expect(container.modules).toEqual([]);
+    expect(container.moduleNames).toEqual([]);
     expect(container.logs instanceof Subject).toEqual(true);
     expect(container.metrics instanceof Subject).toEqual(true);
   });
@@ -30,15 +25,15 @@ describe("Container", () => {
   it("#Container#registerModule", () => {
     const name = "test";
     const container = new Container(name);
-    expect(container.registerModule(ContainerModule.NAME, ContainerModule) instanceof Container).toEqual(true);
-    const testModule = container.resolve<ContainerModule>(ContainerModule.NAME);
-    expect(testModule instanceof ContainerModule);
+    expect(container.registerModule(Module.NAME, Module) instanceof Container).toEqual(true);
+    const testModule = container.resolve<Module>(Module.NAME);
+    expect(testModule instanceof Module);
     expect(testModule.container).toEqual(container);
     expect(testModule.environment).toEqual(container.environment);
-    expect(testModule.name).toEqual(ContainerModule.NAME);
-    expect(testModule.namespace).toEqual(`${name}.${ContainerModule.NAME}`);
-    expect(testModule.log instanceof ContainerModuleLog).toEqual(true);
-    expect(testModule.metric instanceof ContainerModuleMetric).toEqual(true);
+    expect(testModule.name).toEqual(Module.NAME);
+    expect(testModule.namespace).toEqual(`${name}.${Module.NAME}`);
+    expect(testModule.log instanceof ModuleLog).toEqual(true);
+    expect(testModule.metric instanceof ModuleMetric).toEqual(true);
     expect(testModule.debug).toBeDefined();
   });
 

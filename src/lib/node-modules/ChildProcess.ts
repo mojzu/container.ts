@@ -8,7 +8,7 @@ import "rxjs/add/operator/takeWhile";
 import "rxjs/add/operator/timeout";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
-import { ContainerModule, IContainerLogMessage, IContainerModuleOpts } from "../../container";
+import { IContainerLogMessage, IModuleOpts, Module } from "../../container";
 import { ErrorChain, IErrorChainSerialised } from "../error";
 import { IProcessStatus, Process, ProcessError } from "./Process";
 
@@ -107,7 +107,7 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Send call request to process. */
   public static sendCallRequest<T>(
     emitter: IProcessSend,
-    mod: ContainerModule,
+    mod: Module,
     target: string,
     method: string,
     id: number,
@@ -128,7 +128,7 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Handle method call requests. */
   public static handleCallRequest(
     emitter: IProcessSend,
-    mod: ContainerModule,
+    mod: Module,
     data: IProcessCallRequestData,
   ): void {
     const type = EProcessMessageType.CallResponse;
@@ -203,7 +203,7 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Send event to process. */
   public static sendEvent<T>(
     emitter: IProcessSend,
-    mod: ContainerModule,
+    mod: Module,
     name: string,
     data?: T,
   ): void {
@@ -224,20 +224,19 @@ export class ChildProcess extends Process implements IProcessSend {
       .map((event) => event.data as T);
   }
 
-  private _messages = Observable.fromEvent<IProcessMessage>(process, "message");
-  private _events = new Subject<IProcessEventData>();
-
   /** Messages received from parent process. */
-  public get messages(): Observable<IProcessMessage> { return this._messages; }
+  public readonly messages = Observable.fromEvent<IProcessMessage>(process, "message");
 
   /** Events received from parent process. */
-  public get events(): Observable<IProcessEventData> { return this._events; }
+  public readonly events = new Subject<IProcessEventData>();
 
-  public constructor(name: string, opts: IContainerModuleOpts) {
+  protected currentIdentifier = 0;
+
+  public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
     // Listen for and handle messages from parent process.
-    this._messages
+    this.messages
       .subscribe((message) => this.handleMessage(message));
 
     // Forward log and metric messages to parent process.
@@ -261,7 +260,7 @@ export class ChildProcess extends Process implements IProcessSend {
 
   /** Make call to module.method in parent process. */
   public call<T>(target: string, method: string, options: IProcessCallOptions = {}): Observable<T> {
-    return ChildProcess.sendCallRequest<T>(this, this, target, method, this.identifier, options);
+    return ChildProcess.sendCallRequest<T>(this, this, target, method, this.nextIdentifier, options);
   }
 
   /** Send event with optional data to parent process. */
@@ -274,6 +273,9 @@ export class ChildProcess extends Process implements IProcessSend {
     return ChildProcess.listenForEvent<T>(this.events, name);
   }
 
+  /** Incrementing counter for unique identifiers. */
+  protected get nextIdentifier(): number { return ++this.currentIdentifier; }
+
   /** Handle messages received from parent process. */
   protected handleMessage(message: IProcessMessage): void {
     switch (message.type) {
@@ -285,7 +287,7 @@ export class ChildProcess extends Process implements IProcessSend {
       // Send event on internal event bus.
       case EProcessMessageType.Event: {
         const event: IProcessEventData = message.data;
-        this._events.next(event);
+        this.events.next(event);
         break;
       }
     }

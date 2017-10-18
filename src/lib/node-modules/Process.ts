@@ -4,7 +4,7 @@ import "rxjs/add/observable/interval";
 import "rxjs/add/observable/of";
 import "rxjs/add/operator/switchMap";
 import { Observable } from "rxjs/Observable";
-import { ContainerModule, IContainerModuleOpts } from "../../container";
+import { IModuleOpts, Module } from "../../container";
 import { ErrorChain } from "../error";
 
 /** Process information interface. */
@@ -45,7 +45,7 @@ export class ProcessError extends ErrorChain {
 }
 
 /** Node.js process interface. */
-export class Process extends ContainerModule {
+export class Process extends Module {
 
   /** Default module name. */
   public static readonly NAME: string = "Process";
@@ -79,12 +79,9 @@ export class Process extends ContainerModule {
     return process.title;
   }
 
-  private _version: string;
-  private _nodeEnvironment: string;
-
   public get title(): string { return Process.title; }
-  public get version(): string { return this._version; }
-  public get nodeEnvironment(): string { return this._nodeEnvironment; }
+  public readonly version: string;
+  public readonly nodeEnvironment: string;
 
   /** Override in subclass to set process title/version. */
   public get options(): IProcessOptions { return {}; }
@@ -114,13 +111,13 @@ export class Process extends ContainerModule {
     };
   }
 
-  public constructor(name: string, opts: IContainerModuleOpts) {
+  public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
     // Set process title, version and environment.
     Process.setTitle(this.options.name);
-    this._version = this.options.version || "0.0.0";
-    this._nodeEnvironment = this.options.nodeEnvironment || "production";
+    this.version = this.options.version || "0.0.0";
+    this.nodeEnvironment = this.options.nodeEnvironment || "production";
     this.debug(`TITLE="${this.title}" VERSION="${this.version}" NODE_ENV="${this.nodeEnvironment}"`);
 
     // Process metrics on interval.

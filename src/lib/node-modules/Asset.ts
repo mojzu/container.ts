@@ -6,7 +6,7 @@ import "rxjs/add/observable/throw";
 import "rxjs/add/operator/do";
 import "rxjs/add/operator/map";
 import { Observable } from "rxjs/Observable";
-import { ContainerModule, IContainerModuleOpts } from "../../container";
+import { IModuleOpts, Module } from "../../container";
 import { ErrorChain } from "../error";
 import { NodeValidate } from "../node-validate";
 
@@ -23,7 +23,7 @@ export class AssetError extends ErrorChain {
 }
 
 /** Assets read only files interface. */
-export class Asset extends ContainerModule {
+export class Asset extends Module {
 
   /** Default module name. */
   public static readonly NAME: string = "Asset";
@@ -35,23 +35,20 @@ export class Asset extends ContainerModule {
   };
 
   /** Error names. */
-  public static readonly ERROR = {
+  public static readonly ERROR = Object.assign(Module.ERROR, {
     READ_FILE: "AssetReadFileError",
     JSON_PARSE: "AssetJsonParseError",
-  };
+  });
 
-  private _path: string;
-  private _cache: IAssetCache = {};
+  protected readonly path: string;
+  protected readonly cache: IAssetCache = {};
 
-  public get path(): string { return this._path; }
-  public get cache(): IAssetCache { return this._cache; }
-
-  public constructor(name: string, opts: IContainerModuleOpts) {
+  public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
     // Get asset directory path from environment.
     const assetPath = path.resolve(this.environment.get(Asset.ENV.PATH));
-    this._path = NodeValidate.isDirectory(assetPath);
+    this.path = NodeValidate.isDirectory(assetPath);
     this.debug(`${Asset.ENV.PATH}="${this.path}"`);
   }
 

@@ -7,11 +7,8 @@ export interface IEnvironmentVariables {
 /** Environment variables class. */
 export class Environment {
 
-  /** Environment variables object. */
-  public get variables(): IEnvironmentVariables { return this._variables; }
-
   public constructor(
-    private _variables: IEnvironmentVariables = {},
+    public readonly variables: IEnvironmentVariables = {},
   ) { }
 
   /** Returns a copy of environment. */
@@ -21,12 +18,12 @@ export class Environment {
 
   /** Get an environment variable value or undefined. */
   public get(name: string): string | undefined {
-    return this._variables[name];
+    return this.variables[name];
   }
 
   /** Set an environment variable value. */
   public set(name: string, value: string): Environment {
-    this._variables[name] = value;
+    this.variables[name] = value;
     return this;
   }
 
