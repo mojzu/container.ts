@@ -11,29 +11,32 @@
     "assets": "assets/**/*"
   },
   "scripts": {
-    "clean": "node fuse clean",
-    "distclean": "node fuse distclean",
-    "lint": "node fuse lint",
-    "start": "node fuse start",
-    "build": "node fuse build"
+    "clean": "ts-node fuse.ts clean",
+    "distclean": "ts-node fuse.ts distclean",
+    "lint": "ts-node fuse.ts lint",
+    "start": "ts-node fuse.ts start",
+    "dist": "ts-node fuse.ts dist"
   },
   "dependencies": {
-    "container.ts": "^0.32.0",
-    "rollbar": "^2.2.9",
-    "rxjs": "^5.4.3",
+    "container.ts": "^0.33.0",
+    "rollbar": "^2.2.10",
+    "rxjs": "^5.5.0",
     "statsd-client": "^0.4.0",
     "winston": "^2.4.0"
   },
   "devDependencies": {
-    "@types/node": "^8.0.34",
+    "@types/del": "^3.0.0",
+    "@types/node": "^8.0.45",
     "@types/statsd-client": "^0.1.31",
     "@types/winston": "^2.3.6",
+    "@types/yargs": "^8.0.2",
     "del": "^3.0.0",
     "fuse-box": "^2.3.3",
-    "minimist": "^1.2.0",
     "pkg": "^4.2.5",
+    "ts-node": "^3.3.0",
     "tslint": "^5.7.0",
     "typescript": "^2.5.3",
-    "uglify-js": "^3.1.3"
+    "uglify-js": "^3.1.4",
+    "yargs": "^9.0.1"
   }
 }

@@ -9,6 +9,10 @@ describe("ErrorChain", () => {
   const serialised = chainError.serialise();
   const deserialised = ErrorChain.deserialise(serialised);
 
+  it("#joinNames", () => {
+    expect(chainError.joinNames()).toEqual("ErrorTwo.ErrorOne.Error");
+  });
+
   it("#serialise", () => {
     expect(serialised.ErrorChain.length).toEqual(3);
     expect(serialised.ErrorChain[0].name).toEqual("ErrorTwo");

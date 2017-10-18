@@ -25,8 +25,13 @@ export class ErrorChain {
     DESERIALISE: "DeserialiseError",
   };
 
+  /** Returns true if error instance of ErrorChain. */
+  public static isErrorChain(error: any): error is ErrorChain {
+    return (error instanceof ErrorChain);
+  }
+
   /** Returns true if error instance of Error or ErrorChain */
-  public static isError(error: any): boolean {
+  public static isError(error: any): error is Error | ErrorChain {
     return (error instanceof Error) || (error instanceof ErrorChain);
   }
 
@@ -101,6 +106,23 @@ export class ErrorChain {
 
   public toString(): string { return this.message || ""; }
 
+  /** Join chained error names. */
+  public joinNames(separator = "."): string {
+    const names = [this.name];
+
+    if (this.cause != null) {
+      if (ErrorChain.isErrorChain(this.cause)) {
+        names.push(this.cause.joinNames(separator));
+      } else if (this.cause instanceof Error) {
+        if (this.cause.name != null) {
+          names.push(this.cause.name);
+        }
+      }
+    }
+
+    return names.join(separator);
+  }
+
   public serialise(): IErrorChainSerialised {
     try {
       // Serialise this error object.
@@ -115,7 +137,7 @@ export class ErrorChain {
 
       // Serialise chained error if available.
       if (this.cause != null) {
-        if (this.cause instanceof ErrorChain) {
+        if (ErrorChain.isErrorChain(this.cause)) {
           const serialised = this.cause.serialise();
           chained = chained.concat(serialised.ErrorChain);
         } else if (this.cause instanceof Error) {
