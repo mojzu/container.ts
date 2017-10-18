@@ -19,12 +19,12 @@
     "/lib/**/!(*.test).js.map"
   ],
   "scripts": {
-    "clean": "node fuse clean",
-    "distclean": "node fuse distclean",
-    "lint": "node fuse lint",
-    "test": "node fuse test",
-    "example": "node fuse example",
-    "dist": "node fuse dist"
+    "clean": "ts-node fuse.ts clean",
+    "distclean": "ts-node fuse.ts distclean",
+    "lint": "ts-node fuse.ts lint",
+    "test": "ts-node fuse.ts test",
+    "example": "ts-node fuse.ts example",
+    "dist": "ts-node fuse.ts dist"
   },
   "dependencies": {
     "@types/debug": "^0.0.30",

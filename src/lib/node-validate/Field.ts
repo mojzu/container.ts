@@ -2,14 +2,14 @@ import { Field } from "../validate";
 import { INodeValidateBufferOptions, NodeValidate } from "./NodeValidate";
 
 export class BufferField extends Field<Buffer> {
-  public constructor(private _options: INodeValidateBufferOptions = {}) {
+  public constructor(protected readonly options: INodeValidateBufferOptions = {}) {
     super();
   }
   public validate(value: string): Buffer {
-    return NodeValidate.isBuffer(value, this._options);
+    return NodeValidate.isBuffer(value, this.options);
   }
   public format(value: Buffer): string {
-    return value.toString(this._options.encoding);
+    return value.toString(this.options.encoding);
   }
 }
 

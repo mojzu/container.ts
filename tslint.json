@@ -9,12 +9,6 @@
     "no-empty": false,
     "no-empty-interface": false,
     "no-var-requires": false,
-    "object-literal-sort-keys": false,
-    "variable-name": [
-      true,
-      "ban-keywords",
-      "check-format",
-      "allow-leading-underscore"
-    ]
+    "object-literal-sort-keys": false
   }
 }

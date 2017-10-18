@@ -8,4 +8,3 @@
 *.d.ts
 *.js.map
 *.js
-!fuse.js

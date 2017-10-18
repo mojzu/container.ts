@@ -52,10 +52,10 @@ export abstract class Field<T> {
 
 /** Operator field helper. */
 export abstract class OperatorField<T> extends Field<T> {
-  protected _fields: Array<Field<T>>;
+  protected readonly fields: Array<Field<T>>;
   public constructor(...fields: Array<Field<T>>) {
     super();
-    this._fields = fields;
+    this.fields = fields;
   }
 }
 
@@ -65,7 +65,7 @@ export class AndField<T> extends OperatorField<T> {
   public validate(value: string, context?: any): T {
     let validated: T | null;
     try {
-      validated = this._fields
+      validated = this.fields
         .map((f) => f.validate(value, context))
         .reduce((p, c) => ((p != null) ? p : c), null);
     } catch (error) {
@@ -80,7 +80,7 @@ export class AndField<T> extends OperatorField<T> {
   public format(value: T, context?: any): string {
     let formatted: string | null;
     try {
-      formatted = this._fields
+      formatted = this.fields
         .map((f) => f.format(value, context))
         .reduce((p, c) => ((p != null) ? p : c), null);
     } catch (error) {
@@ -100,7 +100,7 @@ export class OrField<T> extends OperatorField<T> {
   public validate(value: string, context?: any): T {
     let validated: T | null;
     try {
-      validated = this._fields
+      validated = this.fields
         .map((f) => {
           try {
             return f.validate(value, context);
@@ -121,7 +121,7 @@ export class OrField<T> extends OperatorField<T> {
   public format(value: T, context?: any): string {
     let formatted: string | null;
     try {
-      formatted = this._fields
+      formatted = this.fields
         .map((f) => {
           try {
             return f.format(value, context);
@@ -147,7 +147,7 @@ export class NotField<T> extends OperatorField<T> {
   public validate(value: string, context?: any): null {
     let validated: T | null;
     try {
-      validated = this._fields
+      validated = this.fields
         .map((f) => {
           try {
             return f.validate(value, context);
@@ -168,7 +168,7 @@ export class NotField<T> extends OperatorField<T> {
   public format(value: T, context?: any): null {
     let formatted: string | null;
     try {
-      formatted = this._fields
+      formatted = this.fields
         .map((f) => {
           try {
             return f.format(value, context);
@@ -194,22 +194,26 @@ export class NotField<T> extends OperatorField<T> {
  */
 export class OptionalField<T> extends Field<T> {
 
-  private _formatDefault: string | null;
+  protected readonly formatDefault: string | null;
 
-  public constructor(private _field: Field<T>, private _default?: T, context?: any) {
+  public constructor(
+    protected readonly field: Field<T>,
+    protected readonly defaultValue?: T,
+    context?: any,
+  ) {
     super();
-    this._formatDefault = this.format(_default, context);
+    this.formatDefault = this.format(defaultValue, context);
   }
 
   public validate(value?: string, context?: any): T | null {
     try {
       if (value == null) {
-        if (this._formatDefault == null) {
+        if (this.formatDefault == null) {
           return null;
         }
-        return this._field.validate(this._formatDefault, context);
+        return this.field.validate(this.formatDefault, context);
       }
-      return this._field.validate(value, context);
+      return this.field.validate(value, context);
     } catch (error) {
       throw new FieldError(EFieldError.InvalidOptional, value, error);
     }
@@ -218,12 +222,12 @@ export class OptionalField<T> extends Field<T> {
   public format(value?: T, context?: any): string | null {
     try {
       if (value == null) {
-        if (this._default == null) {
+        if (this.defaultValue == null) {
           return null;
         }
-        return this._field.format(this._default, context);
+        return this.field.format(this.defaultValue, context);
       }
-      return this._field.format(value, context);
+      return this.field.format(value, context);
     } catch (error) {
       throw new FieldError(EFieldError.InvalidOptional, value, error);
     }
@@ -232,11 +236,11 @@ export class OptionalField<T> extends Field<T> {
 }
 
 export class BooleanField extends Field<boolean> {
-  public constructor(private _options: IValidateBooleanOptions = {}) {
+  public constructor(protected readonly options: IValidateBooleanOptions = {}) {
     super();
   }
   public validate(value: string): boolean {
-    return Validate.isBoolean(value, this._options);
+    return Validate.isBoolean(value, this.options);
   }
   public format(value: boolean): string {
     return String(value);
@@ -244,11 +248,11 @@ export class BooleanField extends Field<boolean> {
 }
 
 export class IntegerField extends Field<number> {
-  public constructor(private _options: IValidateIntegerOptions = {}) {
+  public constructor(protected readonly options: IValidateIntegerOptions = {}) {
     super();
   }
   public validate(value: string): number {
-    return Validate.isInteger(value, this._options);
+    return Validate.isInteger(value, this.options);
   }
   public format(value: number): string {
     return String(value);
@@ -256,11 +260,11 @@ export class IntegerField extends Field<number> {
 }
 
 export class FloatField extends Field<number> {
-  public constructor(private _options: IValidateNumberOptions = {}) {
+  public constructor(protected readonly options: IValidateNumberOptions = {}) {
     super();
   }
   public validate(value: string): number {
-    return Validate.isFloat(value, this._options);
+    return Validate.isFloat(value, this.options);
   }
   public format(value: number): string {
     return String(value);
@@ -277,11 +281,11 @@ export class HexadecimalField extends Field<number> {
 }
 
 export class StringField extends Field<string> {
-  public constructor(private _options: IValidateStringOptions = {}) {
+  public constructor(protected readonly options: IValidateStringOptions = {}) {
     super();
   }
   public validate(value: string): string {
-    return Validate.isString(value, this._options);
+    return Validate.isString(value, this.options);
   }
   public format(value: string): string {
     return value;
@@ -289,11 +293,11 @@ export class StringField extends Field<string> {
 }
 
 export class AsciiField extends Field<string> {
-  public constructor(private _options: IValidateStringOptions = {}) {
+  public constructor(protected readonly options: IValidateStringOptions = {}) {
     super();
   }
   public validate(value: string): string {
-    return Validate.isAscii(value, this._options);
+    return Validate.isAscii(value, this.options);
   }
   public format(value: string): string {
     return value;
@@ -301,11 +305,11 @@ export class AsciiField extends Field<string> {
 }
 
 export class Base64Field extends Field<string> {
-  public constructor(private _options: IValidateStringOptions = {}) {
+  public constructor(protected readonly options: IValidateStringOptions = {}) {
     super();
   }
   public validate(value: string): string {
-    return Validate.isBase64(value, this._options);
+    return Validate.isBase64(value, this.options);
   }
   public format(value: string): string {
     return value;
@@ -349,11 +353,11 @@ export class TimeZoneField extends Field<string> {
 }
 
 export class LocaleField extends Field<string> {
-  public constructor(private _options: IValidateLocaleOptions = {}) {
+  public constructor(protected readonly options: IValidateLocaleOptions = {}) {
     super();
   }
   public validate(value: string): string {
-    return Validate.isLocale(value, this._options);
+    return Validate.isLocale(value, this.options);
   }
   public format(value: string): string {
     return value;
@@ -361,11 +365,11 @@ export class LocaleField extends Field<string> {
 }
 
 export class DateField extends Field<moment.Moment> {
-  public constructor(private _options: IValidateDateOptions = {}) {
+  public constructor(protected readonly options: IValidateDateOptions = {}) {
     super();
   }
   public validate(value: string): moment.Moment {
-    return Validate.isDate(value, this._options);
+    return Validate.isDate(value, this.options);
   }
   public format(value: moment.Moment): string {
     return value.format();
@@ -373,11 +377,11 @@ export class DateField extends Field<moment.Moment> {
 }
 
 export class DurationField extends Field<moment.Duration> {
-  public constructor(private _options: IValidateDurationOptions = {}) {
+  public constructor(protected readonly options: IValidateDurationOptions = {}) {
     super();
   }
   public validate(value: string): moment.Duration {
-    return Validate.isDuration(value, this._options);
+    return Validate.isDuration(value, this.options);
   }
   public format(value: moment.Duration): string {
     return value.toISOString();
@@ -385,11 +389,11 @@ export class DurationField extends Field<moment.Duration> {
 }
 
 export class IpField extends Field<string> {
-  public constructor(private _options: IValidateIpOptions = {}) {
+  public constructor(protected readonly options: IValidateIpOptions = {}) {
     super();
   }
   public validate(value: string): string {
-    return Validate.isIp(value, this._options);
+    return Validate.isIp(value, this.options);
   }
   public format(value: string): string {
     return value;
@@ -397,11 +401,11 @@ export class IpField extends Field<string> {
 }
 
 export class DomainField extends Field<string> {
-  public constructor(private _options: IValidateDomainOptions = {}) {
+  public constructor(protected readonly options: IValidateDomainOptions = {}) {
     super();
   }
   public validate(value: string): string {
-    return Validate.isDomain(value, this._options);
+    return Validate.isDomain(value, this.options);
   }
   public format(value: string): string {
     return value;
@@ -409,11 +413,11 @@ export class DomainField extends Field<string> {
 }
 
 export class UrlField extends Field<string> {
-  public constructor(private _options: IValidateUrlOptions = { require_host: true }) {
+  public constructor(protected readonly options: IValidateUrlOptions = { require_host: true }) {
     super();
   }
   public validate(value: string): string {
-    return Validate.isUrl(value, this._options);
+    return Validate.isUrl(value, this.options);
   }
   public format(value: string): string {
     return value;
@@ -421,11 +425,11 @@ export class UrlField extends Field<string> {
 }
 
 export class EmailField extends Field<string> {
-  public constructor(private _options: IValidateEmailOptions = {}) {
+  public constructor(protected readonly options: IValidateEmailOptions = {}) {
     super();
   }
   public validate(value: string): string {
-    return Validate.isEmail(value, this._options);
+    return Validate.isEmail(value, this.options);
   }
   public format(value: string): string {
     return value;

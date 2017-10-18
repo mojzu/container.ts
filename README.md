@@ -23,8 +23,8 @@ Clone repository, install dependencies with `yarn install` and run scripts: `yar
 | ----------- | ------------------------------------------------- |
 | `clean`     | Clean compiled files.                             |
 | `distclean` | Remove Node modules.                              |
-| `test`      | Run tests using Jest.                             |
 | `lint`      | Run TSLint on project.                            |
+| `test`      | Run tests using Jest.                             |
 | `example`   | Run example script, `yarn run example -f schema`. |
 | `dist`      | Build library for release.                        |
 
@@ -47,10 +47,17 @@ Add [Code Climate](https://codeclimate.com/) repository token to [Travis CI](htt
 -   [LICENCE](https://help.github.com/articles/licensing-a-repository/)
 -   [package.json](https://docs.npmjs.com/files/package.json)
 -   [README](https://help.github.com/articles/about-readmes/)
--   [Jest](https://facebook.github.io/jest/)
 -   [tsconfig.json](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
 -   [TSLint](https://palantir.github.io/tslint/)
 -   [Yarn](https://yarnpkg.com/en/docs/cli/)
+-   [Jest](https://facebook.github.io/jest/)
+
+Set the Git commit message template.
+
+```Shell
+$ git config --global commit.template .gitmessage
+```
+
 -   [pkg](https://github.com/zeit/pkg)
 -   [Neon](https://github.com/neon-bindings/neon)
 -   [Rollbar](https://rollbar.com/)
@@ -59,9 +66,3 @@ Add [Code Climate](https://codeclimate.com/) repository token to [Travis CI](htt
 -   [Loggly](https://www.loggly.com/)
 -   [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/)
 -   [Datadog](https://www.datadoghq.com/)
-
-Set the Git commit message template.
-
-```Shell
-$ git config --global commit.template .gitmessage
-```

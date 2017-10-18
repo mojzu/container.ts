@@ -124,9 +124,9 @@ export abstract class Schema {
    * callbacks must provide a default value, null or throw an error.
    * @param data Input data.
    */
-  public static validate<T>(data: any, mask?: ISchemaMask, _keyRoot = "", _schema = this.SCHEMA): T {
-    const validated: any = Array.isArray(_schema) ? [] : {};
-    Schema.map(data, validated, _schema, mask, Object.keys(data || {}), _keyRoot, Schema.validateMapHandlers);
+  public static validate<T>(data: any, mask?: ISchemaMask, keyRoot = "", schema = this.SCHEMA): T {
+    const validated: any = Array.isArray(schema) ? [] : {};
+    Schema.map(data, validated, schema, mask, Object.keys(data || {}), keyRoot, Schema.validateMapHandlers);
     return validated;
   }
 
@@ -135,9 +135,9 @@ export abstract class Schema {
    * Classes static format rules are applied where data is available.
    * @param data Input data.
    */
-  public static format<T>(data: T, mask?: ISchemaMask, _keyRoot = "", _schema = this.SCHEMA): any {
-    const formatted: any = Array.isArray(_schema) ? [] : {};
-    Schema.map(data, formatted, _schema, mask, Object.keys(data || {}), _keyRoot, Schema.formatMapHandlers);
+  public static format<T>(data: T, mask?: ISchemaMask, keyRoot = "", schema = this.SCHEMA): any {
+    const formatted: any = Array.isArray(schema) ? [] : {};
+    Schema.map(data, formatted, schema, mask, Object.keys(data || {}), keyRoot, Schema.formatMapHandlers);
     return formatted;
   }
 
