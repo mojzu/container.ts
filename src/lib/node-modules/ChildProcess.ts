@@ -240,10 +240,10 @@ export class ChildProcess extends Process implements IProcessSend {
       .subscribe((message) => this.handleMessage(message));
 
     // Forward log and metric messages to parent process.
-    this.container.logs
+    this.container.logs$
       .subscribe((log) => this.send(EProcessMessageType.Log, log));
 
-    this.container.metrics
+    this.container.metrics$
       .subscribe((metric) => this.send(EProcessMessageType.Metric, metric));
 
     // Send status event on interval.

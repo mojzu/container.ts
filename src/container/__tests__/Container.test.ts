@@ -18,8 +18,8 @@ describe("Container", () => {
     expect(container.name).toEqual(name);
     expect(container.environment instanceof Environment).toEqual(true);
     expect(container.moduleNames).toEqual([]);
-    expect(container.logs instanceof Subject).toEqual(true);
-    expect(container.metrics instanceof Subject).toEqual(true);
+    expect(container.logs$ instanceof Subject).toEqual(true);
+    expect(container.metrics$ instanceof Subject).toEqual(true);
   });
 
   it("#Container#registerModule", () => {

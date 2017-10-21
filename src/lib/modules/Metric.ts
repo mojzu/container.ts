@@ -9,7 +9,7 @@ export abstract class Metric extends Module {
     super(name, opts);
 
     // Subscribe to container metric messages.
-    this.container.metrics
+    this.container.metrics$
       .subscribe((metric) => this.handleMetric(metric));
   }
 
