@@ -1,5 +1,9 @@
 # Modules
 
+Modules are split into `container.ts/lib/modules` and `container.ts/lib/node-modules`.
+
+Modules in `node-modules` depend on Node.js APIs.
+
 ## Log
 
 Module for handling other modules logs.
@@ -119,3 +123,11 @@ const json = await ASSETS.readJson("data.json").toPromise();
 // Disable caching when read a file.
 const data = await ASSETS.readFile("data.bin", { cache: false }).toPromise();
 ```
+
+## Scripts
+
+TODO
+
+## ChildProcess
+
+TODO

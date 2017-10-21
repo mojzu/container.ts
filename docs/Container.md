@@ -1,5 +1,7 @@
 # Container
 
+Module dependency injection container, wrapper for `awilix` library.
+
 ```TypeScript
 import * as process from "process";
 import { Observable } from "rxjs/Observable";
