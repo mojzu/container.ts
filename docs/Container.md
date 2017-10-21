@@ -40,6 +40,8 @@ class AppModule extends Module {
     return this.container.waitStarted(Process.NAME)
       .map(() => {
         // All modules have debug, log and metric instances.
+        // Logs and metrics are sent to the container which can then be
+        // handled by a logging/metrics module.
         this.debug("something to debug");
         this.log.info("something to log", { meta: "information" });
         this.metric.increment("counter");

@@ -1,5 +1,50 @@
 # Modules
 
+## Log
+
+Module for handling other modules logs.
+
+```TypeScript
+import { ContainerLogMessage } from "container.ts";
+import { Log } from "container.ts/lib/modules";
+
+// Extend the abstract 'Log' module to handle modules logs.
+export class AppLog extends Log {
+
+  public static readonly NAME: string = "Log";
+
+  // All logs produced by modules in the container are handled here.
+  // Logs are filtered by level using 'LOG_LEVEL' environment variable.
+  // Levels are based on RFC5424 so they can be passed to a logging library.
+  protected handleLog(log: ContainerLogMessage): void {
+    // ...
+  }
+
+}
+```
+
+## Metric
+
+Module for handling other modules metrics.
+
+```TypeScript
+import { ContainerMetricMessage } from "container.ts";
+import { Metric } from "container.ts/lib/modules";
+
+// Extend the abstract 'Metric' module to handle modules metrics.
+export class AppMetric extends Metric {
+
+  public static readonly NAME: string = "Metric";
+
+  // All metrics produced by modules in the container are handled here.
+  // Types are based on StatsD so they can be passed to a metrics library.
+  protected handleMetric(metric: ContainerMetricMessage): void {
+    // ...
+  }
+
+}
+```
+
 ## Process
 
 Module for Node.js process management and metrics.
@@ -8,9 +53,9 @@ Module for Node.js process management and metrics.
 import { IProcessOptions, Process } from "container.ts/lib/node-modules";
 
 // Extend the 'Process' class to override defaults.
-export class MainProcess extends Process {
+export class AppProcess extends Process {
 
-  public static readonly NAME: string = "Main";
+  public static readonly NAME: string = "Process";
 
   // Override 'options' getter to set the processes name, version and environment.
   // Name is used to change the Node.js process name.
