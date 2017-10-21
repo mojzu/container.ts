@@ -1,5 +1,5 @@
 export * from "../modules";
-export * from "./Asset";
+export * from "./Assets";
 export * from "./ChildProcess";
 export * from "./Process";
 export * from "./Script";
