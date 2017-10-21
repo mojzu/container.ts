@@ -1,6 +1,6 @@
 # Container
 
-Module dependency injection container, wrapper for `awilix` library.
+Module dependency injection container, wrapper for [awilix](https://www.npmjs.com/package/awilix) library.
 
 ```TypeScript
 import * as process from "process";

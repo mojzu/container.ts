@@ -4,18 +4,18 @@ Modules are split into `container.ts/lib/modules` and `container.ts/lib/node-mod
 
 Modules in `node-modules` depend on Node.js APIs.
 
-## Log
+## Logs
 
 Module for handling other modules logs.
 
 ```TypeScript
 import { ContainerLogMessage } from "container.ts";
-import { Log } from "container.ts/lib/modules";
+import { Logs } from "container.ts/lib/modules";
 
-// Extend the abstract 'Log' module to handle modules logs.
-export class AppLog extends Log {
+// Extend the abstract 'Logs' module to handle modules logs.
+export class AppLogs extends Logs {
 
-  public static readonly NAME: string = "Log";
+  public static readonly NAME: string = "Logs";
 
   // All logs produced by modules in the container are handled here.
   // Logs are filtered by level using 'LOG_LEVEL' environment variable.
@@ -27,18 +27,18 @@ export class AppLog extends Log {
 }
 ```
 
-## Metric
+## Metrics
 
 Module for handling other modules metrics.
 
 ```TypeScript
 import { ContainerMetricMessage } from "container.ts";
-import { Metric } from "container.ts/lib/modules";
+import { Metrics } from "container.ts/lib/modules";
 
-// Extend the abstract 'Metric' module to handle modules metrics.
-export class AppMetric extends Metric {
+// Extend the abstract 'Metrics' module to handle modules metrics.
+export class AppMetrics extends Metrics {
 
-  public static readonly NAME: string = "Metric";
+  public static readonly NAME: string = "Metrics";
 
   // All metrics produced by modules in the container are handled here.
   // Types are based on StatsD so they can be passed to a metrics library.
@@ -96,6 +96,8 @@ export class AppProcess extends Process {
 
 Module for reading assets files directory bundled with application.
 
+Designed to work with [pkg](https://www.npmjs.com/package/pkg).
+
 ```TypeScript
 import { Container, Environment } from "container.ts";
 import { Assets } from "container.ts/lib/node-modules";
@@ -109,6 +111,7 @@ const CONTAINER = new Container("Main", ENVIRONMENT)
   .registerModule(Assets.NAME, Assets);
 
 // Resolve module reference from container.
+// Or make this module a dependency of another.
 const ASSETS = CONTAINER.resolve<Assets>(Assets.NAME);
 
 // Read a binary file into a Node.js 'Buffer'.
@@ -126,8 +129,84 @@ const data = await ASSETS.readFile("data.bin", { cache: false }).toPromise();
 
 ## Scripts
 
-TODO
+Module for managing child process scripts bundled with application.
+
+Designed to work with [pkg](https://www.npmjs.com/package/pkg).
+
+```TypeScript
+import { Container, Environment } from "container.ts";
+import { Scripts } from "container.ts/lib/node-modules";
+
+// Set the 'SCRIPTS_PATH' variable in container environment.
+const ENVIRONMENT = new Environment()
+  .set(Scripts.ENV.PATH, "/path/to/scripts/directory");
+
+// Register 'Scripts' module in container.
+const CONTAINER = new Container("Main", ENVIRONMENT)
+  .registerModule(Scripts.NAME, Scripts);
+
+// Resolve module reference from container.
+// Or make this module a dependency of another.
+const SCRIPTS = CONTAINER.resolve<Scripts>(Scripts.NAME);
+
+// Fork a new process from a script file.
+// Optionally pass in command line arguments to script.
+const proc = SCRIPTS.fork("script.js", { args: ["-v"] });
+
+// Start a new named worker process from a script file.
+// Workers are restarted by default, they may also have their uptime limited.
+SCRIPTS.startWorker("1", "worker.js", { restart: true, uptimeLimit: "T1M" });
+
+// Get a reference to workers current process (recreated on restart).
+const worker = SCRIPTS.getWorker("1");
+
+// Stop a named worker.
+// All workers are stopped automatically on container stop.
+SCRIPTS.stopWorker("1");
+```
 
 ## ChildProcess
 
-TODO
+Module for interprocess communication between a parent `ScriptsProcess` instance and its processes `ChildProcess` module.
+
+```TypeScript
+import { Observable } from "rxjs/Observable";
+import { Container, Environment, IModuleOpts } from "container.ts";
+import { ChildProcess } from "container.ts/lib/node-modules";
+
+// The 'ChildProcess' inherits from 'Process'.
+// Extend the 'ChildProcess' in the same way as 'Process' class.
+export class SubProcess extends ChildProcess {
+
+  public static readonly NAME: string = "SubProcess";
+
+  public constructor(name: string, opts: IModuleOpts) {
+    super(name, opts);
+
+    // Receive events from the parent process.
+    // Event data can be any serialisable object.
+    // Other modules may depend on this and use listen/event methods.
+    // Equivalent methods for parent are available on 'ScriptsProcess' instance.
+    this.listen<number>("ping")
+      .subscribe((data) => {
+        // Ping event with number data received from parent.
+        // Send events to the parent process.
+        this.event<number>("pong", data * 3);
+      });
+  }
+
+  public example(): Observable<number> {
+    // Logs and metrics emitted by modules in a child process are forwarded
+    // to the parent processes container by default.
+    this.log.info("log sent to parent");
+    this.metric.increment("parentCounter");
+
+    // Make a function call to any module in the parent container.
+    // Target function must return an observable of serialisable data.
+    // Function arguments may be passed in options.
+    // Equivalent methods for parent are available on 'ScriptsProcess' instance.
+    return this.call("ParentModule", "parentMethod", { args: [1, 2, 3] });
+  }
+
+}
+```
