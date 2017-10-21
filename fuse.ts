@@ -42,6 +42,8 @@ fuseBox.Sparky.task("test-worker", () => {
     target: "server",
     plugins: [fuseBox.TypeScriptHelpers()],
   });
+  fuse.bundle("script.test")
+    .instructions(" > [lib/node-modules/__tests__/scripts/script.test.ts]");
   fuse.bundle("worker.test")
     .instructions(" > [lib/node-modules/__tests__/scripts/worker.test.ts]");
   return fuse.run();
