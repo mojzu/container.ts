@@ -1,8 +1,8 @@
 import { Container, ContainerMetricMessage } from "../../../container";
-import { Metric } from "../Metric";
+import { Metrics } from "../Metrics";
 
-class TestMetric extends Metric {
-  public static readonly NAME: string = "TestMetric";
+class TestMetrics extends Metrics {
+  public static readonly NAME: string = "TestMetrics";
   protected handleMetric(metric: ContainerMetricMessage): void {
     // TODO: Test this.
   }
@@ -12,9 +12,9 @@ describe("Metric", () => {
 
   const NAME = "Test";
   const CONTAINER = new Container(NAME)
-    .registerModule(TestMetric.NAME, TestMetric);
+    .registerModule(TestMetrics.NAME, TestMetrics);
 
-  const METRIC = CONTAINER.resolve<TestMetric>(TestMetric.name);
+  const METRICS = CONTAINER.resolve<TestMetrics>(TestMetrics.name);
 
   beforeAll((done) => {
     CONTAINER.start()
@@ -32,9 +32,9 @@ describe("Metric", () => {
       });
   });
 
-  it("#TestMetric", () => {
-    expect(METRIC).toBeDefined();
-    expect(METRIC.name).toEqual(TestMetric.NAME);
+  it("#TestMetrics", () => {
+    expect(METRICS).toBeDefined();
+    expect(METRICS.name).toEqual(TestMetrics.NAME);
   });
 
 });

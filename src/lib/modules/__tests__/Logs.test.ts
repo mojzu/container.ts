@@ -1,25 +1,25 @@
 import { Container, ContainerLogMessage, ELogLevel } from "../../../container";
-import { Log } from "../Log";
+import { Logs } from "../Logs";
 
-type ITestLogCallback = (log: ContainerLogMessage) => void;
+type ITestLogsCallback = (log: ContainerLogMessage) => void;
 
-class TestLog extends Log {
-  public static readonly NAME: string = "TestLog";
+class TestLogs extends Logs {
+  public static readonly NAME: string = "TestLogs";
   protected handleLog(log: ContainerLogMessage): void {
-    const callback: ITestLogCallback = log.args[0];
+    const callback: ITestLogsCallback = log.args[0];
     if (callback != null) {
       callback(log);
     }
   }
 }
 
-describe("Log", () => {
+describe("Logs", () => {
 
   const NAME = "Test";
   const CONTAINER = new Container(NAME)
-    .registerModule(TestLog.NAME, TestLog);
+    .registerModule(TestLogs.NAME, TestLogs);
 
-  const LOG = CONTAINER.resolve<TestLog>(TestLog.NAME);
+  const LOGS = CONTAINER.resolve<TestLogs>(TestLogs.NAME);
 
   beforeAll((done) => {
     CONTAINER.start()
@@ -38,19 +38,19 @@ describe("Log", () => {
   });
 
   it("#TestLog", () => {
-    expect(LOG).toBeDefined();
-    expect(LOG.name).toEqual(TestLog.NAME);
+    expect(LOGS).toBeDefined();
+    expect(LOGS.name).toEqual(TestLogs.NAME);
   });
 
   it("#TestLog#emergency", (done) => {
     const error = new Error("Emergency");
     const metadata = { value: 1 };
-    LOG.log.emergency(error, metadata, (log: ContainerLogMessage) => {
+    LOGS.log.emergency(error, metadata, (log: ContainerLogMessage) => {
       expect(log.level).toEqual(ELogLevel.Emergency);
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
-      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLog.NAME}`);
+      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLogs.NAME}`);
       done();
     });
   });
@@ -58,12 +58,12 @@ describe("Log", () => {
   it("#TestLog#critical", (done) => {
     const error = new Error("Critical");
     const metadata = { value: 1 };
-    LOG.log.critical(error, metadata, (log: ContainerLogMessage) => {
+    LOGS.log.critical(error, metadata, (log: ContainerLogMessage) => {
       expect(log.level).toEqual(ELogLevel.Critical);
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
-      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLog.NAME}`);
+      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLogs.NAME}`);
       done();
     });
   });

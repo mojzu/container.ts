@@ -33,12 +33,11 @@ export interface IScriptsOptions {
 }
 
 /** Scripts worker options. */
-export interface IScriptsWorkerOptions {
+export interface IScriptsWorkerOptions extends IScriptsOptions {
   /** Worker process should restart after exit. */
   restart?: boolean;
   /** Maximum script uptime as ISO8601 duration. */
   uptimeLimit?: string;
-  // TODO: More scripts worker options.
 }
 
 /** Scripts worker. */
@@ -241,7 +240,7 @@ export class Scripts extends Module {
 
   public startWorker(name: string, target: string, options: IScriptsWorkerOptions = {}): ScriptsProcess {
     const uptimeLimit = this.validUptimeLimit(options.uptimeLimit);
-    const process = this.fork(target);
+    const process = this.fork(target, options);
 
     if (this.workers[name] == null) {
       const unsubscribe$ = new Subject<void>();
@@ -254,6 +253,7 @@ export class Scripts extends Module {
     process.exit$
       .takeUntil(this.workers[name].unsubscribe$)
       .subscribe((code) => {
+        this.debug(`WORKER="${process.target}" EXIT="${code}"`);
         // Restart worker process by default.
         if ((options.restart == null) || !!options.restart) {
           this.startWorker(name, target, options);
