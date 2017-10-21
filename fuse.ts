@@ -31,11 +31,24 @@ fuseBox.Sparky.task("tsc", ["clean"], () => {
 
 // Run TSLint linter.
 fuseBox.Sparky.task("lint", () => {
-  return tools.shell("tslint -c tslint.json -p tsconfig.json --type-check", CWD);
+  return tools.shell("tslint -c tslint.json -p tsconfig.json", CWD);
+});
+
+// Build worker script bundle for tests.
+fuseBox.Sparky.task("test-worker", () => {
+  const fuse = fuseBox.FuseBox.init({
+    homeDir: "src",
+    output: "src/lib/node-modules/__tests__/scripts/$name.js",
+    target: "server",
+    plugins: [fuseBox.TypeScriptHelpers()],
+  });
+  fuse.bundle("worker.test")
+    .instructions(" > [lib/node-modules/__tests__/scripts/worker.test.ts]");
+  return fuse.run();
 });
 
 // Run Jest tests with coverage.
-fuseBox.Sparky.task("test", ["clean"], () => {
+fuseBox.Sparky.task("test", ["clean", "test-worker"], () => {
   return tools.shell("jest --coverage", CWD);
 });
 
