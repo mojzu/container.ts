@@ -170,12 +170,13 @@ SCRIPTS.stopWorker("1");
 Module for interprocess communication between a parent `ScriptsProcess` instance and its processes `ChildProcess` module.
 
 ```TypeScript
+import * as process from "process";
 import { Observable } from "rxjs/Observable";
 import { Container, Environment, IModuleOpts } from "container.ts";
 import { ChildProcess } from "container.ts/lib/node-modules";
 
-// The 'ChildProcess' inherits from 'Process'.
-// Extend the 'ChildProcess' in the same way as 'Process' class.
+// The 'ChildProcess' class inherits from 'Process'.
+// Extend the 'ChildProcess' class in the same way as 'Process' class.
 export class SubProcess extends ChildProcess {
 
   public static readonly NAME: string = "SubProcess";
@@ -209,4 +210,20 @@ export class SubProcess extends ChildProcess {
   }
 
 }
+
+// Create environment instance using process environment.
+const ENVIRONMENT = new Environment(process.env);
+
+// Register 'SubProcess' module in container.
+const CONTAINER = new Container("Worker", ENVIRONMENT)
+  .registerModule(SubProcess.NAME, SubProcess);
+
+// Start container modules.
+CONTAINER.start()
+  .subscribe({
+    error: (error) => {
+      process.stderr.write(`${error}\n`);
+      process.exit(1);
+    },
+  });
 ```
