@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import * as childProcess from "child_process";
 import * as path from "path";
+import "rxjs/add/observable/forkJoin";
 import "rxjs/add/observable/fromEvent";
 import "rxjs/add/observable/of";
 import "rxjs/add/operator/switchMap";
@@ -24,10 +25,26 @@ import {
   IProcessMessage,
   IProcessSend,
 } from "./ChildProcess";
+import { IProcessStatus } from "./Process";
 
 /** Scripts process options. */
 export interface IScriptsOptions {
   args?: string[];
+}
+
+/** Scripts worker options. */
+export interface IScriptsWorkerOptions {
+  /** Worker process should restart after exit. */
+  restart?: boolean;
+  /** Maximum script uptime as ISO8601 duration. */
+  uptimeLimit?: string;
+  // TODO: More scripts worker options.
+}
+
+/** Scripts worker. */
+export interface IScriptsWorker {
+  process: ScriptsProcess;
+  unsubscribe$: Subject<void>;
 }
 
 /** Scripts error class. */
@@ -166,6 +183,7 @@ export class Scripts extends Module {
   };
 
   public readonly path: string;
+  public readonly workers: { [name: string]: IScriptsWorker } = {};
 
   public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
@@ -176,6 +194,25 @@ export class Scripts extends Module {
     assert(scriptsPath != null, "Scripts path is undefined");
     this.path = NodeValidate.isDirectory(scriptsPath);
     this.debug(`${Scripts.ENV.PATH}="${this.path}"`);
+  }
+
+  public stop(): void | Observable<void> {
+    const observables$: Array<Observable<any>> = [];
+
+    // Wait for worker processes to exit if connected.
+    Object.keys(this.workers).map((name) => {
+      const worker = this.workers[name];
+      worker.unsubscribe$.next();
+      worker.unsubscribe$.complete();
+
+      if ((worker.process.connected)) {
+        observables$.push(worker.process.exit$);
+      }
+    });
+
+    if (observables$.length > 0) {
+      return Observable.forkJoin(...observables$).map(() => undefined);
+    }
   }
 
   /** Spawn new Node.js process using script file. */
@@ -196,6 +233,70 @@ export class Scripts extends Module {
     const filePath = NodeValidate.isFile(path.resolve(this.path, target));
     const process = childProcess.fork(filePath, forkArgs, forkOptions);
     return new ScriptsProcess(this, `${target}`, process, options);
+  }
+
+  public getWorker(name: string): ScriptsProcess | null {
+    return (this.workers[name] != null) ? this.workers[name].process : null;
+  }
+
+  public startWorker(name: string, target: string, options: IScriptsWorkerOptions = {}): ScriptsProcess {
+    const uptimeLimit = this.validUptimeLimit(options.uptimeLimit);
+    const process = this.fork(target);
+
+    if (this.workers[name] == null) {
+      const unsubscribe$ = new Subject<void>();
+      this.workers[name] = { process, unsubscribe$ };
+    } else {
+      this.workers[name].process = process;
+    }
+
+    // Handle worker restarts.
+    process.exit$
+      .takeUntil(this.workers[name].unsubscribe$)
+      .subscribe((code) => {
+        // Restart worker process by default.
+        if ((options.restart == null) || !!options.restart) {
+          this.startWorker(name, target, options);
+        }
+      });
+
+    // Track worker process uptime.
+    process.listen<IProcessStatus>(ChildProcess.EVENT.STATUS)
+      .takeUntil(this.workers[name].unsubscribe$)
+      .subscribe((status) => {
+        // Kill worker process if uptime limit exceeded.
+        if ((uptimeLimit != null) && (status.uptime > uptimeLimit)) {
+          this.debug(`WORKER="${process.target}" KILL`);
+          process.kill();
+        }
+      });
+
+    return process;
+  }
+
+  public stopWorker(name: string): Observable<string | number> {
+    const worker = this.workers[name];
+    let observable$: Observable<string | number> = Observable.of(0);
+
+    if (worker != null) {
+      worker.unsubscribe$.next();
+      worker.unsubscribe$.complete();
+      if (worker.process.connected) {
+        worker.process.kill();
+        observable$ = worker.process.exit$;
+      }
+      delete this.workers[name];
+    }
+
+    return observable$;
+  }
+
+  protected validUptimeLimit(limit?: string): number | null {
+    if (limit != null) {
+      const duration = NodeValidate.isDuration(limit);
+      return duration.asSeconds();
+    }
+    return null;
   }
 
 }
