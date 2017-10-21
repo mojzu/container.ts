@@ -68,7 +68,7 @@ export interface IProcessMessage extends Object {
 
 /** Process send method interface. */
 export interface IProcessSend {
-  messages: Observable<IProcessMessage>;
+  messages$: Observable<IProcessMessage>;
   send: (type: EProcessMessageType, data: any) => void;
 }
 
@@ -85,7 +85,6 @@ export class ChildProcess extends Process implements IProcessSend {
 
   /** Environment variable names. */
   public static readonly ENV = {
-    /** Application log level (default info). */
     NAME: "CHILD_PROCESS_NAME",
   };
 
@@ -122,7 +121,7 @@ export class ChildProcess extends Process implements IProcessSend {
     const sendData: IProcessCallRequestData = { id, target, method, args };
     emitter.send(EProcessMessageType.CallRequest, sendData);
 
-    return ChildProcess.handleCallResponse<T>(emitter.messages, id, args, timeout);
+    return ChildProcess.handleCallResponse<T>(emitter.messages$, id, args, timeout);
   }
 
   /** Handle method call requests. */
@@ -165,12 +164,12 @@ export class ChildProcess extends Process implements IProcessSend {
 
   /** Handle method call responses. */
   public static handleCallResponse<T>(
-    messages: Observable<IProcessMessage>,
+    messages$: Observable<IProcessMessage>,
     id: number,
     args: any[],
     timeout: number,
   ): Observable<T> {
-    return messages
+    return messages$
       .filter((message) => {
         // Filter by message type and identifier.
         if (message.type === EProcessMessageType.CallResponse) {
@@ -216,19 +215,19 @@ export class ChildProcess extends Process implements IProcessSend {
 
   /** Listen for events from process. */
   public static listenForEvent<T>(
-    events: Observable<IProcessEventData>,
+    events$: Observable<IProcessEventData>,
     name: string,
   ): Observable<T> {
-    return events
+    return events$
       .filter((event) => name === event.name)
       .map((event) => event.data as T);
   }
 
   /** Messages received from parent process. */
-  public readonly messages = Observable.fromEvent<IProcessMessage>(process, "message");
+  public readonly messages$ = Observable.fromEvent<IProcessMessage>(process, "message");
 
   /** Events received from parent process. */
-  public readonly events = new Subject<IProcessEventData>();
+  public readonly events$ = new Subject<IProcessEventData>();
 
   protected currentIdentifier = 0;
 
@@ -236,7 +235,7 @@ export class ChildProcess extends Process implements IProcessSend {
     super(name, opts);
 
     // Listen for and handle messages from parent process.
-    this.messages
+    this.messages$
       .subscribe((message) => this.handleMessage(message));
 
     // Forward log and metric messages to parent process.
@@ -270,7 +269,7 @@ export class ChildProcess extends Process implements IProcessSend {
 
   /** Listen for event sent by parent process. */
   public listen<T>(name: string): Observable<T> {
-    return ChildProcess.listenForEvent<T>(this.events, name);
+    return ChildProcess.listenForEvent<T>(this.events$, name);
   }
 
   /** Incrementing counter for unique identifiers. */
@@ -287,7 +286,7 @@ export class ChildProcess extends Process implements IProcessSend {
       // Send event on internal event bus.
       case EProcessMessageType.Event: {
         const event: IProcessEventData = message.data;
-        this.events.next(event);
+        this.events$.next(event);
         break;
       }
     }

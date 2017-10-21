@@ -20,7 +20,7 @@ describe("Assets", () => {
     await CONTAINER.stop().toPromise();
   });
 
-  it("#Asset", () => {
+  it("#Assets", () => {
     expect(ASSETS).toBeDefined();
     expect(ASSETS.name).toEqual(Assets.NAME);
   });
