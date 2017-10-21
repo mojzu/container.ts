@@ -50,9 +50,6 @@ export class Process extends Module {
   /** Default module name. */
   public static readonly NAME: string = "Process";
 
-  /** Default interval to log process metrics (1m). */
-  public static readonly DEFAULT_METRIC_INTERVAL = 60000;
-
   /** Log names. */
   public static readonly LOG = {
     INFORMATION: "ProcessInformation",
@@ -85,6 +82,9 @@ export class Process extends Module {
 
   /** Override in subclass to set process title/version. */
   public get options(): IProcessOptions { return {}; }
+
+  /** Override in subclass to change metric interval. */
+  public get metricInterval(): number { return 60000; }
 
   public get information(): IProcessInformation {
     return {
@@ -121,7 +121,7 @@ export class Process extends Module {
     this.debug(`TITLE="${this.title}" VERSION="${this.version}" NODE_ENV="${this.nodeEnvironment}"`);
 
     // Process metrics on interval.
-    Observable.interval(Process.DEFAULT_METRIC_INTERVAL)
+    Observable.interval(this.metricInterval)
       .subscribe(() => this.processMetrics(this.status));
   }
 
@@ -130,15 +130,14 @@ export class Process extends Module {
     // Log process information.
     this.log.info(Process.LOG.INFORMATION, this.information);
 
-    // Process stop event handlers.
+    // Process stop signal handlers.
     process.on("SIGTERM", this.handleStop.bind(this, "SIGTERM"));
     process.on("SIGINT", this.handleStop.bind(this, "SIGINT"));
   }
 
-  /** Stop container when process termination event received. */
-  protected handleStop(event: string): void {
-    this.debug(`STOP="${event}"`);
-
+  /** Stop container when process termination signal received. */
+  protected handleStop(signal: string): void {
+    this.debug(`STOP="${signal}"`);
     this.container.stop()
       .subscribe({
         next: () => process.exit(0),

@@ -1,6 +1,51 @@
 # Modules
 
+## Process
+
+Module for Node.js process management and metrics.
+
+```TypeScript
+import { IProcessOptions, Process } from "container.ts/lib/node-modules";
+
+// Extend the 'Process' class to override defaults.
+export class MainProcess extends Process {
+
+  public static readonly NAME: string = "Main";
+
+  // Override 'options' getter to set the processes name, version and environment.
+  // Name is used to change the Node.js process name.
+  public get options(): IProcessOptions {
+    return {
+      name: "main",
+      version: "1.2.3",
+      nodeEnvironment: "production",
+    };
+  }
+
+  // Override 'metricInterval' to change rate at which process
+  // metrics are collected, default is every 60 seconds.
+  public get metricInterval(): number { return 120000; }
+
+  public example() {
+    // The process title, version and nodeEnvironment are available
+    // as properties on an instance of this class.
+    const title: string = this.title;
+    const version: string = this.version;
+    const nodeEnvironment: string = this.nodeEnvironment;
+
+    // When 'start' method is called, this module will log information
+    // about the host platform, such as architecture, Node.js version, etc.
+
+    // This module adds handlers for SIGTERM and SIGINT signals that will
+    // automatically call this.container.stop in case of process exit.
+  }
+
+}
+```
+
 ## Assets
+
+Module for reading assets files directory bundled with application.
 
 ```TypeScript
 import { Container, Environment } from "container.ts";
