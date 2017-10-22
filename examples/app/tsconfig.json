@@ -12,12 +12,16 @@
     "removeComments": true,
     "strict": true,
     "noUnusedLocals": true,
+    "noUnusedParameters": false,
     "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": false,
     "suppressImplicitAnyIndexErrors": true,
     "moduleResolution": "node",
     "typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
     "./src/**/*.ts"

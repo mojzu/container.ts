@@ -1,22 +1,34 @@
 # Application
 
+Example application.
+
 ## Developer
 
 Clone repository, install dependencies with `yarn install` and run scripts: `yarn run ...`
 
-| Script      | Description                                                   |
-| ----------- | ------------------------------------------------------------- |
-| `clean`     | Clean compiled files.                                         |
-| `distclean` | Remove Node modules and generated documentation.              |
-| `lint`      | Run TSLint on project.                                        |
-| `start`     | Start application for development.                            |
-| `build`     | Build application for release (optional `-p` production flag) |
+| Script        | Description                           |
+| ------------- | ------------------------------------- |
+| `clean`       | Clean compiled files.                 |
+| `distclean`   | Clean compiled files and Node modules |
+| `lint`        | Lint package.                         |
+| `test`        | Test package with coverage.           |
+| `start`       | Start application for development.    |
+| `dist`        | Build application for release.        |
+
+| Flag                 | Description               |
+| -------------------- | ------------------------- |
+| `-n`, `--name`       | Package name override.    |
+| `-v`, `--version`    | Package version override. |
+| `-p`, `--production` | Production flag.          |
 
 ## Vagrant
 
-```Shell
-$ vagrant up|ssh|halt|destroy
-```
+| Command | Description |
+| ------- | ----------- |
+| up      |             |
+| ssh     |             |
+| halt    |             |
+| destroy |             |
 
 ### Telegraf, InfluxDB, Chronograf
 
