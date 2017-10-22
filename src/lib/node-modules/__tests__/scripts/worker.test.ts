@@ -23,8 +23,13 @@ class TestModule extends Module {
   }
 
   // Test method called from parent process.
-  public testCall(data: number): Observable<number> {
+  public testCall1(data: number): Observable<number> {
     return Observable.of(data * 2);
+  }
+
+  // Test method to call into parent process.
+  public testCall2(data: string): Observable<number> {
+    return this.childProcess.call("Test", "testCall2", { args: [data] });
   }
 
 }

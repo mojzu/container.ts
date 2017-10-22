@@ -22,20 +22,12 @@ describe("ChildProcess", () => {
 
   const PROCESS = CONTAINER.resolve<TestChildProcess>(TestChildProcess.NAME);
 
-  beforeAll((done) => {
-    CONTAINER.start()
-      .subscribe({
-        next: () => done(),
-        error: (error) => done.fail(error),
-      });
+  beforeAll(async () => {
+    await CONTAINER.start().toPromise();
   });
 
-  afterAll((done) => {
-    CONTAINER.stop()
-      .subscribe({
-        next: () => done(),
-        error: (error) => done.fail(error),
-      });
+  afterAll(async () => {
+    await CONTAINER.stop().toPromise();
   });
 
   it("#ChildProcess", () => {
