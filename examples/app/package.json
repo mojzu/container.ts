@@ -23,7 +23,8 @@
     "rollbar": "^2.2.10",
     "rxjs": "^5.5.0",
     "statsd-client": "^0.4.0",
-    "winston": "^2.4.0"
+    "winston": "^2.4.0",
+    "yargs": "^9.0.1"
   },
   "devDependencies": {
     "@types/del": "^3.0.0",
@@ -40,8 +41,7 @@
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "typescript": "^2.5.3",
-    "uglify-js": "^3.1.5",
-    "yargs": "^9.0.1"
+    "uglify-js": "^3.1.5"
   },
   "jest": {
     "transform": {

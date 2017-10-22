@@ -1,23 +1,19 @@
-import {
-  ContainerLogMessage,
-  ELogLevel,
-  IContainerModuleOpts,
-} from "container.ts";
+import { ContainerLogMessage, ELogLevel, IModuleOpts } from "container.ts";
 import { ErrorChain } from "container.ts/lib/error";
-import { Log } from "container.ts/lib/node-modules";
+import { Logs } from "container.ts/lib/node-modules";
 import * as winston from "winston";
 
-export class WinstonLog extends Log {
+export class WinstonLogs extends Logs {
 
-  public static readonly NAME: string = "WinstonLog";
+  public static readonly NAME: string = "Winston";
 
-  private _logger: winston.LoggerInstance;
+  protected readonly logger: winston.LoggerInstance;
 
-  public constructor(name: string, opts: IContainerModuleOpts) {
+  public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
     // Construct Winston logger with console transport.
-    this._logger = new winston.Logger({
+    this.logger = new winston.Logger({
       transports: [
         new winston.transports.Console({
           level: "debug",
@@ -46,35 +42,35 @@ export class WinstonLog extends Log {
     // Map log level to winston log methods.
     switch (log.level) {
       case ELogLevel.Emergency: {
-        this._logger.emerg(message, log.metadata, ...log.args, callback);
+        this.logger.emerg(message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Alert: {
-        this._logger.alert(message, log.metadata, ...log.args, callback);
+        this.logger.alert(message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Critical: {
-        this._logger.crit(message, log.metadata, ...log.args, callback);
+        this.logger.crit(message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Error: {
-        this._logger.error(message, log.metadata, ...log.args, callback);
+        this.logger.error(message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Warning: {
-        this._logger.warning(message, log.metadata, ...log.args, callback);
+        this.logger.warning(message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Notice: {
-        this._logger.notice(message, log.metadata, ...log.args, callback);
+        this.logger.notice(message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Informational: {
-        this._logger.info(message, log.metadata, ...log.args, callback);
+        this.logger.info(message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Debug: {
-        this._logger.debug(message, log.metadata, ...log.args, callback);
+        this.logger.debug(message, log.metadata, ...log.args, callback);
         break;
       }
     }

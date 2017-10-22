@@ -1,60 +1,49 @@
-import {
-  ContainerLogMessage,
-  ELogLevel,
-  IContainerModuleDependencies,
-  IContainerModuleOpts,
-} from "container.ts";
-import { Log } from "container.ts/lib/node-modules";
+import { ContainerLogMessage, ELogLevel, IModuleDependencies, IModuleOpts } from "container.ts";
+import { Logs } from "container.ts/lib/node-modules";
 import { Validate } from "container.ts/lib/validate";
+import * as Rollbar from "rollbar";
 import { MainProcess } from "./MainProcess";
 
-// Rollbar does not have defined types.
-const ROLLBAR = require("rollbar");
+export class RollbarLogs extends Logs {
 
-export class RollbarLog extends Log {
-
-  public static readonly NAME: string = "RollbarLog";
+  public static readonly NAME: string = "Rollbar";
 
   /** Environment variable names. */
-  public static ENV = {
-    /** Application log level (default info). */
-    LEVEL: "LOG_LEVEL",
+  public static ENV = Object.assign(Logs.ENV, {
     /** Rollbar access token (required). */
     ACCESS_TOKEN: "ROLLBAR_ACCESS_TOKEN",
     /** Rollbar report level (default error). */
     REPORT_LEVEL: "ROLLBAR_REPORT_LEVEL",
-  };
+  });
 
-  public get dependencies(): IContainerModuleDependencies {
-    return { _process: MainProcess.NAME };
+  public get dependencies(): IModuleDependencies {
+    return { process: MainProcess.NAME };
   }
 
-  private _process: MainProcess;
-  private _rollbar: any;
+  private readonly process: MainProcess;
+  private readonly rollbar: Rollbar;
 
-  public constructor(name: string, opts: IContainerModuleOpts) {
+  public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
     // Get access token from environment.
-    const accessToken = Validate.isString(this.environment.get(RollbarLog.ENV.ACCESS_TOKEN));
-    this.debug(`${RollbarLog.ENV.ACCESS_TOKEN}="${accessToken}"`);
-
     // Get report level from environment or fall back on log level.
-    const rawReportLevel = Validate.isString(this.environment.get(RollbarLog.ENV.REPORT_LEVEL) || "error");
+    const accessToken = Validate.isString(this.environment.get(RollbarLogs.ENV.ACCESS_TOKEN));
+    const rawReportLevel = Validate.isString(this.environment.get(RollbarLogs.ENV.REPORT_LEVEL) || "error");
     const reportLevel = this.reportLevel(rawReportLevel);
-    this.debug(`${RollbarLog.ENV.REPORT_LEVEL}="${reportLevel}"`);
+    this.debug(`${RollbarLogs.ENV.REPORT_LEVEL}="${reportLevel}"`);
 
     // Create Rollbar instance.
     // Report level determined by module log level.
     // Handle uncaught exceptions and unhandled rejections by default.
     // Uncaught errors have 'critical' level by default.
-    this._rollbar = new ROLLBAR({
-      environment: this._process.nodeEnvironment,
+    this.rollbar = new Rollbar({
       accessToken,
+      version: this.process.version,
       reportLevel,
-      handleUncaughtExceptions: true,
-      handleUnhandledRejections: true,
       uncaughtErrorLevel: "critical",
+      captureUncaught: true,
+      captureUnhandledRejections: true,
     });
   }
 
@@ -67,24 +56,24 @@ export class RollbarLog extends Log {
       case ELogLevel.Emergency:
       case ELogLevel.Alert:
       case ELogLevel.Critical: {
-        this._rollbar.critical(log.message, log.metadata, ...log.args, callback);
+        this.rollbar.critical(log.message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Error: {
-        this._rollbar.error(log.message, log.metadata, ...log.args, callback);
+        this.rollbar.error(log.message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Warning: {
-        this._rollbar.warning(log.message, log.metadata, ...log.args, callback);
+        this.rollbar.warning(log.message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Notice:
       case ELogLevel.Informational: {
-        this._rollbar.info(log.message, log.metadata, ...log.args, callback);
+        this.rollbar.info(log.message, log.metadata, ...log.args, callback);
         break;
       }
       case ELogLevel.Debug: {
-        this._rollbar.debug(log.message, log.metadata, ...log.args, callback);
+        this.rollbar.debug(log.message, log.metadata, ...log.args, callback);
         break;
       }
     }
@@ -98,7 +87,7 @@ export class RollbarLog extends Log {
   }
 
   /** Return rollbar report level. */
-  protected reportLevel(value: string): string {
+  protected reportLevel(value: string) {
     const level = this.parseLevel(value);
     switch (level) {
       case ELogLevel.Emergency:
