@@ -7,9 +7,11 @@ export interface IEnvironmentVariables {
 /** Environment variables class. */
 export class Environment {
 
-  public constructor(
-    public readonly variables: IEnvironmentVariables = {},
-  ) { }
+  public readonly variables: IEnvironmentVariables;
+
+  public constructor(...variables: IEnvironmentVariables[]) {
+    this.variables = Object.assign({}, ...variables);
+  }
 
   /** Returns a copy of environment. */
   public copy(variables: IEnvironmentVariables = {}): Environment {
