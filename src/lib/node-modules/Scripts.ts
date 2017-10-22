@@ -14,6 +14,7 @@ import {
   IContainerLogMessage,
   IContainerMetricMessage,
   IEnvironmentVariables,
+  ILogMetadata,
   IModuleOpts,
   Module,
 } from "../../container";
@@ -188,6 +189,16 @@ export class Scripts extends Module {
     PATH: "SCRIPTS_PATH",
   };
 
+  /** Log names. */
+  public static readonly LOG = {
+    WORKER_START: "ScriptsWorkerStart",
+    WORKER_STOP: "ScriptsWorkerStop",
+    WORKER_EXIT: "ScriptsWorkerExit",
+    WORKER_RESTART: "ScriptsWorkerRestart",
+    WORKER_RESTART_LIMIT: "ScriptsWorkerRestartLimit",
+    WORKER_UPTIME_LIMIT: "ScriptsWorkerUptimeLimit",
+  };
+
   public readonly path: string;
   public readonly workers: { [name: string]: IScriptsWorker } = {};
 
@@ -245,6 +256,10 @@ export class Scripts extends Module {
       const unsubscribe$ = new Subject<void>();
       const next$ = new BehaviorSubject<ScriptsProcess>(process);
       this.workers[name] = { process, unsubscribe$, next$, restarts: 0 };
+
+      // Log worker start.
+      const metadata = this.workerLogMetadata({ name, worker: this.workers[name], options });
+      this.log.info(Scripts.LOG.WORKER_START, metadata);
     } else {
       // Restarted worker, reassign process in workers state.
       this.workers[name].unsubscribe$.next();
@@ -258,12 +273,18 @@ export class Scripts extends Module {
     process.exit$
       .takeUntil(worker.unsubscribe$)
       .subscribe((code) => {
+        // Log worker exit.
+        const metadata = this.workerLogMetadata({ name, worker, code });
+        this.log.info(Scripts.LOG.WORKER_EXIT, metadata);
+
         // Restart worker process by default.
         if ((options.restart == null) || !!options.restart) {
           // Do not restart process if limit reached.
           if ((options.restartLimit == null) || (worker.restarts < options.restartLimit)) {
+            this.log.info(Scripts.LOG.WORKER_RESTART, metadata);
             this.startWorker(name, target, options);
           } else {
+            this.log.error(Scripts.LOG.WORKER_RESTART_LIMIT, metadata);
             this.stopWorker(name);
           }
         }
@@ -275,6 +296,8 @@ export class Scripts extends Module {
       .subscribe((status) => {
         // Kill worker process if uptime limit exceeded.
         if ((uptimeLimit != null) && (status.uptime > uptimeLimit)) {
+          const metadata = this.workerLogMetadata({ name, worker });
+          this.log.info(Scripts.LOG.WORKER_UPTIME_LIMIT, metadata);
           process.kill();
         }
       });
@@ -297,6 +320,10 @@ export class Scripts extends Module {
         worker.process.kill();
         observable$ = worker.process.exit$;
       }
+
+      // Log worker stop and delete in state.
+      const metadata = this.workerLogMetadata({ name, worker });
+      this.log.info(Scripts.LOG.WORKER_STOP, metadata);
       delete this.workers[name];
     }
 
@@ -309,6 +336,28 @@ export class Scripts extends Module {
       return duration.asSeconds();
     }
     return null;
+  }
+
+  protected workerLogMetadata(data: {
+    name: string;
+    worker: IScriptsWorker;
+    options?: IScriptsWorkerOptions;
+    code?: string | number;
+  }): ILogMetadata {
+    const metadata: ILogMetadata = {
+      name: data.name,
+      target: data.worker.process.target,
+      restarts: data.worker.restarts,
+    };
+    if (data.options != null) {
+      metadata.restart = data.options.restart;
+      metadata.restartLimit = data.options.restartLimit;
+      metadata.uptimeLimit = data.options.uptimeLimit;
+    }
+    if (data.code != null) {
+      metadata.code = data.code;
+    }
+    return metadata;
   }
 
 }
