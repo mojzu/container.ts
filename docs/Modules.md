@@ -62,7 +62,7 @@ export class AppProcess extends Process {
   public static readonly NAME: string = "Process";
 
   // Override 'options' getter to set the processes name, version and environment.
-  // Name is used to change the Node.js process name.
+  // Name is used to change the Node.js process title.
   public get options(): IProcessOptions {
     return {
       name: "main",
@@ -150,19 +150,22 @@ const CONTAINER = new Container("Main", ENVIRONMENT)
 const SCRIPTS = CONTAINER.resolve<Scripts>(Scripts.NAME);
 
 // Fork a new process from a script file.
-// Optionally pass in command line arguments to script.
-const proc = SCRIPTS.fork("script.js", { args: ["-v"] });
+// Forked process inherits containers environment.
+// Optionally pass in command line arguments and environment overrides to script.
+const proc = SCRIPTS.fork("script.js", { args: ["-v"], env: { KEY: "OVERRIDE" } });
 
 // Start a new named worker process from a script file.
 // Workers are restarted by default, they may also have their uptime limited.
-SCRIPTS.startWorker("1", "worker.js", { restart: true, uptimeLimit: "T1M" });
-
-// Get a reference to workers current process (recreated on restart).
-const worker = SCRIPTS.getWorker("1");
+SCRIPTS.startWorker("1", "worker.js", { restart: true, uptimeLimit: "T1M" })
+  .subscribe((worker) => {
+    // Worker processes are returned via an observable.
+    // When restarted the worker process is recreated and emitted again via this observable.
+    // ...
+  });
 
 // Stop a named worker.
 // All workers are stopped automatically on container stop.
-SCRIPTS.stopWorker("1");
+const code = await SCRIPTS.stopWorker("1").toPromise();
 ```
 
 ## ChildProcess

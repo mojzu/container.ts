@@ -33,15 +33,30 @@ describe("Scripts", () => {
   });
 
   it("#startWorker", async () => {
-    const worker = SCRIPTS.startWorker(WORKER, "worker.test.js", { restart: false });
+    const worker = await SCRIPTS.startWorker(WORKER, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.connected).toEqual(true);
 
     const code = await SCRIPTS.stopWorker(WORKER).toPromise();
     expect(code).toEqual("SIGTERM");
   });
 
+  it("#startWorker#restartLimit", (done) => {
+    let restarts = 0;
+    SCRIPTS.startWorker(WORKER, "script.test.js", { restartLimit: 3 })
+      .subscribe({
+        next: (worker) => {
+          restarts += 1;
+        },
+        error: (error) => done(error),
+        complete: () => {
+          expect(restarts).toEqual(4);
+          done();
+        },
+      });
+  });
+
   it("#ScriptsProcess#call", async () => {
-    const worker = SCRIPTS.startWorker(WORKER, "worker.test.js", { restart: false });
+    const worker = await SCRIPTS.startWorker(WORKER, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.connected).toEqual(true);
 
     const result = await worker.call("Test", "testCall", { args: [4] }).toPromise();
@@ -52,7 +67,7 @@ describe("Scripts", () => {
   });
 
   it("#ScriptsProcess#event", async () => {
-    const worker = SCRIPTS.startWorker(WORKER, "worker.test.js", { restart: false });
+    const worker = await SCRIPTS.startWorker(WORKER, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.connected).toEqual(true);
 
     const pong$ = worker.listen("pong").take(1);

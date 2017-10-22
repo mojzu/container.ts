@@ -7,11 +7,13 @@ import "rxjs/add/observable/of";
 import "rxjs/add/operator/switchMap";
 import "rxjs/add/operator/take";
 import "rxjs/add/operator/takeUntil";
+import { BehaviorSubject } from "rxjs/BehaviorSubject";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import {
   IContainerLogMessage,
   IContainerMetricMessage,
+  IEnvironmentVariables,
   IModuleOpts,
   Module,
 } from "../../container";
@@ -30,12 +32,15 @@ import { IProcessStatus } from "./Process";
 /** Scripts process options. */
 export interface IScriptsOptions {
   args?: string[];
+  env?: IEnvironmentVariables;
 }
 
 /** Scripts worker options. */
 export interface IScriptsWorkerOptions extends IScriptsOptions {
   /** Worker process should restart after exit. */
   restart?: boolean;
+  /** Worker process restarts maximum number of times. */
+  restartLimit?: number;
   /** Maximum script uptime as ISO8601 duration. */
   uptimeLimit?: string;
 }
@@ -44,6 +49,8 @@ export interface IScriptsWorkerOptions extends IScriptsOptions {
 export interface IScriptsWorker {
   process: ScriptsProcess;
   unsubscribe$: Subject<void>;
+  next$: BehaviorSubject<ScriptsProcess>;
+  restarts: number;
 }
 
 /** Scripts error class. */
@@ -68,7 +75,7 @@ export class ScriptsProcess implements IProcessSend {
     public readonly scripts: Scripts,
     public readonly target: string,
     public readonly process: childProcess.ChildProcess,
-    public readonly options: IScriptsOptions = {},
+    public readonly options: IScriptsOptions,
   ) {
     this.scripts.debug(`FORK="${target}"`);
 
@@ -216,62 +223,63 @@ export class Scripts extends Module {
 
   /** Spawn new Node.js process using script file. */
   public fork(target: string, options: IScriptsOptions = {}): ScriptsProcess {
-    const forkArgs = options.args || [];
-    const forkEnv = this.environment.copy();
+    const forkEnv = this.environment.copy(options.env);
 
     // Use container environment when spawning processes.
     // Override name value to prepend application namespace.
     const name = `${this.namespace}.${target}`;
     forkEnv.set(ChildProcess.ENV.NAME, name);
 
-    const forkOptions: childProcess.ForkOptions = {
-      env: forkEnv.variables,
-    };
-
-    // Check script file exists.
+    // Check script file exists and fork.
     const filePath = NodeValidate.isFile(path.resolve(this.path, target));
-    const process = childProcess.fork(filePath, forkArgs, forkOptions);
-    return new ScriptsProcess(this, `${target}`, process, options);
+    const process = childProcess.fork(filePath, options.args || [], { env: forkEnv.variables });
+    return new ScriptsProcess(this, target, process, options);
   }
 
-  public getWorker(name: string): ScriptsProcess | null {
-    return (this.workers[name] != null) ? this.workers[name].process : null;
-  }
-
-  public startWorker(name: string, target: string, options: IScriptsWorkerOptions = {}): ScriptsProcess {
+  public startWorker(name: string, target: string, options: IScriptsWorkerOptions = {}): Observable<ScriptsProcess> {
     const uptimeLimit = this.validUptimeLimit(options.uptimeLimit);
     const process = this.fork(target, options);
 
     if (this.workers[name] == null) {
+      // New worker, create new observables in workers state.
       const unsubscribe$ = new Subject<void>();
-      this.workers[name] = { process, unsubscribe$ };
+      const next$ = new BehaviorSubject<ScriptsProcess>(process);
+      this.workers[name] = { process, unsubscribe$, next$, restarts: 0 };
     } else {
+      // Restarted worker, reassign process in workers state.
+      this.workers[name].unsubscribe$.next();
       this.workers[name].process = process;
+      this.workers[name].next$.next(process);
+      this.workers[name].restarts += 1;
     }
+    const worker = this.workers[name];
 
     // Handle worker restarts.
     process.exit$
-      .takeUntil(this.workers[name].unsubscribe$)
+      .takeUntil(worker.unsubscribe$)
       .subscribe((code) => {
-        this.debug(`WORKER="${process.target}" EXIT="${code}"`);
         // Restart worker process by default.
         if ((options.restart == null) || !!options.restart) {
-          this.startWorker(name, target, options);
+          // Do not restart process if limit reached.
+          if ((options.restartLimit == null) || (worker.restarts < options.restartLimit)) {
+            this.startWorker(name, target, options);
+          } else {
+            this.stopWorker(name);
+          }
         }
       });
 
     // Track worker process uptime.
     process.listen<IProcessStatus>(ChildProcess.EVENT.STATUS)
-      .takeUntil(this.workers[name].unsubscribe$)
+      .takeUntil(worker.unsubscribe$)
       .subscribe((status) => {
         // Kill worker process if uptime limit exceeded.
         if ((uptimeLimit != null) && (status.uptime > uptimeLimit)) {
-          this.debug(`WORKER="${process.target}" KILL`);
           process.kill();
         }
       });
 
-    return process;
+    return worker.next$;
   }
 
   public stopWorker(name: string): Observable<string | number> {
@@ -279,8 +287,12 @@ export class Scripts extends Module {
     let observable$: Observable<string | number> = Observable.of(0);
 
     if (worker != null) {
+      // Observables clean up.
       worker.unsubscribe$.next();
       worker.unsubscribe$.complete();
+      worker.next$.complete();
+
+      // End process if connected.
       if (worker.process.connected) {
         worker.process.kill();
         observable$ = worker.process.exit$;

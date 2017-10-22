@@ -13,7 +13,7 @@ export class Environment {
 
   /** Returns a copy of environment. */
   public copy(variables: IEnvironmentVariables = {}): Environment {
-    return new Environment(Object.assign(variables, this.variables));
+    return new Environment(Object.assign({}, this.variables, variables));
   }
 
   /** Get an environment variable value or undefined. */
