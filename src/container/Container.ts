@@ -24,6 +24,16 @@ import { ELogLevel, ILogMessage, ILogMetadata } from "./Log";
 import { EMetricType, IMetricTags } from "./Metric";
 import { IModule, IModuleConstructor, IModuleOpts, IModuleState } from "./Types";
 
+/** Command line arguments interface matching 'yargs'. */
+export interface IContainerArguments {
+  /** Non-option arguments */
+  _: string[];
+  /** The script name or node command */
+  $0: string;
+  /** All remaining options */
+  [argName: string]: any;
+}
+
 /** Container error class. */
 export class ContainerError extends ErrorChain {
   public constructor(name: string, cause?: Error) {
@@ -84,9 +94,6 @@ export class Container {
     STOP: "ContainerStop",
   };
 
-  /** Container environment reference available to modules. */
-  public readonly environment: Environment;
-
   public readonly container: AwilixContainer;
 
   public readonly modules$ = new BehaviorSubject<IModuleState>({});
@@ -101,7 +108,11 @@ export class Container {
   public readonly metrics$ = new Subject<ContainerMetricMessage>();
 
   /** Creates a new container in proxy resolution mode. */
-  public constructor(public readonly name: string, environment = new Environment()) {
+  public constructor(
+    public readonly name: string,
+    public readonly environment = new Environment(),
+    public readonly argv: IContainerArguments = { _: [], $0: "" },
+  ) {
     this.environment = environment;
     this.container = createContainer({ resolutionMode: ResolutionMode.PROXY });
     this.registerValue<Container>(Container.REFERENCE, this);
