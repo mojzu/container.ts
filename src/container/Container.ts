@@ -147,10 +147,15 @@ export class Container {
     return this.container.resolve<T>(name);
   }
 
+  /** Construct log metric name. */
+  public logMeticName(level: ELogLevel): string {
+    return `Log${ELogLevel[level]}`;
+  }
+
   /** Send log message of level for module. */
   public sendLog(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, args: any[]): void {
     this.logs$.next(new ContainerLogMessage(level, message, metadata, args));
-    this.sendMetric(EMetricType.Increment, `Log${ELogLevel[level]}`, 1, this.logMetadataTags(metadata));
+    this.sendMetric(EMetricType.Increment, this.logMeticName(level), 1, metadata);
   }
 
   /** Send metric message of type for module. */
@@ -257,15 +262,6 @@ export class Container {
     const message = state ? Container.LOG.START : Container.LOG.STOP;
     this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
     return Observable.of(undefined);
-  }
-
-  /** Extract common log metadata for metric tags. */
-  protected logMetadataTags(metadata: ILogMetadata): IMetricTags {
-    const tags: IMetricTags = {};
-    if (metadata.moduleName != null) {
-      tags.moduleName = metadata.moduleName;
-    }
-    return tags;
   }
 
 }

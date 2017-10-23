@@ -53,6 +53,7 @@ export class Process extends Module {
   /** Log names. */
   public static readonly LOG = {
     INFORMATION: "ProcessInformation",
+    STOP: "ProcessStop",
   };
 
   /** Metric names. */
@@ -137,7 +138,7 @@ export class Process extends Module {
 
   /** Stop container when process termination signal received. */
   protected handleStop(signal: string): void {
-    this.debug(`STOP="${signal}"`);
+    this.log.info(Process.LOG.STOP, { signal });
     this.container.stop()
       .subscribe({
         next: () => process.exit(0),

@@ -115,8 +115,6 @@ export class ChildProcess extends Process implements IProcessSend {
     const timeout = options.timeout || ChildProcess.DEFAULT_TIMEOUT;
     const args = options.args || [];
 
-    mod.debug(`CALL="${target}.${method}" "${id}"`);
-
     // Send call request to process.
     const sendData: IProcessCallRequestData = { id, target, method, args };
     emitter.send(EProcessMessageType.CallRequest, sendData);
@@ -206,8 +204,6 @@ export class ChildProcess extends Process implements IProcessSend {
     name: string,
     data?: T,
   ): void {
-    mod.debug(`EVENT="${name}"`);
-
     // Send event request to child process.
     const sendData: IProcessEventData = { name, data };
     emitter.send(EProcessMessageType.Event, sendData);
