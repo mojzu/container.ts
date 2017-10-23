@@ -78,8 +78,6 @@ export class ScriptsProcess implements IProcessSend {
     public readonly process: childProcess.ChildProcess,
     public readonly options: IScriptsOptions,
   ) {
-    this.scripts.debug(`FORK="${target}"`);
-
     // Accumulate multiple callback arguments into array.
     const accumulator = (...args: any[]) => args;
 
@@ -93,8 +91,6 @@ export class ScriptsProcess implements IProcessSend {
       });
 
     this.exit$.subscribe((code) => {
-      this.scripts.debug(`EXIT="${target}" CODE="${code}"`);
-
       // Log error if script exits with error code.
       if (code !== 0) {
         const error = new ScriptsError(this.target);
