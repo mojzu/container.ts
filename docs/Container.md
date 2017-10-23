@@ -7,6 +7,7 @@ import * as process from "process";
 import { Observable } from "rxjs/Observable";
 import { Container, Environment, IModuleDependencies, IModuleOpts, Module } from "container.ts";
 import { Process } from "container.ts/lib/node-modules";
+import { argv } from "yargs";
 
 // Define a new module by extending the 'Module' class.
 class AppModule extends Module {
@@ -68,7 +69,8 @@ ENVIRONMENT
   .set("KEY2", "VALUE2");
 
 // Create container using environment and register modules.
-const CONTAINER = new Container("Main", ENVIRONMENT)
+// Optionally pass in command line arguments provided by 'yargs' package.
+const CONTAINER = new Container("Main", ENVIRONMENT, argv)
   .registerModule(Process.NAME, Process)
   .registerModule(AppModule.NAME, AppModule);
 

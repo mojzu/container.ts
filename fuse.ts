@@ -8,6 +8,7 @@ const CWD = path.resolve(__dirname);
 // Clean compiled files.
 fuseBox.Sparky.task("clean", () => {
   return tools.clean(CWD, [
+    ".fusebox",
     "coverage",
     "*.tgz",
     "*.log",
