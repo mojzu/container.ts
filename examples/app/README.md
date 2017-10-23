@@ -24,11 +24,11 @@ Clone repository, install dependencies with `yarn install` and run scripts: `yar
 ## Vagrant
 
 | Command | Description |
-| ------- | ----------- |
-| up      |             |
-| ssh     |             |
-| halt    |             |
-| destroy |             |
+| ------- | ------------------------------------ |
+| up      | Start and provision virtual machine. |
+| ssh     | Log into virtual machine via SSH.    |
+| halt    | Stop virtual machine.                |
+| destroy | Destroy virtual machine.             |
 
 ### Telegraf, InfluxDB, Chronograf
 
