@@ -57,8 +57,7 @@ fuseBox.Sparky.task("test", ["clean", "test-worker"], () => {
 
 // Run example.
 fuseBox.Sparky.task("example", () => {
-  const target = argv.f || argv.file;
-  return tools.shell(`ts-node ./examples/${target}.ts`, CWD);
+  return tools.shell(`ts-node ./examples/${argv._[1] || "container"}.ts`, CWD);
 });
 
 // Build library for distribution.
