@@ -128,6 +128,7 @@ fuseBox.Sparky.task("configure", () => {
       cache: !CONFIG.cli.production,
       sourceMaps: !CONFIG.cli.production,
       tsConfig: "tsconfig.json",
+      useTypescriptCompiler: true,
       plugins: fusePlugins,
     });
 

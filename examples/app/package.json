@@ -19,22 +19,22 @@
     "assets": "assets/**/*"
   },
   "dependencies": {
-    "container.ts": "^0.39.0",
+    "container.ts": "^0.40.0",
     "rollbar": "^2.2.10",
-    "rxjs": "^5.5.0",
+    "rxjs": "^5.5.2",
     "statsd-client": "^0.4.0",
     "winston": "^2.4.0",
-    "yargs": "^9.0.1"
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
     "@types/del": "^3.0.0",
-    "@types/jest": "^21.1.4",
-    "@types/node": "^8.0.46",
+    "@types/jest": "^21.1.5",
+    "@types/node": "^8.0.47",
     "@types/statsd-client": "^0.1.31",
-    "@types/winston": "^2.3.6",
+    "@types/winston": "^2.3.7",
     "@types/yargs": "^8.0.2",
     "del": "^3.0.0",
-    "fuse-box": "^2.3.3",
+    "fuse-box": "^2.4.0",
     "jest": "^21.2.1",
     "pkg": "^4.2.5",
     "ts-jest": "^21.1.3",
