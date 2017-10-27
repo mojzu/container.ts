@@ -1,6 +1,6 @@
 import * as path from "path";
-import { Observable } from "rxjs/Observable";
 import { Container, Environment, Module } from "../../../container";
+import { Observable } from "../../../container/RxJS";
 import { ErrorChain } from "../../../lib/error";
 import { Scripts } from "../Scripts";
 

@@ -1,8 +1,8 @@
-import { Subject } from "rxjs/Subject";
 import { ErrorChain } from "../../lib/error";
 import { Container, ContainerError } from "../Container";
 import { Environment } from "../Environment";
 import { Module, ModuleLog, ModuleMetric } from "../Module";
+import { Subject } from "../RxJS";
 
 describe("Container", () => {
 

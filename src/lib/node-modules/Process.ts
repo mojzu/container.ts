@@ -1,10 +1,7 @@
 import * as os from "os";
 import * as process from "process";
-import "rxjs/add/observable/interval";
-import "rxjs/add/observable/of";
-import "rxjs/add/operator/switchMap";
-import { Observable } from "rxjs/Observable";
 import { IModuleOpts, Module } from "../../container";
+import { Observable } from "../../container/RxJS";
 import { ErrorChain } from "../error";
 
 /** Process information interface. */

@@ -6,22 +6,11 @@ import {
   RegistrationOptions,
   ResolutionMode,
 } from "awilix";
-import "rxjs/add/observable/forkJoin";
-import "rxjs/add/observable/of";
-import "rxjs/add/observable/throw";
-import "rxjs/add/operator/catch";
-import "rxjs/add/operator/do";
-import "rxjs/add/operator/filter";
-import "rxjs/add/operator/switchMap";
-import "rxjs/add/operator/take";
-import "rxjs/add/operator/timeout";
-import { BehaviorSubject } from "rxjs/BehaviorSubject";
-import { Observable } from "rxjs/Observable";
-import { Subject } from "rxjs/Subject";
 import { ErrorChain } from "../lib/error";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata } from "./Log";
 import { EMetricType, IMetricTags } from "./Metric";
+import { BehaviorSubject, Observable, Subject } from "./RxJS";
 import { IModule, IModuleConstructor, IModuleOpts, IModuleState } from "./Types";
 
 /** Command line arguments interface matching 'yargs'. */

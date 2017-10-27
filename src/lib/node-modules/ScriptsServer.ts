@@ -1,10 +1,6 @@
 import * as net from "net";
-import "rxjs/add/observable/bindNodeCallback";
-import "rxjs/add/observable/fromEvent";
-import "rxjs/add/operator/map";
-import "rxjs/add/operator/switchMap";
-import { Observable } from "rxjs/Observable";
 import { IModuleOpts, Module } from "../../container";
+import { Observable } from "../../container/RxJS";
 import {
   IScriptsWorkerOptions,
   Scripts,

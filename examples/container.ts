@@ -1,8 +1,8 @@
 import * as process from "process";
-import { Observable } from "rxjs/Observable";
 import { argv } from "yargs";
 import { Container, Environment, IModuleDependencies, IModuleOpts, Module } from "../src/container";
 import { Process } from "../src/lib/node-modules";
+import { Observable } from "../src/rxjs";
 
 // Define a new module by extending the 'Module' class.
 class AppModule extends Module {

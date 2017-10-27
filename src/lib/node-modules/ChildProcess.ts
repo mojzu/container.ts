@@ -1,16 +1,7 @@
 import * as net from "net";
 import * as process from "process";
-import "rxjs/add/observable/fromEvent";
-import "rxjs/add/observable/interval";
-import "rxjs/add/operator/filter";
-import "rxjs/add/operator/map";
-import "rxjs/add/operator/mergeMap";
-import "rxjs/add/operator/takeUntil";
-import "rxjs/add/operator/takeWhile";
-import "rxjs/add/operator/timeout";
-import { Observable } from "rxjs/Observable";
-import { Subject } from "rxjs/Subject";
 import { IContainerLogMessage, IModuleOpts, Module } from "../../container";
+import { Observable, Subject } from "../../container/RxJS";
 import { ErrorChain, IErrorChainSerialised } from "../error";
 import { IProcessStatus, Process, ProcessError } from "./Process";
 

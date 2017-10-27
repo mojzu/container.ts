@@ -1,4 +1,4 @@
-import { Observable } from "rxjs/Observable";
+import { Observable } from "./RxJS";
 
 /** Container options injected by awilix library. */
 export interface IModuleOpts {

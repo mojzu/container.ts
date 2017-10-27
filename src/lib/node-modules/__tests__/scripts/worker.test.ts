@@ -1,5 +1,5 @@
-import { Observable } from "rxjs/Observable";
 import { Container, Environment, IModuleDependencies, IModuleOpts, Module } from "../../../../container";
+import { Observable } from "../../../../container/RxJS";
 import { ChildProcess } from "../../ChildProcess";
 
 class TestModule extends Module {

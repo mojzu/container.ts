@@ -1,12 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-import "rxjs/add/observable/bindNodeCallback";
-import "rxjs/add/observable/of";
-import "rxjs/add/observable/throw";
-import "rxjs/add/operator/do";
-import "rxjs/add/operator/map";
-import { Observable } from "rxjs/Observable";
 import { IModuleOpts, Module } from "../../container";
+import { Observable } from "../../container/RxJS";
 import { ErrorChain } from "../error";
 import { NodeValidate } from "../node-validate";
 

@@ -1,10 +1,10 @@
 import * as Debug from "debug";
-import { Observable } from "rxjs/Observable";
 import { ErrorChain } from "../lib/error";
 import { Container } from "./Container";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./Log";
 import { EMetricType, IMetricTags, Metric } from "./Metric";
+import { Observable } from "./RxJS";
 import { IModule, IModuleDependencies, IModuleOpts } from "./Types";
 
 /** Module error class. */

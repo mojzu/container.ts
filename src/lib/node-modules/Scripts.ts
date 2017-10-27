@@ -1,15 +1,6 @@
 import * as childProcess from "child_process";
 import * as net from "net";
 import * as path from "path";
-import "rxjs/add/observable/forkJoin";
-import "rxjs/add/observable/fromEvent";
-import "rxjs/add/observable/of";
-import "rxjs/add/operator/switchMap";
-import "rxjs/add/operator/take";
-import "rxjs/add/operator/takeUntil";
-import { BehaviorSubject } from "rxjs/BehaviorSubject";
-import { Observable } from "rxjs/Observable";
-import { Subject } from "rxjs/Subject";
 import {
   IContainerLogMessage,
   IContainerMetricMessage,
@@ -18,6 +9,7 @@ import {
   IModuleOpts,
   Module,
 } from "../../container";
+import { BehaviorSubject, Observable, Subject } from "../../container/RxJS";
 import { ErrorChain } from "../error";
 import { NodeValidate } from "../node-validate";
 import {
