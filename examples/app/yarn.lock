@@ -271,9 +271,9 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
-awilix@^2.8.4:
-  version "2.8.4"
-  resolved "https://registry.yarnpkg.com/awilix/-/awilix-2.8.4.tgz#34891a1abfb7dcaeeca0bbad7b9bd0d06d0953a7"
+awilix@^2.9.0:
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/awilix/-/awilix-2.9.0.tgz#e99d3f3c885f29e27d46326b64d3b102839f64ff"
   dependencies:
     camel-case "^3.0.0"
     glob "^7.1.2"
@@ -727,12 +727,12 @@ console-polyfill@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/console-polyfill/-/console-polyfill-0.3.0.tgz#84900902a18c47a5eba932be75fa44d23e8af861"
 
-container.ts@^0.40.0:
-  version "0.40.0"
-  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.40.0.tgz#d57be5696f44e73aed9600527eeb62c4cdd7d06b"
+container.ts@^0.42.1:
+  version "0.42.1"
+  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.42.1.tgz#e0f6f31c6857ba37c472d486cfbcc25324e65a5a"
   dependencies:
     "@types/debug" "^0.0.30"
-    awilix "^2.8.4"
+    awilix "^2.9.0"
     debug "^3.1.0"
     rxjs "^5.5.2"
   optionalDependencies:
@@ -2039,8 +2039,8 @@ jsbn@~0.1.0:
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
 
 jschardet@^1.4.2:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/jschardet/-/jschardet-1.5.1.tgz#c519f629f86b3a5bedba58a88d311309eec097f9"
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/jschardet/-/jschardet-1.6.0.tgz#c7d1a71edcff2839db2f9ec30fc5d5ebd3c1a678"
 
 jsdom@^9.12.0:
   version "9.12.0"
@@ -3402,9 +3402,9 @@ trim-right@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
 
-ts-jest@^21.1.3:
-  version "21.1.3"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-21.1.3.tgz#cc3c552e7e8a67db9ededc28c00ae98223614ddc"
+ts-jest@^21.1.4:
+  version "21.1.4"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-21.1.4.tgz#6b720cd4ebfacbc935468e60dd395392f817095b"
   dependencies:
     babel-core "^6.24.1"
     babel-plugin-istanbul "^4.1.4"
@@ -3415,7 +3415,7 @@ ts-jest@^21.1.3:
     jest-util "^21.2.1"
     pkg-dir "^2.0.0"
     source-map-support "^0.5.0"
-    yargs "^9.0.1"
+    yargs "^10.0.3"
 
 ts-node@^3.3.0:
   version "3.3.0"
