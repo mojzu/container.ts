@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import * as childProcess from "child_process";
 import * as path from "path";
 import "rxjs/add/observable/forkJoin";
@@ -203,8 +202,6 @@ export class Scripts extends Module {
 
     // Get script directory path from environment.
     const scriptsPath = path.resolve(this.environment.get(Scripts.ENV.PATH));
-
-    assert(scriptsPath != null, "Scripts path is undefined");
     this.path = NodeValidate.isDirectory(scriptsPath);
     this.debug(`${Scripts.ENV.PATH}="${this.path}"`);
   }

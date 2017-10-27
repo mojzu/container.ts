@@ -98,7 +98,7 @@ export class Assets extends Module {
       // Check file exists, read file contents asynchronously.
       const filePath = NodeValidate.isFile(path.resolve(this.path, target));
       const readFileCallback = fs.readFile.bind(this, filePath, options.encoding);
-      const readFile: () => Observable<T> = Observable.bindNodeCallback(readFileCallback);
+      const readFile = Observable.bindNodeCallback<T>(readFileCallback);
 
       return readFile()
         .do((data) => {
