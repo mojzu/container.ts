@@ -1,5 +1,5 @@
 import { Container, Environment } from "container.ts";
-import { Assets, Scripts } from "container.ts/lib/node-modules";
+import { Assets, Scripts, ScriptsServer } from "container.ts/lib/node-modules";
 import * as process from "process";
 import { argv } from "yargs";
 import * as constants from "./constants";
@@ -23,7 +23,7 @@ ENVIRONMENT
 const CONTAINER = new Container("Main", ENVIRONMENT, argv)
   .registerModule(MainProcess.NAME, MainProcess)
   .registerModule(Assets.NAME, Assets)
-  .registerModule(Scripts.NAME, Scripts)
+  .registerModule(Scripts.NAME, ScriptsServer)
   .registerModule(WinstonLogs.NAME, WinstonLogs)
   .registerModule(StatsdMetrics.NAME, StatsdMetrics);
 
