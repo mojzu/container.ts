@@ -168,6 +168,10 @@ SCRIPTS.startWorker("1", "worker.js", { restart: true, uptimeLimit: "T1M" })
 const code = await SCRIPTS.stopWorker("1").toPromise();
 ```
 
+## ScriptsServer
+
+Provides the same interface as the `Scripts` module, internally creates a server and sends socket handles to child processes for interprocess communication.
+
 ## ChildProcess
 
 Module for interprocess communication between a parent `ScriptsProcess` instance and its processes `ChildProcess` module.

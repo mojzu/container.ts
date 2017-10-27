@@ -1,4 +1,5 @@
 import * as childProcess from "child_process";
+import * as net from "net";
 import * as path from "path";
 import "rxjs/add/observable/forkJoin";
 import "rxjs/add/observable/fromEvent";
@@ -33,6 +34,10 @@ import { IProcessStatus } from "./Process";
 export interface IScriptsOptions {
   args?: string[];
   env?: IEnvironmentVariables;
+  sockets?: {
+    parent: net.Socket;
+    child: net.Socket;
+  };
 }
 
 /** Scripts worker options. */
@@ -71,10 +76,12 @@ export class ScriptsProcessError extends ErrorChain {
 export class ScriptsProcess implements IProcessSend {
 
   public readonly exit$: Observable<number | string>;
-  public readonly messages$: Observable<IProcessMessage>;
+  public readonly messages$ = new Subject<IProcessMessage>();
   public readonly events$ = new Subject<IProcessEventData>();
 
-  public get connected(): boolean { return this.process.connected; }
+  public readonly socket?: net.Socket;
+
+  public get isConnected(): boolean { return this.process.connected; }
 
   protected currentIdentifier = 0;
 
@@ -112,9 +119,21 @@ export class ScriptsProcess implements IProcessSend {
         this.scripts.log.error(chained);
       });
 
+    // If socket provided, configure parent as message receiver.
+    // Send socket as handle to child process.
+    if (options.sockets != null) {
+      this.socket = ChildProcess.socketConfigure({
+        socket: options.sockets.parent,
+        onError: (error) => this.scripts.log.error(error),
+        onData: (data) => this.messages$.next(data),
+      });
+      this.process.send("socket", options.sockets.child);
+    }
+
     // Listen for and handle process messages.
-    this.messages$ = Observable.fromEvent<IProcessMessage>(process, "message")
-      .takeUntil(this.exit$);
+    Observable.fromEvent<IProcessMessage>(process, "message")
+      .takeUntil(this.exit$)
+      .subscribe((message) => this.messages$.next(message));
 
     this.messages$
       .subscribe((message) => this.handleMessage(message));
@@ -128,7 +147,11 @@ export class ScriptsProcess implements IProcessSend {
 
   /** Send message to child process. */
   public send(type: EProcessMessageType, data: any): void {
-    this.process.send({ type, data });
+    if (this.socket != null) {
+      this.socket.write(ChildProcess.socketSerialise({ type, data }));
+    } else {
+      this.process.send({ type, data });
+    }
   }
 
   /** Make call to module.method in child process. */
@@ -222,7 +245,7 @@ export class Scripts extends Module {
       worker.unsubscribe$.next();
       worker.unsubscribe$.complete();
 
-      if ((worker.process.connected)) {
+      if ((worker.process.isConnected)) {
         observables$.push(worker.process.exit$);
       }
     });
@@ -316,7 +339,7 @@ export class Scripts extends Module {
       worker.next$.complete();
 
       // End process if connected.
-      if (worker.process.connected) {
+      if (worker.process.isConnected) {
         worker.process.kill();
         observable$ = worker.process.exit$;
       }

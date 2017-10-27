@@ -1,9 +1,11 @@
+import * as net from "net";
 import * as process from "process";
 import "rxjs/add/observable/fromEvent";
 import "rxjs/add/observable/interval";
 import "rxjs/add/operator/filter";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
+import "rxjs/add/operator/takeUntil";
 import "rxjs/add/operator/takeWhile";
 import "rxjs/add/operator/timeout";
 import { Observable } from "rxjs/Observable";
@@ -77,11 +79,15 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Default module name. */
   public static readonly NAME: string = "ChildProcess";
 
-  /** Default call method timeout (10s). */
-  public static readonly DEFAULT_TIMEOUT = 10000;
-
-  /** Default interval to send status events (1m). */
-  public static readonly DEFAULT_STATUS_INTERVAL = 60000;
+  /** Default values. */
+  public static readonly DEFAULT = {
+    /** Default call method timeout (10s). */
+    TIMEOUT: 10000,
+    /** Default interval to send status events (1m). */
+    STATUS_INTERVAL: 60000,
+    /** Socket data encoding. */
+    ENCODING: "utf8",
+  };
 
   /** Environment variable names. */
   public static readonly ENV = {
@@ -90,8 +96,59 @@ export class ChildProcess extends Process implements IProcessSend {
 
   /** Class event names. */
   public static readonly EVENT = {
+    SOCKET: "socket",
     STATUS: "status",
   };
+
+  /** Configure socket for interprocess communication. */
+  public static socketConfigure(options: {
+    socket: net.Socket;
+    onError: (error: ProcessError) => void;
+    onData: (data: IProcessMessage) => void;
+  }): net.Socket {
+    // Set encoding to receive serialised string data.
+    options.socket.setEncoding(ChildProcess.DEFAULT.ENCODING);
+
+    // Socket observable events.
+    const close$ = Observable.fromEvent<void>(options.socket, "close");
+    const data$ = Observable.fromEvent<string>(options.socket, "data");
+
+    // Subscribe to socket events until closed.
+    data$.takeUntil(close$)
+      .subscribe((data) => {
+        ChildProcess.socketDeserialise(data)
+          .map((message) => options.onData(message));
+      });
+
+    return options.socket;
+  }
+
+  /** Serialise input data for socket. */
+  public static socketSerialise(data: any): string {
+    try {
+      return `${JSON.stringify(data)}\n`;
+    } catch (error) {
+      throw new ProcessError(error);
+    }
+  }
+
+  /** Deserialise input data from socket. */
+  public static socketDeserialise(data: string): IProcessMessage[] {
+    try {
+      const packets = data.split(/\r?\n/);
+      const messages: IProcessMessage[] = [];
+
+      if (packets.length > 1) {
+        for (let i = 0; i < (packets.length - 1); i++) {
+          messages.push(JSON.parse(packets[i]));
+        }
+      }
+
+      return messages;
+    } catch (error) {
+      throw new ProcessError(error);
+    }
+  }
 
   /** Extract serialisable error properties to object. */
   public static serialiseError(error: Error): IErrorChainSerialised {
@@ -112,7 +169,7 @@ export class ChildProcess extends Process implements IProcessSend {
     id: number,
     options: IProcessCallOptions = {},
   ): Observable<T> {
-    const timeout = options.timeout || ChildProcess.DEFAULT_TIMEOUT;
+    const timeout = options.timeout || ChildProcess.DEFAULT.TIMEOUT;
     const args = options.args || [];
 
     // Send call request to process.
@@ -219,8 +276,11 @@ export class ChildProcess extends Process implements IProcessSend {
       .map((event) => event.data as T);
   }
 
+  /** Socket handle received from parent process. */
+  public socket?: net.Socket;
+
   /** Messages received from parent process. */
-  public readonly messages$ = Observable.fromEvent<IProcessMessage>(process, "message");
+  public readonly messages$ = new Subject<IProcessMessage>();
 
   /** Events received from parent process. */
   public readonly events$ = new Subject<IProcessEventData>();
@@ -229,6 +289,22 @@ export class ChildProcess extends Process implements IProcessSend {
 
   public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
+
+    // Listen for a socket message to accept handle.
+    process.once("message", (type: string, socket: net.Socket) => {
+      if (type === ChildProcess.EVENT.SOCKET) {
+        // Configure socket as message receiver.
+        this.socket = ChildProcess.socketConfigure({
+          socket,
+          onError: (error) => this.log.error(error),
+          onData: (data) => this.messages$.next(data),
+        });
+      }
+    });
+
+    // Process messages.
+    Observable.fromEvent<IProcessMessage>(process, "message")
+      .subscribe((message) => this.messages$.next(message));
 
     // Listen for and handle messages from parent process.
     this.messages$
@@ -242,13 +318,15 @@ export class ChildProcess extends Process implements IProcessSend {
       .subscribe((metric) => this.send(EProcessMessageType.Metric, metric));
 
     // Send status event on interval.
-    Observable.interval(ChildProcess.DEFAULT_STATUS_INTERVAL)
+    Observable.interval(ChildProcess.DEFAULT.STATUS_INTERVAL)
       .subscribe(() => this.event<IProcessStatus>(ChildProcess.EVENT.STATUS, this.status));
   }
 
   /** Send message to parent process. */
   public send(type: EProcessMessageType, data: any): void {
-    if (process.send != null) {
+    if (this.socket != null) {
+      this.socket.write(ChildProcess.socketSerialise({ type, data }));
+    } else if (process.send != null) {
       process.send({ type, data });
     }
   }
@@ -286,6 +364,15 @@ export class ChildProcess extends Process implements IProcessSend {
         break;
       }
     }
+  }
+
+  /** Override process stop handler to close socket if present. */
+  protected handleStop(signal: string): void {
+    if (this.socket != null) {
+      this.socket.end();
+      this.socket = undefined;
+    }
+    return super.handleStop(signal);
   }
 
 }

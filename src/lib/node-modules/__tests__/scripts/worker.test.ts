@@ -32,6 +32,10 @@ class TestModule extends Module {
     return this.childProcess.call("Test", "testCall2", { args: [data] });
   }
 
+  public testCall3(data: number): Observable<string> {
+    return Observable.of("\nHello, world!\n");
+  }
+
 }
 
 // Create environment instance using process environment.

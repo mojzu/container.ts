@@ -4,7 +4,7 @@ import { Container, Environment, Module } from "../../../container";
 import { ErrorChain } from "../../../lib/error";
 import { Scripts } from "../Scripts";
 
-class TestModule extends Module {
+export class TestModule extends Module {
   public static readonly NAME = "Test";
   // Test method called from child process.
   public testCall2(data: string): Observable<number> {
@@ -44,7 +44,7 @@ describe("Scripts", () => {
 
   it("#startWorker", async () => {
     const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
-    expect(worker.connected).toEqual(true);
+    expect(worker.isConnected).toEqual(true);
 
     const code = await SCRIPTS.stopWorker("Worker").toPromise();
     expect(code).toEqual("SIGTERM");
@@ -67,7 +67,7 @@ describe("Scripts", () => {
 
   it("#ScriptsProcess#call function does not exist", async () => {
     const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
-    expect(worker.connected).toEqual(true);
+    expect(worker.isConnected).toEqual(true);
 
     try {
       await worker.call("Test", "doesNotExist").toPromise();
@@ -83,7 +83,7 @@ describe("Scripts", () => {
 
   it("#ScriptsProcess#call", async () => {
     const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
-    expect(worker.connected).toEqual(true);
+    expect(worker.isConnected).toEqual(true);
 
     const result = await worker.call<number>("Test", "testCall1", { args: [4] }).toPromise();
     expect(result).toEqual(8);
@@ -94,7 +94,7 @@ describe("Scripts", () => {
 
   it("#ScriptsProcess#ChildProcess#call", async () => {
     const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
-    expect(worker.connected).toEqual(true);
+    expect(worker.isConnected).toEqual(true);
 
     const result = await worker.call<number>("Test", "testCall2", { args: ["hello"] }).toPromise();
     expect(result).toEqual(5);
@@ -105,7 +105,7 @@ describe("Scripts", () => {
 
   it("#ScriptsProcess#event", async () => {
     const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
-    expect(worker.connected).toEqual(true);
+    expect(worker.isConnected).toEqual(true);
 
     const pong$ = worker.listen("pong").take(1);
     worker.event<number>("ping", 8);
