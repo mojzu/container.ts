@@ -66,7 +66,7 @@ export class ScriptsServer extends Scripts {
     const childSocket = net.createConnection(this.port);
     const childSocket$ = Observable.fromEvent<void>(childSocket, "connect").take(1);
 
-    return Observable.zip(parentSocket$, childSocket$)
+    return Observable.forkJoin(parentSocket$, childSocket$)
       .switchMap(([parent]) => {
         options.sockets = { parent, child: childSocket };
         return super.startWorker(name, target, options);
