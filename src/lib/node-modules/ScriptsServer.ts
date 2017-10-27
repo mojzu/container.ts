@@ -23,6 +23,12 @@ export class ScriptsServer extends Scripts {
     SERVER_ERROR: "ScriptsServerError",
   });
 
+  /** Log names. */
+  public static readonly LOG = Object.assign(Scripts.LOG, {
+    START: "ScriptsServerStart",
+    STOP: "ScriptsServerStop",
+  });
+
   /** Scripts server for connecting workers. */
   public readonly server: net.Server = net.createServer();
 
@@ -46,12 +52,15 @@ export class ScriptsServer extends Scripts {
   public start(): Observable<void> {
     const start$ = super.start() || Observable.of(undefined);
     const listen$ = Observable.bindNodeCallback<void>(this.server.listen.bind(this.server))();
-    return Observable.forkJoin(start$, listen$).map(() => undefined);
+    return Observable.forkJoin(start$, listen$).map(() => {
+      this.log.info(ScriptsServer.LOG.START, { port: this.port });
+    });
   }
 
   public stop() {
     // Close server and stop scripts.
     this.server.close();
+    this.log.info(ScriptsServer.LOG.STOP);
     return super.stop();
   }
 
