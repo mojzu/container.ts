@@ -34,6 +34,10 @@ export class MainProcess extends Process {
         this.worker$ = this.scripts.startWorker(this.workerName, "worker.js", {
           uptimeLimit: "PT5M", // Restart worker process every 5 minutes.
         });
+
+        this.worker$.subscribe(() => {
+          this.debug("worker started");
+        });
       });
   }
 
