@@ -55,8 +55,15 @@ export interface IScriptsWorker {
 
 /** Scripts error class. */
 export class ScriptsError extends ErrorChain {
+  public constructor(cause?: Error) {
+    super({ name: "ScriptsError" }, cause);
+  }
+}
+
+/** ScriptsProcess error class. */
+export class ScriptsProcessError extends ErrorChain {
   public constructor(target: string, cause?: Error) {
-    super({ name: "ScriptsError", value: target }, cause);
+    super({ name: "ScriptsProcessError", value: target }, cause);
   }
 }
 
@@ -92,7 +99,7 @@ export class ScriptsProcess implements IProcessSend {
     this.exit$.subscribe((code) => {
       // Log error if script exits with error code.
       if (code !== 0) {
-        const error = new ScriptsError(this.target);
+        const error = new ScriptsProcessError(this.target);
         this.scripts.log.error(error);
       }
     });
@@ -101,7 +108,7 @@ export class ScriptsProcess implements IProcessSend {
     Observable.fromEvent(process, "error")
       .takeUntil(this.exit$)
       .subscribe((error: Error) => {
-        const chained = new ScriptsError(this.target, error);
+        const chained = new ScriptsProcessError(this.target, error);
         this.scripts.log.error(chained);
       });
 
@@ -325,8 +332,12 @@ export class Scripts extends Module {
 
   protected validUptimeLimit(limit?: string): number | null {
     if (limit != null) {
-      const duration = NodeValidate.isDuration(limit);
-      return duration.asSeconds();
+      try {
+        const duration = NodeValidate.isDuration(limit);
+        return duration.asSeconds();
+      } catch (error) {
+        throw new ScriptsError(error);
+      }
     }
     return null;
   }
