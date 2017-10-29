@@ -170,7 +170,7 @@ const code = await SCRIPTS.stopWorker("1").toPromise();
 
 ## ScriptsServer
 
-Provides the same interface as the `Scripts` module, internally creates a server and sends socket handles to child processes for interprocess communication.
+Provides the same interface as the `Scripts` module, internally creates a server and sends socket handles to child processes for interprocess communication. This limits the use of `process.send`.
 
 ## ChildProcess
 
