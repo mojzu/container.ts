@@ -249,11 +249,6 @@ export class Scripts extends Module {
   public fork(target: string, options: IScriptsOptions = {}): ScriptsProcess {
     const forkEnv = this.environment.copy(options.env);
 
-    // Use container environment when spawning processes.
-    // Override name value to prepend application namespace.
-    const name = `${this.namespace}.${target}`;
-    forkEnv.set(ChildProcess.ENV.NAME, name);
-
     // Check script file exists and fork.
     const filePath = NodeValidate.isFile(path.resolve(this.path, target));
     const process = childProcess.fork(filePath, options.args || [], { env: forkEnv.variables });
