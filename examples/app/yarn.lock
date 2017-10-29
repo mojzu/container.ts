@@ -727,9 +727,9 @@ console-polyfill@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/console-polyfill/-/console-polyfill-0.3.0.tgz#84900902a18c47a5eba932be75fa44d23e8af861"
 
-container.ts@^0.46.0:
-  version "0.46.0"
-  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.46.0.tgz#8ef32df56be7f21adfe4995c86d819e6352f63a7"
+container.ts@^0.46.2:
+  version "0.46.2"
+  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.46.2.tgz#a95ab12d5268bcba835242b2d3b218c872405ef7"
   dependencies:
     "@types/debug" "^0.0.30"
     awilix "^2.9.0"

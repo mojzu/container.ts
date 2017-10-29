@@ -1,5 +1,5 @@
 import { Container, Environment } from "container.ts";
-import { WorkerProcess } from "../modules";
+import { ChildProcess } from "container.ts/lib/node-modules";
 
 // Create environment instance using process environment.
 const ENVIRONMENT = new Environment(process.env);
@@ -7,10 +7,10 @@ const ENVIRONMENT = new Environment(process.env);
 // Create container instance with name and environment.
 // Populate container for dependency injection.
 const CONTAINER = new Container("Worker", ENVIRONMENT)
-  .registerModule(WorkerProcess.NAME, WorkerProcess);
+  .registerModule(ChildProcess.NAME, ChildProcess);
 
-// Start container modules.
-CONTAINER.start()
+// Signal operational.
+CONTAINER.up()
   .subscribe({
     error: (error) => {
       process.stderr.write(`${error}\n`);

@@ -3,7 +3,7 @@ import { ErrorChain } from "container.ts/lib/error";
 import { Logs } from "container.ts/lib/node-modules";
 import * as winston from "winston";
 
-export class WinstonLogs extends Logs {
+export class Winston extends Logs {
 
   public static readonly NAME: string = "Winston";
 
@@ -25,7 +25,7 @@ export class WinstonLogs extends Logs {
   }
 
   /** Winston handler for incoming log messages. */
-  protected handleLog(log: ContainerLogMessage): void {
+  protected onMessage(log: ContainerLogMessage): void {
     const callback = this.handleError.bind(this);
     let message: string;
 

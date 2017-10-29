@@ -1,8 +1,7 @@
-import { Assets, Scripts } from "container.ts/lib/node-modules";
+import { Assets, Process, Scripts } from "container.ts/lib/node-modules";
 import * as fuseBox from "fuse-box";
 import * as path from "path";
 import { argv } from "yargs";
-import * as constants from "./src/constants";
 import * as tools from "./tools";
 const packageJson = require("./package.json");
 
@@ -104,9 +103,9 @@ fuseBox.Sparky.task("configure", () => {
       fuseBox.TypeScriptHelpers(),
       fuseBox.EnvPlugin({
         // Environment variable overrides.
-        [constants.ENV_NAME]: CONFIG.cli.name,
-        [constants.ENV_VERSION]: CONFIG.cli.version,
-        [constants.ENV_ENV]: CONFIG.cli.production ? "production" : "development",
+        [Process.ENV.NAME]: CONFIG.cli.name,
+        [Process.ENV.VERSION]: CONFIG.cli.version,
+        [Process.ENV.NODE_ENV]: CONFIG.cli.production ? "production" : "development",
         // Directory locations based on build configuration.
         [Assets.ENV.PATH]: (CONFIG.targetPkg ? pkgAssetPath : assetPath),
         [Scripts.ENV.PATH]: (CONFIG.targetPkg ? pkgScriptPath : scriptPath),

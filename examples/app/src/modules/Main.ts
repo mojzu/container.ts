@@ -1,9 +1,8 @@
 import { IModuleDependencies } from "container.ts";
-import { IProcessOptions, Process, Scripts, ScriptsProcess } from "container.ts/lib/node-modules";
+import { Process, Scripts, ScriptsProcess } from "container.ts/lib/node-modules";
 import { Observable } from "rxjs/Observable";
-import * as constants from "../constants";
 
-export class MainProcess extends Process {
+export class Main extends Process {
 
   public static readonly NAME: string = "Main";
 
@@ -13,22 +12,14 @@ export class MainProcess extends Process {
 
   public readonly scripts: Scripts;
 
-  public get options(): IProcessOptions {
-    return {
-      name: this.environment.get(constants.ENV_NAME),
-      version: this.environment.get(constants.ENV_VERSION),
-      nodeEnvironment: this.environment.get(constants.ENV_ENV),
-    };
-  }
-
   public readonly workerName = "Worker";
   public worker$: Observable<ScriptsProcess>;
 
-  public start(): Observable<void> {
-    super.start();
+  public up(): Observable<void> {
+    super.up();
 
-    // Wait for scripts module to start.
-    return this.container.waitStarted(Scripts.NAME)
+    // Wait for scripts module.
+    return this.container.waitUp(Scripts.NAME)
       .map(() => {
         // Start worker process.
         this.worker$ = this.scripts.startWorker(this.workerName, "worker.js", {

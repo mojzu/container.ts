@@ -1,10 +1,10 @@
 import { ContainerLogMessage, ELogLevel, IModuleDependencies, IModuleOpts } from "container.ts";
 import { Logs } from "container.ts/lib/node-modules";
 import { Validate } from "container.ts/lib/validate";
-import * as Rollbar from "rollbar";
-import { MainProcess } from "./MainProcess";
+import * as rollbar from "rollbar";
+import { Main } from "./Main";
 
-export class RollbarLogs extends Logs {
+export class Rollbar extends Logs {
 
   public static readonly NAME: string = "Rollbar";
 
@@ -17,27 +17,27 @@ export class RollbarLogs extends Logs {
   });
 
   public get dependencies(): IModuleDependencies {
-    return { process: MainProcess.NAME };
+    return { process: Main.NAME };
   }
 
-  private readonly process: MainProcess;
-  private readonly rollbar: Rollbar;
+  private readonly process: Main;
+  private readonly rollbar: rollbar;
 
   public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
     // Get access token from environment.
     // Get report level from environment or fall back on log level.
-    const accessToken = Validate.isString(this.environment.get(RollbarLogs.ENV.ACCESS_TOKEN));
-    const rawReportLevel = Validate.isString(this.environment.get(RollbarLogs.ENV.REPORT_LEVEL) || "error");
+    const accessToken = Validate.isString(this.environment.get(Rollbar.ENV.ACCESS_TOKEN));
+    const rawReportLevel = Validate.isString(this.environment.get(Rollbar.ENV.REPORT_LEVEL) || "error");
     const reportLevel = this.reportLevel(rawReportLevel);
-    this.debug(`${RollbarLogs.ENV.REPORT_LEVEL}="${reportLevel}"`);
+    this.debug(`${Rollbar.ENV.REPORT_LEVEL}="${reportLevel}"`);
 
     // Create Rollbar instance.
     // Report level determined by module log level.
     // Handle uncaught exceptions and unhandled rejections by default.
     // Uncaught errors have 'critical' level by default.
-    this.rollbar = new Rollbar({
+    this.rollbar = new rollbar({
       accessToken,
       version: this.process.version,
       reportLevel,
@@ -48,7 +48,7 @@ export class RollbarLogs extends Logs {
   }
 
   /** Rollbar handler for incoming log messages. */
-  protected handleLog(log: ContainerLogMessage): void {
+  protected onMessage(log: ContainerLogMessage): void {
     const callback = this.handleError.bind(this);
 
     // Map log level to rollbar log methods.
