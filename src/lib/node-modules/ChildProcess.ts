@@ -80,12 +80,6 @@ export class ChildProcess extends Process implements IProcessSend {
     ENCODING: "utf8",
   };
 
-  /** Environment variable names. */
-  public static readonly ENV = Object.assign(Process.ENV, {
-    /** Passed by parent Scripts module. */
-    NAME: "CHILD_PROCESS_NAME",
-  });
-
   /** Class event names. */
   public static readonly EVENT = {
     SOCKET: "socket",
