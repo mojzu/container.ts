@@ -19,7 +19,7 @@
     "assets": "assets/**/*"
   },
   "dependencies": {
-    "container.ts": "^0.42.4",
+    "container.ts": "^0.46.0",
     "rollbar": "^2.2.10",
     "rxjs": "^5.5.2",
     "statsd-client": "^0.4.0",
@@ -41,7 +41,7 @@
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "typescript": "^2.5.3",
-    "uglify-js": "^3.1.5"
+    "uglify-js": "^3.1.6"
   },
   "jest": {
     "transform": {
