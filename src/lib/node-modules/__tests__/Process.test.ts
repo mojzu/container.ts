@@ -22,11 +22,11 @@ describe("Process", () => {
   const PROCESS = CONTAINER.resolve<TestProcess>(TestProcess.NAME);
 
   beforeAll(async () => {
-    await CONTAINER.start().toPromise();
+    await CONTAINER.up().toPromise();
   });
 
   afterAll(async () => {
-    await CONTAINER.stop().toPromise();
+    await CONTAINER.down().toPromise();
   });
 
   it("#Process", () => {

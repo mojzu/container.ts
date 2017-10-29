@@ -10,9 +10,10 @@ export abstract class Metrics extends Module {
 
     // Subscribe to container metric messages.
     this.container.metrics$
-      .subscribe((metric) => this.handleMetric(metric));
+      .subscribe((metric) => this.onMessage(metric));
   }
 
-  protected abstract handleMetric(metric: ContainerMetricMessage): void;
+  /** Abstract handler for incoming metric messages. */
+  protected abstract onMessage(metric: ContainerMetricMessage): void;
 
 }

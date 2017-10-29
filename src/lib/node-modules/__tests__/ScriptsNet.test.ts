@@ -1,30 +1,30 @@
 import * as path from "path";
 import { Container, Environment } from "../../../container";
-import { ScriptsServer } from "../ScriptsServer";
+import { ScriptsNet } from "../ScriptsNet";
 import { TestModule } from "./Scripts.test";
 
-describe("ScriptsServer", () => {
+describe("ScriptsNet", () => {
 
   const ENVIRONMENT = new Environment()
-    .set(ScriptsServer.ENV.PATH, path.resolve(__dirname, "scripts"));
+    .set(ScriptsNet.ENV.PATH, path.resolve(__dirname, "scripts"));
 
   const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModule(ScriptsServer.NAME, ScriptsServer)
+    .registerModule(ScriptsNet.NAME, ScriptsNet)
     .registerModule(TestModule.NAME, TestModule);
 
-  const SCRIPTS = CONTAINER.resolve<ScriptsServer>(ScriptsServer.NAME);
+  const SCRIPTS = CONTAINER.resolve<ScriptsNet>(ScriptsNet.NAME);
 
   beforeAll(async () => {
-    await CONTAINER.start().toPromise();
+    await CONTAINER.up().toPromise();
   });
 
   afterAll(async () => {
-    await CONTAINER.stop().toPromise();
+    await CONTAINER.down().toPromise();
   });
 
-  it("#ScriptsServer", () => {
+  it("#ScriptsNet", () => {
     expect(SCRIPTS).toBeDefined();
-    expect(SCRIPTS.name).toEqual(ScriptsServer.NAME);
+    expect(SCRIPTS.name).toEqual(ScriptsNet.NAME);
   });
 
   it("#call", async () => {

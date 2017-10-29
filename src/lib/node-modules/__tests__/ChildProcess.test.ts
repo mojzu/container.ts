@@ -23,11 +23,11 @@ describe("ChildProcess", () => {
   const PROCESS = CONTAINER.resolve<TestChildProcess>(TestChildProcess.NAME);
 
   beforeAll(async () => {
-    await CONTAINER.start().toPromise();
+    await CONTAINER.up().toPromise();
   });
 
   afterAll(async () => {
-    await CONTAINER.stop().toPromise();
+    await CONTAINER.down().toPromise();
   });
 
   it("#ChildProcess", () => {

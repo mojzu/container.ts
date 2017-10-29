@@ -47,8 +47,8 @@ const CONTAINER = new Container("Server", ENVIRONMENT)
   .registerModule(ChildProcess.NAME, ChildProcess)
   .registerModule(TestModule.NAME, TestModule);
 
-// Start container modules.
-CONTAINER.start()
+// Signal operational.
+CONTAINER.up()
   .subscribe({
     error: (error) => {
       process.stderr.write(`${error}\n`);

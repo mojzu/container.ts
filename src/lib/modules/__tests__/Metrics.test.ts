@@ -3,7 +3,7 @@ import { Metrics } from "../Metrics";
 
 class TestMetrics extends Metrics {
   public static readonly NAME: string = "TestMetrics";
-  protected handleMetric(metric: ContainerMetricMessage): void {
+  protected onMessage(metric: ContainerMetricMessage): void {
     // TODO: Test this.
   }
 }
@@ -17,11 +17,11 @@ describe("Metric", () => {
   const METRICS = CONTAINER.resolve<TestMetrics>(TestMetrics.name);
 
   beforeAll(async () => {
-    await CONTAINER.start().toPromise();
+    await CONTAINER.up().toPromise();
   });
 
   afterAll(async () => {
-    await CONTAINER.stop().toPromise();
+    await CONTAINER.down().toPromise();
   });
 
   it("#TestMetrics", () => {

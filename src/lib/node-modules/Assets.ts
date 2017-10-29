@@ -41,15 +41,13 @@ export class Assets extends Module {
     JSON_PARSE: "AssetsJsonParseError",
   });
 
-  protected readonly path: string;
+  protected readonly path = this.getPath();
   protected readonly cache: IAssetsCache = {};
 
   public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
-    // Get assets directory path from environment.
-    const assetsPath = path.resolve(this.environment.get(Assets.ENV.PATH));
-    this.path = NodeValidate.isDirectory(assetsPath);
+    // Debug environment variables.
     this.debug(`${Assets.ENV.PATH}="${this.path}"`);
   }
 
@@ -76,6 +74,10 @@ export class Assets extends Module {
           return Observable.throw(new AssetsError(Assets.ERROR.JSON_PARSE, target, error));
         }
       });
+  }
+
+  protected getPath(): string {
+    return NodeValidate.isDirectory(path.resolve(this.environment.get(Assets.ENV.PATH)));
   }
 
   protected read<T extends string | Buffer>(target: string, options: IAssetsReadOptions = {}): Observable<T> {

@@ -82,6 +82,7 @@ export class ChildProcess extends Process implements IProcessSend {
 
   /** Environment variable names. */
   public static readonly ENV = {
+    /** Passed by parent Scripts module. */
     NAME: "CHILD_PROCESS_NAME",
   };
 
@@ -357,13 +358,13 @@ export class ChildProcess extends Process implements IProcessSend {
     }
   }
 
-  /** Override process stop handler to close socket if present. */
-  protected handleStop(signal: string): void {
+  /** Override process down handler to close socket if present. */
+  protected onSignal(signal: string): void {
     if (this.socket != null) {
       this.socket.end();
       this.socket = undefined;
     }
-    return super.handleStop(signal);
+    return super.onSignal(signal);
   }
 
 }

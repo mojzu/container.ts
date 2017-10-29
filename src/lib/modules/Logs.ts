@@ -8,27 +8,31 @@ export abstract class Logs extends Module {
 
   /** Environment variable names. */
   public static readonly ENV = {
-    /** Application log level (default info). */
-    LEVEL: "LOG_LEVEL",
+    /** Application logs level (default warning). */
+    LEVEL: "LOGS_LEVEL",
   };
 
-  protected readonly level: ELogLevel;
+  /** Parsed application logs level. */
+  protected readonly level = this.parseLevel(this.getLevel());
 
   public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
-    // Get log level from environment or fall back on default.
-    const rawLevel = Validate.isString(this.environment.get(Logs.ENV.LEVEL) || "info");
-    this.level = this.parseLevel(rawLevel);
+    // Debug environment variables.
     this.debug(`${Logs.ENV.LEVEL}="${ELogLevel[this.level]}"`);
 
     // Subscribe to container log messages filtered by level.
     this.container.filterLogs(this.level)
-      .subscribe((log) => this.handleLog(log));
+      .subscribe((log) => this.onMessage(log));
   }
 
   /** Abstract handler for incoming log messages. */
-  protected abstract handleLog(log: ContainerLogMessage): void;
+  protected abstract onMessage(log: ContainerLogMessage): void;
+
+  /** Get log level from environment or default to warning. */
+  protected getLevel(): string {
+    return Validate.isString(this.environment.get(Logs.ENV.LEVEL) || "warning");
+  }
 
   /** Convert environment log level string to level index, defaults to warning. */
   protected parseLevel(level?: string): ELogLevel {

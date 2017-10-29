@@ -5,7 +5,7 @@ type ITestLogsCallback = (log: ContainerLogMessage) => void;
 
 class TestLogs extends Logs {
   public static readonly NAME: string = "TestLogs";
-  protected handleLog(log: ContainerLogMessage): void {
+  protected onMessage(log: ContainerLogMessage): void {
     const callback: ITestLogsCallback = log.args[0];
     if (callback != null) {
       callback(log);
@@ -22,11 +22,11 @@ describe("Logs", () => {
   const LOGS = CONTAINER.resolve<TestLogs>(TestLogs.NAME);
 
   beforeAll(async () => {
-    await CONTAINER.start().toPromise();
+    await CONTAINER.up().toPromise();
   });
 
   afterAll(async () => {
-    await CONTAINER.stop().toPromise();
+    await CONTAINER.down().toPromise();
   });
 
   it("#TestLog", () => {

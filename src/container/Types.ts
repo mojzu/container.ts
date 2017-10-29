@@ -18,8 +18,8 @@ export interface IModuleConstructor {
 /** Container module. */
 export interface IModule {
   name: string;
-  start(): void | Observable<void>;
-  stop(): void | Observable<void>;
+  up(): void | Observable<void>;
+  down(): void | Observable<void>;
 }
 
 /** Module state interface. */

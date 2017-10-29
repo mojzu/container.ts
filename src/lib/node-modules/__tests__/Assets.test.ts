@@ -13,11 +13,11 @@ describe("Assets", () => {
   const ASSETS = CONTAINER.resolve<Assets>(Assets.NAME);
 
   beforeAll(async () => {
-    await CONTAINER.start().toPromise();
+    await CONTAINER.up().toPromise();
   });
 
   afterAll(async () => {
-    await CONTAINER.stop().toPromise();
+    await CONTAINER.down().toPromise();
   });
 
   it("#Assets", () => {

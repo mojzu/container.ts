@@ -34,13 +34,13 @@ class AppModule extends Module {
     // ...
   }
 
-  // Start/stop hooks are called when the modules container methods of the same
-  // name are called. Start/stop may also return an observable to perform asynchronous
+  // Up/down hooks are called when the modules container methods of the same
+  // name are called. Up/down may also return an observable to perform asynchronous
   // actions, or void if none are required.
-  public start(): Observable<void> | void {
-    // Modules may wait for their dependencies to start using container methods.
-    // A 'waitStopped' method is also available when stopping a module.
-    return this.container.waitStarted(Process.NAME)
+  public up(): Observable<void> | void {
+    // Modules may wait for their dependencies to signal up using container methods.
+    // An equivalent 'waitDown' method is also available.
+    return this.container.waitUp(Process.NAME)
       .map(() => {
         // All modules have debug, log and metric instances.
         // Logs and metrics are sent to the container which can then be
@@ -52,7 +52,7 @@ class AppModule extends Module {
       });
   }
 
-  public stop(): Observable<void> | void {
+  public down(): Observable<void> | void {
     // ...
   }
 
@@ -76,10 +76,10 @@ const CONTAINER = new Container("Main", ENVIRONMENT, argv)
   .registerModule(Process.NAME, Process)
   .registerModule(AppModule.NAME, AppModule);
 
-// Start container modules.
-// The 'Process' module automatically calls container.stop when
+// Signal operational.
+// The 'Process' module automatically calls container.down when
 // process is terminated by a signal.
-CONTAINER.start()
+CONTAINER.up()
   .subscribe({
     error: (error) => {
       process.stderr.write(`${error}\n`);

@@ -82,11 +82,11 @@ export class AppProcess extends Process {
     const version: string = this.version;
     const nodeEnvironment: string = this.nodeEnvironment;
 
-    // When 'start' method is called, this module will log information
+    // When 'up' method is called, this module will log information
     // about the host platform, such as architecture, Node.js version, etc.
 
     // This module adds handlers for SIGTERM and SIGINT signals that will
-    // automatically call this.container.stop in case of process exit.
+    // automatically call this.container.down in case of process exit.
   }
 
 }
@@ -168,7 +168,7 @@ SCRIPTS.startWorker("1", "worker.js", { restart: true, uptimeLimit: "T1M" })
 const code = await SCRIPTS.stopWorker("1").toPromise();
 ```
 
-## ScriptsServer
+## ScriptsNet
 
 Provides the same interface as the `Scripts` module, internally creates a server and sends socket handles to child processes for interprocess communication. This limits the use of `process.send`.
 
@@ -225,8 +225,8 @@ const ENVIRONMENT = new Environment(process.env);
 const CONTAINER = new Container("Worker", ENVIRONMENT)
   .registerModule(SubProcess.NAME, SubProcess);
 
-// Start container modules.
-CONTAINER.start()
+// Signal operational.
+CONTAINER.up()
   .subscribe({
     error: (error) => {
       process.stderr.write(`${error}\n`);

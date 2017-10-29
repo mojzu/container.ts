@@ -216,19 +216,17 @@ export class Scripts extends Module {
     WORKER_UPTIME_LIMIT: "ScriptsWorkerUptimeLimit",
   };
 
-  public readonly path: string;
+  public readonly path = this.getPath();
   public readonly workers: { [name: string]: IScriptsWorker } = {};
 
   public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
 
-    // Get script directory path from environment.
-    const scriptsPath = path.resolve(this.environment.get(Scripts.ENV.PATH));
-    this.path = NodeValidate.isDirectory(scriptsPath);
+    // Debug environment variables.
     this.debug(`${Scripts.ENV.PATH}="${this.path}"`);
   }
 
-  public stop(): void | Observable<void> {
+  public down(): void | Observable<void> {
     const observables$: Array<Observable<any>> = [];
 
     // Wait for worker processes to exit if connected.
@@ -263,7 +261,7 @@ export class Scripts extends Module {
   }
 
   public startWorker(name: string, target: string, options: IScriptsWorkerOptions = {}): Observable<ScriptsProcess> {
-    const uptimeLimit = this.validUptimeLimit(options.uptimeLimit);
+    const uptimeLimit = this.getUptimeLimit(options.uptimeLimit);
     const process = this.fork(target, options);
 
     if (this.workers[name] == null) {
@@ -273,7 +271,7 @@ export class Scripts extends Module {
       this.workers[name] = { process, unsubscribe$, next$, restarts: 0 };
 
       // Log worker start.
-      const metadata = this.workerLogMetadata({ name, worker: this.workers[name], options });
+      const metadata = this.getWorkerLogMetadata({ name, worker: this.workers[name], options });
       this.log.info(Scripts.LOG.WORKER_START, metadata);
     } else {
       // Restarted worker, reassign process in workers state.
@@ -289,7 +287,7 @@ export class Scripts extends Module {
       .takeUntil(worker.unsubscribe$)
       .subscribe((code) => {
         // Log worker exit.
-        const metadata = this.workerLogMetadata({ name, worker, code });
+        const metadata = this.getWorkerLogMetadata({ name, worker, code });
         this.log.info(Scripts.LOG.WORKER_EXIT, metadata);
 
         // Restart worker process by default.
@@ -311,7 +309,7 @@ export class Scripts extends Module {
       .subscribe((status) => {
         // Kill worker process if uptime limit exceeded.
         if ((uptimeLimit != null) && (status.uptime > uptimeLimit)) {
-          const metadata = this.workerLogMetadata({ name, worker });
+          const metadata = this.getWorkerLogMetadata({ name, worker });
           this.log.info(Scripts.LOG.WORKER_UPTIME_LIMIT, metadata);
           process.kill();
         }
@@ -337,7 +335,7 @@ export class Scripts extends Module {
       }
 
       // Log worker stop and delete in state.
-      const metadata = this.workerLogMetadata({ name, worker });
+      const metadata = this.getWorkerLogMetadata({ name, worker });
       this.log.info(Scripts.LOG.WORKER_STOP, metadata);
       delete this.workers[name];
     }
@@ -345,7 +343,11 @@ export class Scripts extends Module {
     return observable$;
   }
 
-  protected validUptimeLimit(limit?: string): number | null {
+  protected getPath(): string {
+    return NodeValidate.isDirectory(path.resolve(this.environment.get(Scripts.ENV.PATH)));
+  }
+
+  protected getUptimeLimit(limit?: string): number | null {
     if (limit != null) {
       try {
         const duration = NodeValidate.isDuration(limit);
@@ -357,7 +359,7 @@ export class Scripts extends Module {
     return null;
   }
 
-  protected workerLogMetadata(data: {
+  protected getWorkerLogMetadata(data: {
     name: string;
     worker: IScriptsWorker;
     options?: IScriptsWorkerOptions;

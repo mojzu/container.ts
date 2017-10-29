@@ -24,11 +24,11 @@ describe("Scripts", () => {
   const SCRIPTS = CONTAINER.resolve<Scripts>(Scripts.NAME);
 
   beforeAll(async () => {
-    await CONTAINER.start().toPromise();
+    await CONTAINER.up().toPromise();
   });
 
   afterAll(async () => {
-    await CONTAINER.stop().toPromise();
+    await CONTAINER.down().toPromise();
   });
 
   it("#Scripts", () => {

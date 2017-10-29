@@ -13,7 +13,7 @@ import { EMetricType, IMetricTags } from "./Metric";
 import { BehaviorSubject, Observable, Subject } from "./RxJS";
 import { IModule, IModuleConstructor, IModuleOpts, IModuleState } from "./Types";
 
-/** Command line arguments interface matching 'yargs'. */
+/** Command line arguments interface matching 'yargs' package. */
 export interface IContainerArguments {
   /** Non-option arguments */
   _: string[];
@@ -79,27 +79,32 @@ export class Container {
 
   /** Log names. */
   public static readonly LOG = {
-    START: "ContainerStart",
-    STOP: "ContainerStop",
+    UP: "ContainerUp",
+    DOWN: "ContainerDown",
   };
 
+  /** Root container. */
   public readonly container: AwilixContainer;
 
+  /** Observable module state. */
   public readonly modules$ = new BehaviorSubject<IModuleState>({});
 
   /** Array of registered module names. */
   public get moduleNames(): string[] { return Object.keys(this.modules$.value); }
 
-  /** Container logs. */
+  /** Container module logs. */
   public readonly logs$ = new Subject<ContainerLogMessage>();
 
-  /** Container metrics. */
+  /** Container module metrics. */
   public readonly metrics$ = new Subject<ContainerMetricMessage>();
 
   /** Creates a new container in proxy resolution mode. */
   public constructor(
+    /** Container name, used to namespace modules. */
     public readonly name: string,
+    /** Container environment. */
     public readonly environment = new Environment(),
+    /** Optional command line arguments. */
     public readonly argv: IContainerArguments = { _: [], $0: "" },
   ) {
     this.environment = environment;
@@ -107,44 +112,39 @@ export class Container {
     this.registerValue<Container>(Container.REFERENCE, this);
   }
 
-  /** Create scoped container. */
+  /** Create scope from container. */
   public createScope(): AwilixContainer {
     return this.container.createScope();
   }
 
-  /** Register a module in container, has singleton lifetime by default. */
+  /** Register a named module in container, has singleton lifetime by default. */
   public registerModule<T extends IModuleConstructor>(
-    name: string, instance: T,
+    name: string,
+    instance: T,
     options: RegistrationOptions = { lifetime: Lifetime.SINGLETON },
   ): Container {
     const functionOptions: RegisterNameAndFunctionPair = {
-      [name]: [this.makeModule.bind(this, name, instance), options],
+      [name]: [this.moduleFactory.bind(this, name, instance), options],
     };
     this.container.registerFunction(functionOptions);
-    this.reportModuleState(name, false);
+    this.setModuleState(name, false);
     return this;
   }
 
-  /** Register a value in container. */
+  /** Register a value of type in container. */
   public registerValue<T>(name: string, value: T): Container {
     this.container.registerValue(name, value);
     return this;
   }
 
-  /** Resolve module in container by name. */
+  /** Resolve value or module of type from container by name. */
   public resolve<T>(name: string): T {
     return this.container.resolve<T>(name);
-  }
-
-  /** Construct log metric name. */
-  public logMeticName(level: ELogLevel): string {
-    return `Log${ELogLevel[level]}`;
   }
 
   /** Send log message of level for module. */
   public sendLog(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, args: any[]): void {
     this.logs$.next(new ContainerLogMessage(level, message, metadata, args));
-    this.sendMetric(EMetricType.Increment, this.logMeticName(level), 1, metadata);
   }
 
   /** Send metric message of type for module. */
@@ -152,28 +152,28 @@ export class Container {
     this.metrics$.next(new ContainerMetricMessage(type, name, value, tags));
   }
 
-  /** Observable stream of logs filtered by level. */
+  /** Observable stream of module logs filtered by level. */
   public filterLogs(level: ELogLevel): Observable<ContainerLogMessage> {
     return this.logs$.filter((m) => m.level <= level);
   }
 
-  /** Observable stream of metrics filtered by type. */
+  /** Observable stream of module metrics filtered by type. */
   public filterMetrics(type: EMetricType): Observable<ContainerMetricMessage> {
     return this.metrics$.filter((m) => m.type === type);
   }
 
   /** Signal modules to enter operational state. */
-  public start(timeout?: number): Observable<void> {
-    return this.setModuleStates(true, timeout);
+  public up(timeout?: number): Observable<void> {
+    return this.setState(true, timeout);
   }
 
   /** Signal modules to leave operational state. */
-  public stop(timeout?: number): Observable<void> {
-    return this.setModuleStates(false, timeout);
+  public down(timeout?: number): Observable<void> {
+    return this.setState(false, timeout);
   }
 
-  /** Wait for modules to start before calling next. */
-  public waitStarted(...modules: string[]): Observable<void> {
+  /** Wait for modules to enter operational state before calling next. */
+  public waitUp(...modules: string[]): Observable<void> {
     return this.modules$
       .filter((states) => {
         return modules.reduce((previous, current) => {
@@ -184,8 +184,8 @@ export class Container {
       .take(1);
   }
 
-  /** Wait for modules to stop before calling next. */
-  public waitStopped(...modules: string[]): Observable<void> {
+  /** Wait for modules to leave operational state before calling next. */
+  public waitDown(...modules: string[]): Observable<void> {
     return this.modules$
       .filter((states) => {
         return modules.reduce((previous, current) => {
@@ -196,8 +196,7 @@ export class Container {
       .take(1);
   }
 
-  /** Factory functions for modules. */
-  protected makeModule<T extends IModuleConstructor>(
+  protected moduleFactory<T extends IModuleConstructor>(
     name: string,
     instance: T,
     opts: IModuleOpts,
@@ -205,23 +204,22 @@ export class Container {
     return new instance(name, opts);
   }
 
-  /** Set modules state by calling start/stop methods. */
-  protected setModuleStates(state: boolean, timeout = 10000): Observable<void> {
+  protected setState(state: boolean, timeout = 10000): Observable<void> {
     // Map module methods and report states.
     const modules = this.moduleNames.map((name) => this.container.resolve<IModule>(name));
     const observables$: Array<Observable<void>> = modules
       .map((mod) => {
-        const method: () => void | Observable<void> = state ? mod.start.bind(mod) : mod.stop.bind(mod);
+        const method: () => void | Observable<void> = state ? mod.up.bind(mod) : mod.down.bind(mod);
         const observable$ = method();
 
         if (observable$ == null) {
           // Module method has not returned observable, set state now.
-          this.reportModuleState(mod.name, state);
+          this.setModuleState(mod.name, state);
           return null;
         } else {
           // Observable returned, update state on next.
           return observable$
-            .do(() => this.reportModuleState(mod.name, state));
+            .do(() => this.setModuleState(mod.name, state));
         }
       })
       // Filter to array of observables.
@@ -229,7 +227,7 @@ export class Container {
 
     // Nothing to wait for.
     if (observables$.length === 0) {
-      return this.setModuleStatesDone(state);
+      return this.setStateComplete(state);
     }
 
     // Wait for modules to signal state.
@@ -237,18 +235,16 @@ export class Container {
     return Observable.forkJoin(...observables$)
       .timeout(timeout)
       .catch((error: Error) => Observable.throw(new ContainerError(Container.ERROR.TIMEOUT, error)))
-      .switchMap(() => this.setModuleStatesDone(state));
+      .switchMap(() => this.setStateComplete(state));
   }
 
-  /** Update and report module state via internal subject. */
-  protected reportModuleState(name: string, state: boolean): void {
+  protected setModuleState(name: string, state: boolean): void {
     this.modules$.value[name] = state;
     this.modules$.next(this.modules$.value);
   }
 
-  /** Module states are set. */
-  protected setModuleStatesDone(state: boolean): Observable<void> {
-    const message = state ? Container.LOG.START : Container.LOG.STOP;
+  protected setStateComplete(state: boolean): Observable<void> {
+    const message = state ? Container.LOG.UP : Container.LOG.DOWN;
     this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
     return Observable.of(undefined);
   }

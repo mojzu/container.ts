@@ -108,9 +108,9 @@ export class Module implements IModule {
   }
 
   /** Module operational state. */
-  public start(): void | Observable<void> { }
+  public up(): void | Observable<void> { }
 
   /** Module non-operational state. */
-  public stop(): void | Observable<void> { }
+  public down(): void | Observable<void> { }
 
 }

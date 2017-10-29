@@ -3,4 +3,4 @@ export * from "./Assets";
 export * from "./ChildProcess";
 export * from "./Process";
 export * from "./Scripts";
-export * from "./ScriptsServer";
+export * from "./ScriptsNet";

@@ -50,7 +50,7 @@ export class Process extends Module {
   /** Log names. */
   public static readonly LOG = {
     INFORMATION: "ProcessInformation",
-    STOP: "ProcessStop",
+    SIGNAL: "ProcessSignal",
   };
 
   /** Metric names. */
@@ -124,19 +124,19 @@ export class Process extends Module {
   }
 
   /** Try to read process information asset file, handle process events. */
-  public start(): void {
+  public up(): void {
     // Log process information.
     this.log.info(Process.LOG.INFORMATION, this.information);
 
-    // Process stop signal handlers.
-    process.on("SIGTERM", this.handleStop.bind(this, "SIGTERM"));
-    process.on("SIGINT", this.handleStop.bind(this, "SIGINT"));
+    // Process end signal handlers.
+    process.on("SIGTERM", this.onSignal.bind(this, "SIGTERM"));
+    process.on("SIGINT", this.onSignal.bind(this, "SIGINT"));
   }
 
-  /** Stop container when process termination signal received. */
-  protected handleStop(signal: string): void {
-    this.log.info(Process.LOG.STOP, { signal });
-    this.container.stop()
+  /** Container down when process termination signal received. */
+  protected onSignal(signal: string): void {
+    this.log.info(Process.LOG.SIGNAL, { signal });
+    this.container.down()
       .subscribe({
         next: () => process.exit(0),
         error: (error) => {

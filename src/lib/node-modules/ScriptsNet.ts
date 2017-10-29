@@ -1,5 +1,5 @@
 import * as net from "net";
-import { IModuleOpts, Module } from "../../container";
+import { IModuleOpts } from "../../container";
 import { Observable } from "../../container/RxJS";
 import {
   IScriptsWorkerOptions,
@@ -9,20 +9,15 @@ import {
 } from "./Scripts";
 
 /** Node.js scripts with server interface. */
-export class ScriptsServer extends Scripts {
+export class ScriptsNet extends Scripts {
 
   /** Default module name. */
   public static readonly NAME: string = "Scripts";
 
-  /** Error names. */
-  public static readonly ERROR = Object.assign(Module.ERROR, {
-    SERVER_ERROR: "ScriptsServerError",
-  });
-
   /** Log names. */
   public static readonly LOG = Object.assign(Scripts.LOG, {
-    START: "ScriptsServerStart",
-    STOP: "ScriptsServerStop",
+    UP: "ScriptsNetUp",
+    DOWN: "ScriptsNetDown",
   });
 
   /** Scripts server for connecting workers. */
@@ -45,19 +40,18 @@ export class ScriptsServer extends Scripts {
     this.error$.subscribe((error) => this.log.error(new ScriptsError(error)));
   }
 
-  public start(): Observable<void> {
-    const start$ = super.start() || Observable.of(undefined);
+  public up(): Observable<void> {
+    const up$ = super.up() || Observable.of(undefined);
     const listen$ = Observable.bindNodeCallback<void>(this.server.listen.bind(this.server))();
-    return Observable.forkJoin(start$, listen$).map(() => {
-      this.log.info(ScriptsServer.LOG.START, { port: this.port });
+    return Observable.forkJoin(up$, listen$).map(() => {
+      this.log.info(ScriptsNet.LOG.UP, { port: this.port });
     });
   }
 
-  public stop() {
-    // Close server and stop scripts.
+  public down() {
     this.server.close();
-    this.log.info(ScriptsServer.LOG.STOP);
-    return super.stop();
+    this.log.info(ScriptsNet.LOG.DOWN);
+    return super.down();
   }
 
   public startWorker(name: string, target: string, options: IScriptsWorkerOptions = {}): Observable<ScriptsProcess> {
