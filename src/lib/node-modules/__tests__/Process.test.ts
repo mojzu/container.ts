@@ -1,25 +1,17 @@
 import { Container, Environment } from "../../../container";
-import { IProcessOptions, Process } from "../Process";
-
-class TestProcess extends Process {
-  public static readonly NAME: string = "TestProcess";
-  public get options(): IProcessOptions {
-    return {
-      name: "test-process",
-      version: "1.2.3",
-      nodeEnvironment: "development",
-    };
-  }
-}
+import { Process } from "../Process";
 
 describe("Process", () => {
 
-  const ENVIRONMENT = new Environment();
+  const ENVIRONMENT = new Environment()
+    .set(Process.ENV.NAME, "test-process")
+    .set(Process.ENV.VERSION, "1.2.3")
+    .set(Process.ENV.NODE_ENV, "development");
 
   const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModule(TestProcess.NAME, TestProcess);
+    .registerModule(Process.NAME, Process);
 
-  const PROCESS = CONTAINER.resolve<TestProcess>(TestProcess.NAME);
+  const PROCESS = CONTAINER.resolve<Process>(Process.NAME);
 
   beforeAll(async () => {
     await CONTAINER.up().toPromise();
@@ -31,7 +23,7 @@ describe("Process", () => {
 
   it("#Process", () => {
     expect(PROCESS).toBeDefined();
-    expect(PROCESS.name).toEqual(TestProcess.NAME);
+    expect(PROCESS.name).toEqual(Process.NAME);
     expect(PROCESS.version).toEqual("1.2.3");
     expect(PROCESS.nodeEnvironment).toEqual("development");
   });
