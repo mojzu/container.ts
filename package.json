@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "0.46.2",
+  "version": "0.47.0",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -28,13 +28,13 @@
   },
   "dependencies": {
     "@types/debug": "^0.0.30",
-    "awilix": "^2.9.0",
+    "awilix": "^2.10.0",
     "debug": "^3.1.0",
     "rxjs": "^5.5.2"
   },
   "optionalDependencies": {
     "@types/moment-timezone": "^0.5.1",
-    "moment-timezone": "^0.5.13",
+    "moment-timezone": "^0.5.14",
     "validator": "^9.1.1"
   },
   "devDependencies": {
@@ -49,7 +49,7 @@
     "ts-jest": "^21.1.4",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
-    "typescript": "^2.5.3",
+    "typescript": "^2.6.1",
     "yargs": "^10.0.3"
   },
   "jest": {
