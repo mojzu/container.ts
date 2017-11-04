@@ -23,9 +23,9 @@ export class ScriptsNet extends Scripts {
   /** Scripts server for connecting workers. */
   public readonly server: net.Server = net.createServer();
 
-  protected readonly close$ = Observable.fromEvent<void>(this.server, "close");
-  protected readonly connection$ = Observable.fromEvent<net.Socket>(this.server, "connection");
-  protected readonly error$ = Observable.fromEvent<any>(this.server, "error");
+  protected readonly close$ = Observable.fromEvent<void>(this.server as any, "close");
+  protected readonly connection$ = Observable.fromEvent<net.Socket>(this.server as any, "connection");
+  protected readonly error$ = Observable.fromEvent<any>(this.server as any, "error");
 
   /** Get server port number. */
   public get port(): number {
@@ -58,7 +58,7 @@ export class ScriptsNet extends Scripts {
     // Create socket connection to server and start worker when connected.
     const parentSocket$ = this.connection$.take(1);
     const childSocket = net.createConnection(this.port);
-    const childSocket$ = Observable.fromEvent<void>(childSocket, "connect").take(1);
+    const childSocket$ = Observable.fromEvent<void>(childSocket as any, "connect").take(1);
 
     return Observable.forkJoin(parentSocket$, childSocket$)
       .switchMap(([parent]) => {

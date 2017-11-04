@@ -81,6 +81,7 @@ export class ErrorChain {
       serialised.ErrorChain.reduceRight((p, current) => {
         chained = new ErrorChain(current, chained || undefined);
         chained = Object.assign(chained, current);
+        return null;
       }, null);
 
       return chained;

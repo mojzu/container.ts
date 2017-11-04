@@ -96,8 +96,9 @@ export class ChildProcess extends Process implements IProcessSend {
     options.socket.setEncoding(ChildProcess.DEFAULT.ENCODING);
 
     // Socket observable events.
-    const close$ = Observable.fromEvent<void>(options.socket, "close");
-    const data$ = Observable.fromEvent<string>(options.socket, "data");
+    // TODO: Fix fromEvent emitter types.
+    const close$ = Observable.fromEvent<void>(options.socket as any, "close");
+    const data$ = Observable.fromEvent<string>(options.socket as any, "data");
 
     // Subscribe to socket events until closed.
     data$.takeUntil(close$)
@@ -289,7 +290,7 @@ export class ChildProcess extends Process implements IProcessSend {
     });
 
     // Process messages.
-    Observable.fromEvent<IProcessMessage>(process, "message")
+    Observable.fromEvent<IProcessMessage>(process as any, "message")
       .subscribe((message) => this.messages$.next(message));
 
     // Listen for and handle messages from parent process.

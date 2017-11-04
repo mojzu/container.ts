@@ -64,6 +64,9 @@ export class ScriptsProcessError extends ErrorChain {
   }
 }
 
+/** Process exit callback return value(s). */
+type IProcessExit = [number | null, string | null];
+
 /** Spawned scripts process interface. */
 export class ScriptsProcess implements IProcessSend {
 
@@ -84,15 +87,15 @@ export class ScriptsProcess implements IProcessSend {
     public readonly options: IScriptsOptions,
   ) {
     // Accumulate multiple callback arguments into array.
-    const accumulator = (...args: any[]) => args;
+    const accumulator: () => IProcessExit = (...args: any[]) => args as any;
 
     // Listen for process exit, reduce code/signal for next argument.
-    this.exit$ = Observable.fromEvent(process, "exit", accumulator)
+    this.exit$ = Observable.fromEvent<IProcessExit>(process as any, "exit", accumulator)
       .take(1)
-      .switchMap((args: [number | null, string | null]) => {
+      .map((args) => {
         const [code, signal] = args;
         const value = (typeof code === "number") ? code : signal;
-        return Observable.of((value != null) ? value : 1);
+        return (value != null) ? value : 1;
       });
 
     this.exit$.subscribe((code) => {
@@ -104,9 +107,9 @@ export class ScriptsProcess implements IProcessSend {
     });
 
     // Listen for process error, forward to scripts logger.
-    Observable.fromEvent(process, "error")
+    Observable.fromEvent<Error>(process as any, "error")
       .takeUntil(this.exit$)
-      .subscribe((error: Error) => {
+      .subscribe((error) => {
         const chained = new ScriptsProcessError(this.target, error);
         this.scripts.log.error(chained);
       });
@@ -123,7 +126,7 @@ export class ScriptsProcess implements IProcessSend {
     }
 
     // Listen for and handle process messages.
-    Observable.fromEvent<IProcessMessage>(process, "message")
+    Observable.fromEvent<IProcessMessage>(process as any, "message")
       .takeUntil(this.exit$)
       .subscribe((message) => this.messages$.next(message));
 
