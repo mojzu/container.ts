@@ -12,6 +12,7 @@ export interface IModuleDependencies {
 
 /** Module constructor interface. */
 export interface IModuleConstructor {
+  NAME: string;
   new(name: string, opts: IModuleOpts): IModule;
 }
 
