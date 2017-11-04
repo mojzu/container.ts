@@ -82,7 +82,7 @@ describe("Validate", () => {
   });
 
   it("#isString empty string", () => {
-    const value = Validate.isString("", { empty: true });
+    const value = Validate.isString("", { min: 0 });
     expect(value).toEqual("");
   });
 

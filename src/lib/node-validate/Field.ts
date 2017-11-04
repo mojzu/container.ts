@@ -1,8 +1,8 @@
 import { Field } from "../validate";
-import { INodeValidateBufferOptions, NodeValidate } from "./NodeValidate";
+import * as NodeValidate from "./NodeValidate";
 
 export class BufferField extends Field<Buffer> {
-  public constructor(protected readonly options: INodeValidateBufferOptions = {}) {
+  public constructor(protected readonly options: NodeValidate.INodeValidateBuffer = {}) {
     super();
   }
   public validate(value: string): Buffer {
@@ -17,16 +17,10 @@ export class FileField extends Field<string> {
   public validate(value: string): string {
     return NodeValidate.isFile(value);
   }
-  public format(value: string): string {
-    return value;
-  }
 }
 
 export class DirectoryField extends Field<string> {
   public validate(value: string): string {
     return NodeValidate.isDirectory(value);
-  }
-  public format(value: string): string {
-    return value;
   }
 }

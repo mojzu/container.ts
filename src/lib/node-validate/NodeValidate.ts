@@ -3,80 +3,76 @@ import * as path from "path";
 import { ErrorChain } from "../error";
 import { Validate } from "../validate";
 
-/**
- * Extended validation error codes.
- */
+/** NodeValidate error codes. */
 export enum ENodeValidateError {
   InvalidBuffer,
   InvalidFile,
   InvalidDirectory,
 }
 
-/** Node validation error class. */
+/** NodeValidate error chain class. */
 export class NodeValidateError extends ErrorChain {
   public constructor(code: ENodeValidateError, value?: any, cause?: Error) {
     super({ name: ENodeValidateError[code], value }, cause);
   }
 }
 
-/** Buffer validation options. */
-export interface INodeValidateBufferOptions {
+/** NodeValidate.isBuffer options. */
+export interface INodeValidateBuffer {
+  /** Optional encoding for buffer. */
   encoding?: string;
 }
 
-/**
- * Node validation methods container.
- */
+export function isBuffer(value = "", options: INodeValidateBuffer = {}): Buffer {
+  let buf = null;
+
+  try {
+    buf = Buffer.from(value, options.encoding);
+  } catch (error) {
+    throw new NodeValidateError(ENodeValidateError.InvalidBuffer, value, error);
+  }
+
+  if (buf == null) {
+    throw new NodeValidateError(ENodeValidateError.InvalidBuffer, value);
+  }
+  return buf;
+}
+
+export function isFile(value = ""): string {
+  let isValid = false;
+
+  try {
+    value = path.resolve(value);
+    isValid = fs.lstatSync(value).isFile();
+  } catch (error) {
+    throw new NodeValidateError(ENodeValidateError.InvalidFile, value, error);
+  }
+
+  if (!isValid) {
+    throw new NodeValidateError(ENodeValidateError.InvalidFile, value);
+  }
+  return value;
+}
+
+export function isDirectory(value = ""): string {
+  let isValid = false;
+
+  try {
+    value = path.resolve(value);
+    isValid = fs.lstatSync(value).isDirectory();
+  } catch (error) {
+    throw new NodeValidateError(ENodeValidateError.InvalidDirectory, value, error);
+  }
+
+  if (!isValid) {
+    throw new NodeValidateError(ENodeValidateError.InvalidDirectory, value);
+  }
+  return value;
+}
+
+/** Static validate methods container. */
 export class NodeValidate extends Validate {
-
-  public static isBuffer(value = "", options: INodeValidateBufferOptions = {}): Buffer {
-    let buf = null;
-
-    try {
-      buf = Buffer.from(value, options.encoding);
-    } catch (error) {
-      throw new NodeValidateError(ENodeValidateError.InvalidBuffer, value, error);
-    }
-
-    if (buf == null) {
-      throw new NodeValidateError(ENodeValidateError.InvalidBuffer, value);
-    }
-
-    return buf;
-  }
-
-  public static isFile(value = ""): string {
-    let isFile = false;
-
-    try {
-      value = path.resolve(value);
-      isFile = fs.lstatSync(value).isFile();
-    } catch (error) {
-      throw new NodeValidateError(ENodeValidateError.InvalidFile, value, error);
-    }
-
-    if (!isFile) {
-      throw new NodeValidateError(ENodeValidateError.InvalidFile, value);
-    }
-
-    return value;
-  }
-
-  public static isDirectory(value = ""): string {
-    let isDirectory = false;
-
-    try {
-      value = path.resolve(value);
-      isDirectory = fs.lstatSync(value).isDirectory();
-    } catch (error) {
-      throw new NodeValidateError(ENodeValidateError.InvalidDirectory, value, error);
-    }
-
-    if (!isDirectory) {
-      throw new NodeValidateError(ENodeValidateError.InvalidDirectory, value);
-    }
-
-    return value;
-  }
-
+  public static isBuffer = isBuffer;
+  public static isFile = isFile;
+  public static isDirectory = isDirectory;
 }

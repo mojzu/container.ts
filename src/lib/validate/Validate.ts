@@ -3,9 +3,7 @@ import * as validator from "validator";
 import { ErrorChain } from "../error";
 import { ISO3166, ISO639 } from "./data";
 
-/**
- * Validation error codes.
- */
+/** Validate error codes. */
 export enum EValidateError {
   InvalidBoolean,
   InvalidInteger,
@@ -14,6 +12,21 @@ export enum EValidateError {
   InvalidString,
   InvalidAscii,
   InvalidBase64,
+  InvalidAlpha,
+  InvalidAlphanumeric,
+  InvalidCreditCard,
+  InvalidEmail,
+  InvalidDomain,
+  InvalidHexColour,
+  InvalidIp,
+  InvalidJson,
+  InvalidMacAddress,
+  InvalidMd5,
+  InvalidMobilePhone,
+  InvalidMongoId,
+  InvalidPostalCode,
+  InvalidUrl,
+  InvalidUuid,
   InvalidPort,
   InvalidLanguage,
   InvalidCountry,
@@ -21,432 +34,586 @@ export enum EValidateError {
   InvalidTimeZone,
   InvalidDate,
   InvalidDuration,
-  InvalidIp,
-  InvalidDomain,
-  InvalidUrl,
-  InvalidEmail,
-  InvalidMongoId,
-  InvalidHexColour,
 }
 
-/** Validate error class. */
+/** Validate error chain class. */
 export class ValidateError extends ErrorChain {
   public constructor(code: EValidateError, value?: any, cause?: Error) {
     super({ name: EValidateError[code], value }, cause);
   }
 }
 
-/** Boolean validation options. */
-export interface IValidateBooleanOptions {
+/** Validate.isBoolean options. */
+export interface IValidateBoolean {
   /** If true, strict validation is used. */
   strict?: boolean;
 }
 
-/** Number validation options. */
-export interface IValidateNumberOptions {
-  min?: number;
-  max?: number;
+/** Wrapper for validator.toBoolean. */
+export function isBoolean(value = "", options: IValidateBoolean = {}): boolean {
+  const strict = !!options.strict;
+  try {
+    return validator.toBoolean(value, strict);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidBoolean, value, error);
+  }
 }
 
-/** Integer validation options. */
-export interface IValidateIntegerOptions extends IValidateNumberOptions {
-  allow_leading_zeroes?: boolean;
-  lt?: number;
-  gt?: number;
+/** Validate.isInteger options. */
+export interface IValidateInteger extends ValidatorJS.IsIntOptions { }
+
+/** Wrapper for validator.isInt. */
+export function isInteger(value = "", options: IValidateInteger = {}): number {
+  let isValid = false;
+
+  try {
+    isValid = validator.isInt(value, options);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidInteger, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidInteger, value);
+  }
+  return validator.toInt(value, 10);
 }
 
-/** String validation options. */
-export interface IValidateStringOptions {
-  /** If true, string may be empty. */
-  empty?: boolean;
-  /** Minimum length of string. */
-  min?: number;
-  /** Maximum length of string. */
-  max?: number;
-  /** Allowed values for string. */
-  values?: string[];
-  /** Require upper case characters. */
-  uppercase?: boolean;
+/** Validate.isFloat options. */
+export interface IValidateFloat extends ValidatorJS.IsFloatOptions { }
+
+/** Wrapper for validator.isFloat. */
+export function isFloat(value = "", options: IValidateFloat = {}): number {
+  let isValid = false;
+
+  try {
+    isValid = validator.isFloat(value, options);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidFloat, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidFloat, value);
+  }
+  return validator.toFloat(value);
+}
+
+/** Wrapper for validator.isHexadecimal. */
+export function isHexadecimal(value = ""): number {
+  let isValid = false;
+
+  try {
+    isValid = validator.isHexadecimal(value);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidHexadecimal, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidHexadecimal, value);
+  }
+  return validator.toInt(value, 16);
+}
+
+/** Validate.isString options. */
+export interface IValidateString extends ValidatorJS.IsLengthOptions {
   /** Require lower case characters. */
   lowercase?: boolean;
+  /** Require upper case characters. */
+  uppercase?: boolean;
+  /** Optional array of allowed values. */
+  values?: string[];
 }
 
-/** Locale validation options. */
-export interface IValidateLocaleOptions {
+/** Wrapper for validator methods isLength, isUppercase, isLowercase and isIn. */
+export function isString(value = "", options: IValidateString = {}): string {
+  const uppercase = !!options.uppercase;
+  const lowercase = !!options.lowercase;
+  const values = options.values || [];
+  let isValid = false;
+
+  // If minimum length is undefined, default to 1.
+  // Passing undefined minimum causes empty strings to pass validation.
+  if (options.min == null) {
+    options.min = 1;
+  }
+
+  try {
+    // Validate is string of length.
+    isValid = validator.isLength(value, { min: options.min, max: options.max });
+    // Check in values array if provided.
+    if (values.length > 0) {
+      isValid = isValid && validator.isIn(value, values);
+    }
+    // Check if uppercase/lowercase if required.
+    if (uppercase && !validator.isUppercase(value)) {
+      isValid = false;
+    }
+    if (lowercase && !validator.isLowercase(value)) {
+      isValid = false;
+    }
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidString, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidString, value);
+  }
+  return value;
+}
+
+/** Wrapper for validator.isAscii. */
+export function isAscii(value = "", options: IValidateString = {}): string {
+  let isValid = false;
+
+  try {
+    isValid = validator.isAscii(value);
+    value = isString(value, options);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidAscii, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidAscii, value);
+  }
+  return value;
+}
+
+/** Wrapper for validator.isBase64. */
+export function isBase64(value = "", options: IValidateString = {}): string {
+  let isValid = false;
+
+  try {
+    isValid = validator.isBase64(value);
+    value = isString(value, options);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidBase64, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidBase64, value);
+  }
+  return value;
+}
+
+/** Validate.isAlpha options. */
+export interface IValidateAlpha extends IValidateString {
+  /** Locale used by validator, defaults to en-GB. */
+  locale?: ValidatorJS.AlphaLocale;
+}
+
+/** Wrapper for validator.isAlpha. */
+export function isAlpha(value = "", options: IValidateAlpha = {}): string {
+  const locale = options.locale || "en-GB";
+  let isValid = false;
+
+  try {
+    isValid = validator.isAlpha(value, locale);
+    value = isString(value, options);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidAlpha, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidAlpha, value);
+  }
+  return value;
+}
+
+/** Validate.isAlphanumeric options. */
+export interface IValidateAlphanumeric extends IValidateString {
+  /** Locale used by validator, defaults to en-GB. */
+  locale?: ValidatorJS.AlphanumericLocale;
+}
+
+/** Wrapper for validator.isAlphanumeric. */
+export function isAlphanumeric(value = "", options: IValidateAlphanumeric = {}): string {
+  const locale = options.locale || "en-GB";
+  let isValid = false;
+
+  try {
+    isValid = validator.isAlphanumeric(value, locale);
+    value = isString(value, options);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidAlphanumeric, value);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidAlphanumeric, value);
+  }
+  return value;
+}
+
+/** Wrapper for validator.isCreditCard. */
+export function isCreditCard(value = ""): string {
+  let isValid = false;
+
+  try {
+    isValid = validator.isCreditCard(value);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidCreditCard, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidCreditCard, value);
+  }
+  return value;
+}
+
+/** Validate.isEmail options. */
+export interface IValidateEmail extends ValidatorJS.IsEmailOptions { }
+
+/** Wrapper for validator.isEmail. */
+export function isEmail(value = "", options: IValidateEmail = {}): string {
+  let isValid = false;
+
+  try {
+    isValid = validator.isEmail(value, options);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidEmail, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidEmail, value);
+  }
+  return value;
+}
+
+/** Validate.isDomain options. */
+export interface IValidateDomain extends ValidatorJS.IsFQDNOptions { }
+
+/** Wrapper for validator.isFQDN. */
+export function isDomain(value = "", options: IValidateDomain = {}): string {
+  let isValid = false;
+
+  try {
+    isValid = validator.isFQDN(value, options);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidDomain, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidDomain, value);
+  }
+  return value;
+}
+
+/** Wrapper for validator.isHexColor. */
+export function isHexColour(value = ""): string {
+  let isValid = false;
+
+  try {
+    isValid = validator.isHexColor(value);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidHexColour, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidHexColour, value);
+  }
+  return value;
+}
+
+/** Validate.isIp options. */
+export interface IValidateIp {
+  /** IP version number, defaults to 4. */
+  version?: 4 | 6;
+}
+
+/** Wrapper for validator.isIP. */
+export function isIp(value = "", options: IValidateIp = {}): string {
+  const version = options.version || 4;
+  let isValid = false;
+
+  try {
+    isValid = validator.isIP(value, version);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidIp, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidIp, value);
+  }
+  return value;
+}
+
+/** Wrapper for validator.isJSON. */
+export function isJson<T>(value = ""): T {
+  let isValid = false;
+
+  try {
+    isValid = validator.isJSON(value);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidJson, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidJson, value);
+  }
+  return JSON.parse(value);
+}
+
+/** Wrapper for validator.isMACAddress. */
+export function isMacAddress(value = ""): string {
+  let isValid = false;
+
+  try {
+    isValid = validator.isMACAddress(value);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidMacAddress, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidMacAddress, value);
+  }
+  return value;
+}
+
+/** Wrapper for validator.isMD5. */
+export function isMd5(value = ""): string {
+  let isValid = false;
+
+  try {
+    isValid = validator.isMD5(value);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidMd5, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidMd5, value);
+  }
+  return value;
+}
+
+/** Validate.isMobilePhone options. */
+export interface IValidateMobilePhone {
+  /** Locale used by validator, defaults to en-GB. */
+  locale?: ValidatorJS.MobilePhoneLocale;
+}
+
+/** Wrapper for validator.isMobilePhone. */
+export function isMobilePhone(value = "", options: IValidateMobilePhone = {}): string {
+  const locale = options.locale || "en-GB";
+  let isValid = false;
+
+  try {
+    isValid = validator.isMobilePhone(value, locale);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidMobilePhone, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidMobilePhone, value);
+  }
+  return value;
+}
+
+/** Wrapper for validator.isMongoId. */
+export function isMongoId(value = ""): string {
+  let isValid = false;
+
+  try {
+    isValid = validator.isMongoId(value);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidMongoId, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidMongoId, value);
+  }
+  return value;
+}
+
+/** Validate.isPostalCode options. */
+export interface IValidatePostalCode {
+  /** Locale used by validator, defaults to GB. */
+  locale?: ValidatorJS.PostalCodeLocale;
+}
+
+/** Wrapper for validator.isPostalCode. */
+export function isPostalCode(value = "", options: IValidatePostalCode = {}): string {
+  const locale = options.locale || "GB";
+  let isValid = false;
+
+  try {
+    isValid = validator.isPostalCode(value, locale);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidPostalCode, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidPostalCode, value);
+  }
+  return value;
+}
+
+/** Validate.isUrl options. */
+export interface IValidateUrl extends ValidatorJS.IsURLOptions { }
+
+/** Wrapper for validator.isURL. */
+export function isUrl(value = "", options: IValidateUrl = { require_host: true }): string {
+  let isValid = false;
+
+  try {
+    isValid = validator.isURL(value, options);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidUrl, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidUrl, value);
+  }
+  return value;
+}
+
+/** Validate.isUuid options. */
+export interface IValidateUuid {
+  /** UUID version number, defaults to all. */
+  version?: 3 | 4 | 5;
+}
+
+/** Wrapper for validator.isUUID. */
+export function isUuid(value = "", options: IValidateUuid = {}): string {
+  const version = options.version || "all";
+  let isValid = false;
+
+  try {
+    isValid = validator.isUUID(value, version);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidUuid, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidUuid, value);
+  }
+  return value;
+}
+
+/** Validate that value is a valid port number (1 - 65535). */
+export function isPort(value = ""): number {
+  try {
+    return isInteger(value, { min: 0x1, max: 0xFFFF });
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidPort, value, error);
+  }
+}
+
+/** Validate that value is a valid ISO639 language code. */
+export function isLanguage(value = ""): string {
+  try {
+    return isString(value.toLowerCase(), { min: 2, max: 2, values: ISO639 });
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidLanguage, value, error);
+  }
+}
+
+/** Validate that value is a valid ISO3166 country code. */
+export function isCountry(value = ""): string {
+  try {
+    return isString(value.toUpperCase(), { min: 2, max: 2, values: ISO3166 });
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidCountry, value, error);
+  }
+}
+
+/** Validate.isLocale options. */
+export interface IValidateLocale {
+  /** Language/country code separator, defaults to '_'. */
   separator?: string;
 }
 
-/** Date validation options. */
-export interface IValidateDateOptions {
+/** Validate that value is a valid locale (language_COUNTRY). */
+export function isLocale(value = "", options: IValidateLocale = {}): string {
+  const separator = options.separator || "_";
+  try {
+    const parts = value.split(separator);
+    const language = isLanguage(parts[0]);
+    const country = isCountry(parts[1]);
+    return `${language}${separator}${country}`;
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidLocale, value, error);
+  }
+}
+
+/** Validate that value is a valid time zone defined in 'moment-timezone' library. */
+export function isTimeZone(value = ""): string {
+  try {
+    return isString(value, { values: moment.tz.names() });
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidTimeZone, value, error);
+  }
+}
+
+/** Validate.isDate options. */
+export interface IValidateDate {
+  /** Formatting hints passed to 'moment-timezone', defaults to ISO8601. */
   format?: string | string[];
+  /** Timezone used for parsing, defaults to 'Etc/UTC'. */
   timezone?: string;
 }
 
-/** Duration validation options. */
-export interface IValidateDurationOptions {
+/** Validate that value is a valid date parsed by 'moment-timezone' library. */
+export function isDate(value = "", options: IValidateDate = {}): moment.Moment {
+  const format = options.format || moment.ISO_8601;
+  const timezone = options.timezone || "Etc/UTC";
+  let date: moment.Moment;
+  let isValid = false;
+
+  try {
+    date = moment.tz(value, format, timezone);
+    isValid = date.isValid();
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidDate, value, error);
+  }
+
+  if (!isValid) {
+    throw new ValidateError(EValidateError.InvalidDate, value);
+  }
+  return date;
+}
+
+/** Validate.isDuration options. */
+export interface IValidateDuration {
+  /** Optional unit of time passed to 'moment-timezone'. */
   unit?: moment.unitOfTime.DurationConstructor;
 }
 
-/** IP validation options. */
-export interface IValidateIpOptions {
-  version?: number;
+/** Validate that value is a valid duration parsed by 'moment-timezone' library. */
+export function isDuration(value = "", options: IValidateDuration = {}): moment.Duration {
+  try {
+    return moment.duration(value, options.unit);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidDuration, value, error);
+  }
 }
 
-/** Domain validation options. */
-export interface IValidateDomainOptions {
-  require_tld?: boolean;
-  allow_underscores?: boolean;
-  allow_trailing_dot?: boolean;
-}
-
-/** URL validation options. */
-export interface IValidateUrlOptions {
-  protocols?: string[];
-  require_tld?: boolean;
-  require_protocol?: boolean;
-  require_host: boolean;
-  require_valid_protocol?: boolean;
-  allow_underscores?: boolean;
-  host_whitelist?: Array<string | RegExp>;
-  host_blacklist?: Array<string | RegExp>;
-  allow_trailing_dot?: boolean;
-  allow_protocol_relative_urls?: boolean;
-}
-
-/** Email validation options. */
-export interface IValidateEmailOptions {
-  normalise?: boolean;
-  lowercase?: boolean;
-  remove_dots?: boolean;
-  remove_extension?: boolean;
-  allow_display_name?: boolean;
-  allow_utf8_local_part?: boolean;
-  require_tld?: boolean;
-}
-
-/**
- * Validation methods container.
- */
+/** Static validate methods container. */
 export class Validate {
-
-  public static isBoolean(value = "", options: IValidateBooleanOptions = {}): boolean {
-    const strict = !!options.strict;
-    try {
-      return validator.toBoolean(value, strict);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidBoolean, value, error);
-    }
-  }
-
-  public static isInteger(value = "", options: IValidateIntegerOptions = {}): number {
-    let isInt = false;
-
-    try {
-      isInt = validator.isInt(value, options);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidInteger, value, error);
-    }
-
-    if (!isInt) {
-      throw new ValidateError(EValidateError.InvalidInteger, value);
-    }
-
-    return parseInt(value, 10);
-  }
-
-  public static isFloat(value = "", options: IValidateNumberOptions = {}): number {
-    let isFloat = false;
-
-    try {
-      isFloat = validator.isFloat(value, options);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidFloat, value, error);
-    }
-
-    if (!isFloat) {
-      throw new ValidateError(EValidateError.InvalidFloat, value);
-    }
-
-    return parseFloat(value);
-  }
-
-  public static isHexadecimal(value = ""): number {
-    let isHexadecimal = false;
-
-    try {
-      isHexadecimal = validator.isHexadecimal(value);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidHexadecimal, value, error);
-    }
-
-    if (!isHexadecimal) {
-      throw new ValidateError(EValidateError.InvalidHexadecimal, value);
-    }
-
-    return parseInt(value, 16);
-  }
-
-  public static isString(value = "", options: IValidateStringOptions = {}): string {
-    const emptyIsAllowed = !!options.empty;
-    const min = options.min || 1;
-    const max = options.max;
-    const values = options.values || [];
-    const uppercase = options.uppercase || false;
-    const lowercase = options.lowercase || false;
-
-    let isEmpty = false;
-    let isValid = false;
-    let inArray = false;
-
-    try {
-      // Validate is string of length.
-      isValid = validator.isLength(value, min, max);
-      // Check if empty if allowed.
-      if (emptyIsAllowed) {
-        isEmpty = validator.isEmpty(value);
-      }
-      // Check in array if provided.
-      if (values.length > 0) {
-        inArray = validator.isIn(value, values);
-      }
-      // Check if uppercase/lowercase if required.
-      if (uppercase) {
-        if (!validator.isUppercase(value)) {
-          isValid = false;
-        }
-      }
-      if (lowercase) {
-        if (!validator.isLowercase(value)) {
-          isValid = false;
-        }
-      }
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidString, value, error);
-    }
-
-    const notInArray = (values.length > 0) && !inArray;
-    const notValid = !(emptyIsAllowed && isEmpty) && !isValid;
-
-    if (notInArray || notValid) {
-      throw new ValidateError(EValidateError.InvalidString, value);
-    }
-
-    return value;
-  }
-
-  public static isAscii(value = "", options: IValidateStringOptions = {}): string {
-    let isAscii = false;
-    let ascii: string;
-
-    try {
-      isAscii = validator.isAscii(value);
-      ascii = Validate.isString(value, options);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidAscii, value, error);
-    }
-
-    if (!isAscii) {
-      throw new ValidateError(EValidateError.InvalidAscii, value);
-    }
-
-    return ascii;
-  }
-
-  public static isBase64(value = "", options: IValidateStringOptions = {}): string {
-    let isBase64 = false;
-    let base64: string;
-
-    try {
-      isBase64 = validator.isBase64(value);
-      base64 = Validate.isString(value, options);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidBase64, value, error);
-    }
-
-    if (!isBase64) {
-      throw new ValidateError(EValidateError.InvalidBase64, value);
-    }
-
-    return base64;
-  }
-
-  public static isPort(value = ""): number {
-    try {
-      return Validate.isInteger(value, { min: 0x1, max: 0xFFFF });
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidPort, value, error);
-    }
-  }
-
-  public static isLanguage(value = ""): string {
-    try {
-      return Validate.isString(value.toLowerCase(), { min: 2, max: 2, values: ISO639 });
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidLanguage, value, error);
-    }
-  }
-
-  public static isCountry(value = ""): string {
-    try {
-      return Validate.isString(value.toUpperCase(), { min: 2, max: 2, values: ISO3166 });
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidCountry, value, error);
-    }
-  }
-
-  public static isLocale(value = "", options: IValidateLocaleOptions = {}): string {
-    const separator = options.separator || "_";
-
-    try {
-      const parts = value.split(separator);
-      const language = Validate.isLanguage(parts[0]);
-      const country = Validate.isCountry(parts[1]);
-      return `${language}${separator}${country}`;
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidLocale, value, error);
-    }
-  }
-
-  public static isTimeZone(value = ""): string {
-    try {
-      return Validate.isString(value, { values: moment.tz.names() });
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidTimeZone, value, error);
-    }
-  }
-
-  public static isDate(value = "", options: IValidateDateOptions = {}): moment.Moment {
-    const format = options.format || moment.ISO_8601;
-    const timezone = options.timezone || "Etc/UTC";
-    let date: moment.Moment;
-
-    try {
-      date = moment.tz(value, format, timezone);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidDate, value, error);
-    }
-
-    if (!date.isValid()) {
-      throw new ValidateError(EValidateError.InvalidDate, value);
-    }
-
-    return date;
-  }
-
-  public static isDuration(value = "", options: IValidateDurationOptions = {}): moment.Duration {
-    const unit = options.unit || "ms";
-    try {
-      return moment.duration(value, unit);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidDuration, value, error);
-    }
-  }
-
-  public static isIp(value = "", options: IValidateIpOptions = {}): string {
-    const version = options.version || 4;
-    let isIp = false;
-
-    try {
-      isIp = validator.isIP(value, version);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidIp, value, error);
-    }
-
-    if (!isIp) {
-      throw new ValidateError(EValidateError.InvalidIp, value);
-    }
-
-    return value;
-  }
-
-  public static isDomain(value = "", options: IValidateDomainOptions = {}): string {
-    let isDomain = false;
-
-    try {
-      isDomain = validator.isFQDN(value, options);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidDomain, value, error);
-    }
-
-    if (!isDomain) {
-      throw new ValidateError(EValidateError.InvalidDomain, value);
-    }
-
-    return value;
-  }
-
-  public static isUrl(value = "", options: IValidateUrlOptions = { require_host: true }): string {
-    let isUrl = false;
-
-    try {
-      isUrl = validator.isURL(value, options);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidUrl, value, error);
-    }
-
-    if (!isUrl) {
-      throw new ValidateError(EValidateError.InvalidUrl, value);
-    }
-
-    return value;
-  }
-
-  public static isEmail(value = "", options: IValidateEmailOptions = {}): string {
-    const normalise = options.normalise || false;
-    let email: string;
-    let isEmail = false;
-
-    try {
-      email = value;
-      if (normalise) {
-        const normalisedEmail = validator.normalizeEmail(value, options);
-        if (!normalisedEmail) {
-          throw new ValidateError(EValidateError.InvalidEmail, value);
-        }
-        email = normalisedEmail;
-      }
-      isEmail = validator.isEmail(email, options);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidEmail, value, error);
-    }
-
-    if (!isEmail) {
-      throw new ValidateError(EValidateError.InvalidEmail, value);
-    }
-
-    return email;
-  }
-
-  public static isMongoId(value = ""): string {
-    let isMongoId = false;
-
-    try {
-      isMongoId = validator.isMongoId(value);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidMongoId, value, error);
-    }
-
-    if (!isMongoId) {
-      throw new ValidateError(EValidateError.InvalidMongoId, value);
-    }
-
-    return value;
-  }
-
-  public static isHexColour(value = ""): string {
-    let isHexColour = false;
-
-    try {
-      isHexColour = validator.isHexColor(value);
-    } catch (error) {
-      throw new ValidateError(EValidateError.InvalidHexColour, value, error);
-    }
-
-    if (!isHexColour) {
-      throw new ValidateError(EValidateError.InvalidHexColour, value);
-    }
-
-    return value;
-  }
-
+  public static isBoolean = isBoolean;
+  public static isInteger = isInteger;
+  public static isFloat = isFloat;
+  public static isHexadecimal = isHexadecimal;
+  public static isString = isString;
+  public static isAscii = isAscii;
+  public static isBase64 = isBase64;
+  public static isAlpha = isAlpha;
+  public static isAlphanumeric = isAlphanumeric;
+  public static isCreditCard = isCreditCard;
+  public static isEmail = isEmail;
+  public static isDomain = isDomain;
+  public static isHexColour = isHexColour;
+  public static isIp = isIp;
+  public static isJson = isJson;
+  public static isMacAddress = isMacAddress;
+  public static isMd5 = isMd5;
+  public static isMobilePhone = isMobilePhone;
+  public static isMongoId = isMongoId;
+  public static isPostalCode = isPostalCode;
+  public static isUrl = isUrl;
+  public static isUuid = isUuid;
+  public static isPort = isPort;
+  public static isLanguage = isLanguage;
+  public static isCountry = isCountry;
+  public static isLocale = isLocale;
+  public static isTimeZone = isTimeZone;
+  public static isDate = isDate;
+  public static isDuration = isDuration;
 }
