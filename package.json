@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "0.47.0",
+  "version": "0.47.1",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@types/debug": "^0.0.30",
-    "awilix": "^2.10.0",
+    "awilix": "^2.11.1",
     "debug": "^3.1.0",
     "rxjs": "^5.5.2"
   },
@@ -40,13 +40,13 @@
   },
   "devDependencies": {
     "@types/del": "^3.0.0",
-    "@types/jest": "^21.1.5",
-    "@types/node": "^8.0.47",
+    "@types/jest": "^21.1.6",
+    "@types/node": "^8.0.51",
     "@types/yargs": "^8.0.2",
     "del": "^3.0.0",
     "fuse-box": "^2.4.0",
     "jest": "^21.2.1",
-    "ts-jest": "^21.1.4",
+    "ts-jest": "^21.2.1",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "typescript": "^2.6.1",
