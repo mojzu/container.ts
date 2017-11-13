@@ -26,18 +26,21 @@ describe("Assets", () => {
   });
 
   it("#readFile without encoding", async () => {
-    const data = await ASSETS.readFile("test.txt").toPromise();
+    const data = await ASSETS.readFile("test.txt", { cache: false }).toPromise();
     expect(data instanceof Buffer).toEqual(true);
+    expect(ASSETS.isCached("test.txt")).toEqual(false);
   });
 
   it("#readFile with encoding", async () => {
-    const text = await ASSETS.readFile("test.txt", { encoding: "utf8" }).toPromise();
+    const text = await ASSETS.readFile("test.txt", { cache: true, encoding: "utf8" }).toPromise();
     expect(typeof text === "string").toEqual(true);
+    expect(ASSETS.isCached("test.txt", "utf8")).toEqual(true);
   });
 
   it("#readJson", async () => {
     const json = await ASSETS.readJson("test.json").toPromise();
     expect(typeof json === "object").toEqual(true);
+    expect(ASSETS.isCached("test.json", "utf8")).toEqual(true);
   });
 
   it("#readJson parse error", async () => {

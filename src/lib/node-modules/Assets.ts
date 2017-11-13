@@ -51,6 +51,12 @@ export class Assets extends Module {
     this.debug(`${Assets.ENV.PATH}="${this.path}"`);
   }
 
+  /** Returns true if target file is cached. */
+  public isCached(target: string, encoding?: string): boolean {
+    const cacheKey = `${target}:${encoding}`;
+    return (this.cache[cacheKey] != null);
+  }
+
   // Overload signature for correct return types.
   public readFile(target: string, options?: { cache?: boolean }): Observable<Buffer>;
   public readFile(target: string, options: IAssetsReadOptions): Observable<string>;
