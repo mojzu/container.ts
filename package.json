@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "0.47.1",
+  "version": "0.48.0",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -46,7 +46,7 @@
     "del": "^3.0.0",
     "fuse-box": "^2.4.0",
     "jest": "^21.2.1",
-    "ts-jest": "^21.2.1",
+    "ts-jest": "^21.2.2",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "typescript": "^2.6.1",
