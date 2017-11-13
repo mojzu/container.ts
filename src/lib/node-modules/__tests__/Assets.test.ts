@@ -1,6 +1,6 @@
 import * as path from "path";
 import { Container, Environment } from "../../../container";
-import { Assets } from "../Assets";
+import { Assets, AssetsError } from "../Assets";
 
 describe("Assets", () => {
 
@@ -38,6 +38,26 @@ describe("Assets", () => {
   it("#readJson", async () => {
     const json = await ASSETS.readJson("test.json").toPromise();
     expect(typeof json === "object").toEqual(true);
+  });
+
+  it("#readJson parse error", async () => {
+    try {
+      await ASSETS.readJson("invalid.json").toPromise();
+      fail();
+    } catch (error) {
+      expect(error instanceof AssetsError).toEqual(true);
+      expect(error.name).toEqual(Assets.ERROR.JSON_PARSE);
+    }
+  });
+
+  it("#readJson does not exist", async () => {
+    try {
+      await ASSETS.readJson("doesnotexist.json").toPromise();
+      fail();
+    } catch (error) {
+      expect(error instanceof AssetsError).toEqual(true);
+      expect(error.name).toEqual(Assets.ERROR.READ_FILE);
+    }
   });
 
 });

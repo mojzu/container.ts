@@ -5,7 +5,7 @@ import { Observable } from "../../container/RxJS";
 import { ErrorChain } from "../error";
 import { NodeValidate } from "../node-validate";
 
-/** Assets files cached when read. */
+/** Assets files may be cached when read. */
 export interface IAssetsCache {
   [key: string]: Buffer | string;
 }
@@ -17,7 +17,7 @@ export class AssetsError extends ErrorChain {
   }
 }
 
-/** Assets read options. */
+/** Assets file read options. */
 export interface IAssetsReadOptions {
   encoding?: string;
   cache?: boolean;
@@ -41,7 +41,7 @@ export class Assets extends Module {
     JSON_PARSE: "AssetsJsonParseError",
   });
 
-  protected readonly path = this.getPath();
+  protected readonly path = this.envPath;
   protected readonly cache: IAssetsCache = {};
 
   public constructor(name: string, opts: IModuleOpts) {
@@ -65,18 +65,18 @@ export class Assets extends Module {
   }
 
   /** Read asset file contents and parse JSON object. */
-  public readJson(target: string, options: IAssetsReadOptions = { encoding: "utf8", cache: true }): Observable<object> {
+  public readJson<T>(target: string, options: IAssetsReadOptions = { encoding: "utf8", cache: true }): Observable<T> {
     return this.read<string>(target, options)
       .map((data) => {
         try {
           return JSON.parse(data);
         } catch (error) {
-          return Observable.throw(new AssetsError(Assets.ERROR.JSON_PARSE, target, error));
+          throw new AssetsError(Assets.ERROR.JSON_PARSE, target, error);
         }
       });
   }
 
-  protected getPath(): string {
+  protected get envPath(): string {
     return NodeValidate.isDirectory(path.resolve(this.environment.get(Assets.ENV.PATH)));
   }
 
