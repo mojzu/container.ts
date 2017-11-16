@@ -36,7 +36,7 @@ export class Assets extends Module {
   };
 
   /** Error names. */
-  public static readonly ERROR = Object.assign(Module.ERROR, {
+  public static readonly ERROR = Object.assign({}, Module.ERROR, {
     READ_FILE: "AssetsReadFileError",
     JSON_PARSE: "AssetsJsonParseError",
   });

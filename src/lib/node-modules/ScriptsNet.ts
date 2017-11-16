@@ -15,7 +15,7 @@ export class ScriptsNet extends Scripts {
   public static readonly NAME: string = "Scripts";
 
   /** Log names. */
-  public static readonly LOG = Object.assign(Scripts.LOG, {
+  public static readonly LOG = Object.assign({}, Scripts.LOG, {
     UP: "ScriptsNetUp",
     DOWN: "ScriptsNetDown",
   });
