@@ -18,7 +18,7 @@ class TestModule extends Module {
     // Responds to ping events from parent process.
     this.childProcess.listen<number>("ping")
       .subscribe((data) => {
-        this.childProcess.event<number>("pong", data * 2);
+        this.childProcess.event<number>("pong", { data: data * 2 });
       });
   }
 
@@ -34,6 +34,10 @@ class TestModule extends Module {
 
   public testCall3(data: number): Observable<string> {
     return Observable.of("\nHello, world!\n");
+  }
+
+  public testLinkCall(data: number): Observable<string> {
+    return this.childProcess.call("Test", "testCall3", { channel: "link" });
   }
 
 }

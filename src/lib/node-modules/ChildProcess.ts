@@ -12,6 +12,7 @@ export enum EProcessMessageType {
   CallRequest,
   CallResponse,
   Event,
+  Socket,
   User,
 }
 
@@ -19,6 +20,13 @@ export enum EProcessMessageType {
 export interface IProcessCallOptions {
   timeout?: number;
   args?: any[];
+  channel?: string;
+}
+
+/** Process event method options. */
+export interface IProcessEventOptions<T> {
+  data?: T;
+  channel?: string;
 }
 
 /** Process call function signature. */
@@ -44,6 +52,7 @@ export interface IProcessCallResponseData {
 export interface IProcessEventData {
   name: string;
   data?: any;
+  channel?: string;
 }
 
 /** Process data types. */
@@ -57,12 +66,13 @@ export type IProcessMessageData = IContainerLogMessage
 export interface IProcessMessage extends Object {
   type: EProcessMessageType;
   data: IProcessMessageData;
+  channel?: string;
 }
 
 /** Process send method interface. */
 export interface IProcessSend {
   messages$: Observable<IProcessMessage>;
-  send: (type: EProcessMessageType, data: any) => void;
+  send: (type: EProcessMessageType, data: any, channel?: string) => void;
 }
 
 export class ChildProcess extends Process implements IProcessSend {
@@ -76,6 +86,8 @@ export class ChildProcess extends Process implements IProcessSend {
     TIMEOUT: 10000,
     /** Default interval to send status events (1m). */
     STATUS_INTERVAL: 60000,
+    /** Default socket channel. */
+    CHANNEL: "_",
     /** Socket data encoding. */
     ENCODING: "utf8",
   };
@@ -83,6 +95,7 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Class event names. */
   public static readonly EVENT = {
     SOCKET: "socket",
+    CHANNEL: "channel",
     STATUS: "status",
   };
 
@@ -161,7 +174,7 @@ export class ChildProcess extends Process implements IProcessSend {
 
     // Send call request to process.
     const sendData: IProcessCallRequestData = { id, target, method, args };
-    emitter.send(EProcessMessageType.CallRequest, sendData);
+    emitter.send(EProcessMessageType.CallRequest, sendData, options.channel);
 
     return ChildProcess.handleCallResponse<T>(emitter.messages$, id, args, timeout);
   }
@@ -171,6 +184,7 @@ export class ChildProcess extends Process implements IProcessSend {
     emitter: IProcessSend,
     mod: Module,
     data: IProcessCallRequestData,
+    channel?: string,
   ): void {
     const type = EProcessMessageType.CallResponse;
     const responseData: IProcessCallResponseData = { id: data.id };
@@ -184,23 +198,23 @@ export class ChildProcess extends Process implements IProcessSend {
         .subscribe({
           next: (next) => {
             const nextData = Object.assign({ next }, responseData);
-            emitter.send(type, nextData);
+            emitter.send(type, nextData, channel);
           },
           error: (error) => {
             error = ChildProcess.serialiseError(error);
             const errorData = Object.assign({ error }, responseData);
-            emitter.send(type, errorData);
+            emitter.send(type, errorData, channel);
           },
           complete: () => {
             const completeData = Object.assign({ complete: true }, responseData);
-            emitter.send(type, completeData);
+            emitter.send(type, completeData, channel);
           },
         });
 
     } catch (error) {
       error = ChildProcess.serialiseError(error);
       const errorData = Object.assign({ error }, responseData);
-      emitter.send(type, errorData);
+      emitter.send(type, errorData, channel);
     }
   }
 
@@ -246,25 +260,28 @@ export class ChildProcess extends Process implements IProcessSend {
     emitter: IProcessSend,
     mod: Module,
     name: string,
-    data?: T,
+    options: IProcessEventOptions<T> = {},
   ): void {
     // Send event request to child process.
-    const sendData: IProcessEventData = { name, data };
-    emitter.send(EProcessMessageType.Event, sendData);
+    const sendData: IProcessEventData = { name, ...options };
+    emitter.send(EProcessMessageType.Event, sendData, options.channel);
   }
 
   /** Listen for events from process. */
   public static listenForEvent<T>(
     events$: Observable<IProcessEventData>,
     name: string,
+    channel?: string,
   ): Observable<T> {
     return events$
-      .filter((event) => name === event.name)
+      .filter((event) => {
+        return (name === event.name) && (channel === event.channel);
+      })
       .map((event) => event.data as T);
   }
 
   /** Socket handle received from parent process. */
-  public socket?: net.Socket;
+  public sockets: { [key: string]: net.Socket | undefined } = {};
 
   /** Messages received from parent process. */
   public readonly messages$ = new Subject<IProcessMessage>();
@@ -280,8 +297,9 @@ export class ChildProcess extends Process implements IProcessSend {
     // Listen for a socket message to accept handle.
     process.once("message", (type: string, socket: net.Socket) => {
       if (type === ChildProcess.EVENT.SOCKET) {
-        // Configure socket as message receiver.
-        this.socket = ChildProcess.socketConfigure({
+        // Configure socket default channel as message receiver.
+        const channel = ChildProcess.DEFAULT.CHANNEL;
+        this.sockets[channel] = ChildProcess.socketConfigure({
           socket,
           onError: (error) => this.log.error(error),
           onData: (data) => this.messages$.next(data),
@@ -297,7 +315,8 @@ export class ChildProcess extends Process implements IProcessSend {
     this.messages$
       .subscribe((message) => this.handleMessage(message));
 
-    // Forward log and metric messages to parent process.
+    // Forward log and metric messages to parent process only.
+    // Do not pass channel into send, defaults to parent.
     this.container.logs$
       .subscribe((log) => this.send(EProcessMessageType.Log, log));
 
@@ -306,13 +325,14 @@ export class ChildProcess extends Process implements IProcessSend {
 
     // Send status event on interval.
     Observable.interval(ChildProcess.DEFAULT.STATUS_INTERVAL)
-      .subscribe(() => this.event<IProcessStatus>(ChildProcess.EVENT.STATUS, this.status));
+      .subscribe(() => this.event<IProcessStatus>(ChildProcess.EVENT.STATUS, { data: this.status }));
   }
 
-  /** Send message to parent process. */
-  public send(type: EProcessMessageType, data: any): void {
-    if (this.socket != null) {
-      this.socket.write(ChildProcess.socketSerialise({ type, data }));
+  /** Send message to channel process. */
+  public send(type: EProcessMessageType, data: any, channel?: string): void {
+    const socket = this.sockets[channel || ChildProcess.DEFAULT.CHANNEL];
+    if (socket != null) {
+      socket.write(ChildProcess.socketSerialise({ type, data }));
     } else if (process.send != null) {
       process.send({ type, data });
     }
@@ -324,13 +344,13 @@ export class ChildProcess extends Process implements IProcessSend {
   }
 
   /** Send event with optional data to parent process. */
-  public event<T>(name: string, data?: T): void {
-    ChildProcess.sendEvent<T>(this, this, name, data);
+  public event<T>(name: string, options: IProcessEventOptions<T> = {}): void {
+    ChildProcess.sendEvent<T>(this, this, name, options);
   }
 
   /** Listen for event sent by parent process. */
-  public listen<T>(name: string): Observable<T> {
-    return ChildProcess.listenForEvent<T>(this.events$, name);
+  public listen<T>(name: string, channel?: string): Observable<T> {
+    return ChildProcess.listenForEvent<T>(this.events$, name, channel);
   }
 
   /** Incrementing counter for unique identifiers. */
@@ -341,7 +361,7 @@ export class ChildProcess extends Process implements IProcessSend {
     switch (message.type) {
       // Call request received from parent.
       case EProcessMessageType.CallRequest: {
-        ChildProcess.handleCallRequest(this, this, message.data);
+        ChildProcess.handleCallRequest(this, this, message.data, message.channel);
         break;
       }
       // Send event on internal event bus.
@@ -350,15 +370,51 @@ export class ChildProcess extends Process implements IProcessSend {
         this.events$.next(event);
         break;
       }
+      // Socket event received from parent.
+      case EProcessMessageType.Socket : {
+        const channel = message.data;
+        const listener = (type: string, socket: net.Socket) => {
+          if (type === ChildProcess.EVENT.SOCKET) {
+            let socketChannel = this.sockets[channel];
+
+            // End socket channel if it exists.
+            if (socketChannel != null) {
+              socketChannel.end();
+              this.sockets[channel] = undefined;
+            }
+
+            // Configure socket as channel.
+            socketChannel = ChildProcess.socketConfigure({
+              socket,
+              onError: (error) => this.log.error(error),
+              onData: (data) => {
+                data.channel = channel;
+                this.messages$.next(data);
+              },
+            });
+
+            // Remove process listener, send event to parent.
+            this.sockets[channel] = socketChannel;
+            process.removeListener("message", listener);
+            this.event(ChildProcess.EVENT.CHANNEL, { data: message.data });
+          }
+        };
+        // Listen for a socket message to accept handle.
+        process.on("message", listener);
+        break;
+      }
     }
   }
 
   /** Override process down handler to close socket if present. */
   protected onSignal(signal: string): void {
-    if (this.socket != null) {
-      this.socket.end();
-      this.socket = undefined;
-    }
+    Object.keys(this.sockets).map((channel) => {
+      const socket = this.sockets[channel];
+      if (socket != null) {
+        socket.end();
+      }
+      this.sockets[channel] = undefined;
+    });
     return super.onSignal(signal);
   }
 

@@ -18,6 +18,7 @@ export class ScriptsNet extends Scripts {
   public static readonly LOG = Object.assign({}, Scripts.LOG, {
     UP: "ScriptsNetUp",
     DOWN: "ScriptsNetDown",
+    CONNECTION: "ScriptsNetWorkerConnection",
   });
 
   /** Scripts server for connecting workers. */
@@ -56,15 +57,50 @@ export class ScriptsNet extends Scripts {
 
   public startWorker(name: string, target: string, options: IScriptsWorkerOptions = {}): Observable<ScriptsProcess> {
     // Create socket connection to server and start worker when connected.
+    return this.createConnection()
+      .switchMap((sockets) => {
+        options.sockets = sockets;
+        return super.startWorker(name, target, options);
+      });
+  }
+
+  public connectWorkers(channel: string, one: string, two: string): Observable<boolean> {
+    const workerOne = this.workers[one];
+    const workerTwo = this.workers[two];
+
+    if ((workerOne != null) && (workerTwo != null)) {
+      const observable = Observable.combineLatest(workerOne.next$, workerTwo.next$)
+        .switchMap((processes) => {
+          return Observable.forkJoin(
+            Observable.of(processes),
+            this.createConnection(),
+          );
+        })
+        .switchMap(([processes, sockets]) => {
+          return Observable.forkJoin(
+            processes[0].sendChannel(channel, sockets.parent),
+            processes[1].sendChannel(channel, sockets.child),
+          );
+        })
+        .map(([c1, c2]) => c1 && c2)
+        .takeUntil(this.close$)
+        .share();
+
+      observable.subscribe((connected) => {
+        this.log.info(ScriptsNet.LOG.CONNECTION, { connected });
+      });
+      return observable.take(1);
+    }
+
+    return Observable.of(false);
+  }
+
+  protected createConnection(): Observable<{ parent: net.Socket, child: net.Socket }> {
     const parentSocket$ = this.connection$.take(1);
     const childSocket = net.createConnection(this.port);
     const childSocket$ = Observable.fromEvent<void>(childSocket as any, "connect").take(1);
-
     return Observable.forkJoin(parentSocket$, childSocket$)
-      .switchMap(([parent]) => {
-        options.sockets = { parent, child: childSocket };
-        return super.startWorker(name, target, options);
-      });
+      .map(([parent]) => ({ parent, child: childSocket }));
   }
 
 }

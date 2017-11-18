@@ -17,6 +17,7 @@ import {
   EProcessMessageType,
   IProcessCallOptions,
   IProcessEventData,
+  IProcessEventOptions,
   IProcessMessage,
   IProcessSend,
 } from "./ChildProcess";
@@ -122,7 +123,7 @@ export class ScriptsProcess implements IProcessSend {
         onError: (error) => this.scripts.log.error(error),
         onData: (data) => this.messages$.next(data),
       });
-      this.process.send("socket", options.sockets.child);
+      this.process.send(ChildProcess.EVENT.SOCKET, options.sockets.child);
     }
 
     // Listen for and handle process messages.
@@ -149,14 +150,25 @@ export class ScriptsProcess implements IProcessSend {
     }
   }
 
+  /** Send socket channel to child process. */
+  public sendChannel(name: string, socket: net.Socket): Observable<boolean> {
+    this.send(EProcessMessageType.Socket, name);
+    return Observable.of(false)
+      .delay(500)
+      .map(() => this.process.send(ChildProcess.EVENT.SOCKET, socket))
+      .switchMap(() => this.listen<string>(ChildProcess.EVENT.CHANNEL))
+      .take(1)
+      .map((channel) => name === channel);
+  }
+
   /** Make call to module.method in child process. */
   public call<T>(target: string, method: string, options: IProcessCallOptions = {}): Observable<T> {
     return ChildProcess.sendCallRequest<T>(this, this.scripts, target, method, this.nextIdentifier, options);
   }
 
   /** Send event with optional data to child process. */
-  public event<T>(name: string, data?: T): void {
-    ChildProcess.sendEvent<T>(this, this.scripts, name, data);
+  public event<T>(name: string, options: IProcessEventOptions<T> = {}): void {
+    ChildProcess.sendEvent<T>(this, this.scripts, name, options);
   }
 
   /** Listen for event sent by child process. */
@@ -183,7 +195,7 @@ export class ScriptsProcess implements IProcessSend {
       }
       // Call request received from child.
       case EProcessMessageType.CallRequest: {
-        ChildProcess.handleCallRequest(this, this.scripts, message.data);
+        ChildProcess.handleCallRequest(this, this.scripts, message.data, message.channel);
         break;
       }
       // Send event on internal event bus.

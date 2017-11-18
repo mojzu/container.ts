@@ -108,7 +108,7 @@ describe("Scripts", () => {
     expect(worker.isConnected).toEqual(true);
 
     const pong$ = worker.listen("pong").take(1);
-    worker.event<number>("ping", 8);
+    worker.event<number>("ping", { data: 8 });
     const result = await pong$.toPromise();
     expect(result).toEqual(16);
 

@@ -54,12 +54,30 @@ describe("ScriptsNet", () => {
     expect(worker.isConnected).toEqual(true);
 
     const pong$ = worker.listen("pong").take(1);
-    worker.event<number>("ping", 8);
+    worker.event<number>("ping", { data: 8 });
     const result = await pong$.toPromise();
     expect(result).toEqual(16);
 
     const code = await SCRIPTS.stopWorker("Worker").toPromise();
     expect(code).toEqual(0);
+  });
+
+  it("#connectWorkers", async () => {
+    const worker1 = await SCRIPTS.startWorker("Worker1", "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker2 = await SCRIPTS.startWorker("Worker2", "worker.test.js", { restart: false }).take(1).toPromise();
+    expect(worker1.isConnected).toEqual(true);
+    expect(worker2.isConnected).toEqual(true);
+
+    const connected = await SCRIPTS.connectWorkers("link", "Worker1", "Worker2").toPromise();
+    expect(connected).toEqual(true);
+
+    const result = await worker1.call<string>("Test", "testLinkCall", { args: [2], channel: "link" }).toPromise();
+    expect(result).toEqual("\nHello, world!\n");
+
+    const code1 = await SCRIPTS.stopWorker("Worker1").toPromise();
+    const code2 = await SCRIPTS.stopWorker("Worker2").toPromise();
+    expect(code1).toEqual(0);
+    expect(code2).toEqual(0);
   });
 
 });
