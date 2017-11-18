@@ -154,7 +154,7 @@ export class ScriptsProcess implements IProcessSend {
   public sendChannel(name: string, socket: net.Socket): Observable<boolean> {
     this.send(EProcessMessageType.Socket, name);
     return Observable.of(false)
-      .delay(500)
+      .delay(1000)
       .map(() => this.process.send(ChildProcess.EVENT.SOCKET, socket))
       .switchMap(() => this.listen<string>(ChildProcess.EVENT.CHANNEL))
       .take(1)
