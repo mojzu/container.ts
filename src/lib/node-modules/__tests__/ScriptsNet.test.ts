@@ -83,7 +83,7 @@ describe("ScriptsNet", () => {
   it("#ScriptsProcess#ChildProcess#call data size testing", async () => {
     const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.isConnected).toEqual(true);
-    const size = 2048;
+    const size = 1024;
 
     for (let i = 0; i < 10; i++) {
       // console.time("socket");
