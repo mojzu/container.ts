@@ -135,7 +135,7 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Deserialise input data from socket. */
   public static socketDeserialise(data: string): IProcessMessage[] {
     try {
-      const packets = data.split(/\r?\n/);
+      const packets = data.split(/\n/);
       const messages: IProcessMessage[] = [];
 
       if (packets.length > 1) {

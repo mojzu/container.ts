@@ -1,16 +1,8 @@
 import * as path from "path";
-import { Container, Environment, Module } from "../../../container";
-import { Observable } from "../../../container/RxJS";
+import { Container, Environment } from "../../../container";
 import { ErrorChain } from "../../../lib/error";
 import { Scripts } from "../Scripts";
-
-export class TestModule extends Module {
-  public static readonly NAME = "Test";
-  // Test method called from child process.
-  public testCall2(data: string): Observable<number> {
-    return Observable.of(data.length);
-  }
-}
+import { TestModule } from "./Mock";
 
 describe("Scripts", () => {
 
@@ -111,6 +103,22 @@ describe("Scripts", () => {
     worker.event<number>("ping", { data: 8 });
     const result = await pong$.toPromise();
     expect(result).toEqual(16);
+
+    const code = await SCRIPTS.stopWorker("Worker").toPromise();
+    expect(code).toEqual(0);
+  });
+
+  it("#ScriptsProcess#ChildProcess#call data size testing", async () => {
+    const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
+    expect(worker.isConnected).toEqual(true);
+    const size = 2048;
+
+    for (let i = 0; i < 10; i++) {
+      // console.time("process");
+      const data = await worker.call<any[]>("Test", "testData", { args: [size] }).toPromise();
+      expect(data.length).toEqual(size);
+      // console.timeEnd("process");
+    }
 
     const code = await SCRIPTS.stopWorker("Worker").toPromise();
     expect(code).toEqual(0);

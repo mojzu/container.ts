@@ -58,6 +58,7 @@
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(tsx?)$",
     "testPathIgnorePatterns": [
+      "Mock.ts",
       "script.test.ts",
       "worker.test.ts"
     ],

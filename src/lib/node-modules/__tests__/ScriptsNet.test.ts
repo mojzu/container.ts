@@ -1,7 +1,7 @@
 import * as path from "path";
 import { Container, Environment } from "../../../container";
 import { ScriptsNet } from "../ScriptsNet";
-import { TestModule } from "./Scripts.test";
+import { TestModule } from "./Mock";
 
 describe("ScriptsNet", () => {
 
@@ -78,6 +78,22 @@ describe("ScriptsNet", () => {
     const code2 = await SCRIPTS.stopWorker("Worker2").toPromise();
     expect(code1).toEqual(0);
     expect(code2).toEqual(0);
+  });
+
+  it("#ScriptsProcess#ChildProcess#call data size testing", async () => {
+    const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
+    expect(worker.isConnected).toEqual(true);
+    const size = 2048;
+
+    for (let i = 0; i < 10; i++) {
+      // console.time("socket");
+      const data = await worker.call<any[]>("Test", "testData", { args: [size] }).toPromise();
+      expect(data.length).toEqual(size);
+      // console.timeEnd("socket");
+    }
+
+    const code = await SCRIPTS.stopWorker("Worker").toPromise();
+    expect(code).toEqual(0);
   });
 
 });

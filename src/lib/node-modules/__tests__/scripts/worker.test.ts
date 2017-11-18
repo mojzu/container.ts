@@ -40,6 +40,10 @@ class TestModule extends Module {
     return this.childProcess.call("Test", "testCall3", { channel: "link" });
   }
 
+  public testData(size: number): Observable<any[]> {
+    return Observable.of(new Array(size).fill(Math.random()));
+  }
+
 }
 
 // Create environment instance using process environment.
