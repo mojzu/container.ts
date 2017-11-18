@@ -4,7 +4,7 @@
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
-  "repository": "https://github.com/mojzunet/container.ts.git",
+  "repository": "https://github.com/mojzu/container.ts.git",
   "author": "mojzu <mail@mojzu.net>",
   "license": "Unlicense",
   "files": [
