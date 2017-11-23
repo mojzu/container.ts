@@ -3,7 +3,6 @@ import {
   createContainer,
   Lifetime,
   RegisterNameAndFunctionPair,
-  RegistrationOptions,
   ResolutionMode,
 } from "awilix";
 import { ErrorChain } from "../lib/error";
@@ -74,7 +73,7 @@ export class Container {
 
   /** Error names. */
   public static readonly ERROR = {
-    TIMEOUT: "ContainerTimeoutError",
+    STATE: "ContainerStateError",
   };
 
   /** Log names. */
@@ -90,7 +89,14 @@ export class Container {
   public readonly modules$ = new BehaviorSubject<IModuleState>({});
 
   /** Array of registered module names. */
-  public get moduleNames(): string[] { return Object.keys(this.modules$.value); }
+  public get moduleNames(): string[] {
+    return Object.keys(this.modules$.value);
+  }
+
+  /** Array of registered modules. */
+  public get modules(): IModule[] {
+    return this.moduleNames.map((n) => this.container.resolve<IModule>(n));
+  }
 
   /** Container module logs. */
   public readonly logs$ = new Subject<ContainerLogMessage>();
@@ -117,17 +123,16 @@ export class Container {
     return this.container.createScope();
   }
 
-  /** Register a named module in container, has singleton lifetime by default. */
+  /** Register a named module in container. */
   public registerModule<T extends IModuleConstructor>(
     name: string,
     instance: T,
-    options: RegistrationOptions = { lifetime: Lifetime.SINGLETON },
   ): Container {
     const functionOptions: RegisterNameAndFunctionPair = {
-      [name]: [this.moduleFactory.bind(this, name, instance), options],
+      [name]: [this.moduleFactory.bind(this, name, instance), { lifetime: Lifetime.SINGLETON }],
     };
     this.container.registerFunction(functionOptions);
-    this.setModuleState(name, false);
+    this.moduleState(name, false);
     return this;
   }
 
@@ -164,89 +169,104 @@ export class Container {
 
   /** Signal modules to enter operational state. */
   public up(timeout?: number): Observable<void> {
-    return this.setState(true, timeout);
+    const observables$ = this.modules
+      .map((mod) => {
+        return this.waitUp(...this.moduleDependencies(mod))
+          .switchMap(() => {
+            const up$ = mod.up();
+
+            if (up$ == null) {
+              // Module up returned void, set state now.
+              return this.moduleState(mod.name, true);
+            }
+            // Observable returned, update state on next.
+            return up$
+              .switchMap(() => this.moduleState(mod.name, true));
+          });
+      });
+    return this.containerState(observables$, false, timeout);
   }
 
   /** Signal modules to leave operational state. */
   public down(timeout?: number): Observable<void> {
-    return this.setState(false, timeout);
+    const observables$ = this.modules
+      .map((mod) => {
+        return this.waitDown(...this.moduleDependants(mod))
+          .switchMap(() => {
+            const down$ = mod.down();
+
+            if (down$ == null) {
+              // Module down returned void, set state now.
+              return this.moduleState(mod.name, false);
+            }
+            // Observable returned, update state on next.
+            return down$
+              .switchMap(() => this.moduleState(mod.name, false));
+          });
+      });
+    return this.containerState(observables$, false, timeout);
   }
 
   /** Wait for modules to enter operational state before calling next. */
-  public waitUp(...modules: string[]): Observable<void> {
+  protected waitUp(...modules: string[]): Observable<void> {
     return this.modules$
       .filter((states) => {
         return modules.reduce((previous, current) => {
           return previous && states[current];
         }, true);
       })
-      .switchMap(() => Observable.of(undefined))
+      .map(() => undefined)
       .take(1);
   }
 
   /** Wait for modules to leave operational state before calling next. */
-  public waitDown(...modules: string[]): Observable<void> {
+  protected waitDown(...modules: string[]): Observable<void> {
     return this.modules$
       .filter((states) => {
-        return modules.reduce((previous, current) => {
+        return !modules.reduce((previous, current) => {
           return previous || states[current];
         }, false);
       })
-      .switchMap(() => Observable.of(undefined))
+      .map(() => undefined)
       .take(1);
   }
 
-  protected moduleFactory<T extends IModuleConstructor>(
-    name: string,
-    instance: T,
-    opts: IModuleOpts,
-  ): IModule {
+  protected moduleFactory<T extends IModuleConstructor>(name: string, instance: T, opts: IModuleOpts): IModule {
     return new instance(name, opts);
   }
 
-  protected setState(state: boolean, timeout = 10000): Observable<void> {
-    // Map module methods and report states.
-    const modules = this.moduleNames.map((name) => this.container.resolve<IModule>(name));
-    const observables$: Array<Observable<void>> = modules
-      .map((mod) => {
-        const method: () => void | Observable<void> = state ? mod.up.bind(mod) : mod.down.bind(mod);
-        const observable$ = method();
-
-        if (observable$ == null) {
-          // Module method has not returned observable, set state now.
-          this.setModuleState(mod.name, state);
-          return null;
-        } else {
-          // Observable returned, update state on next.
-          return observable$
-            .do(() => this.setModuleState(mod.name, state));
-        }
-      })
-      // Filter to array of observables.
-      .filter((o) => (o != null)) as any;
-
-    // Nothing to wait for.
-    if (observables$.length === 0) {
-      return this.setStateComplete(state);
-    }
-
-    // Wait for modules to signal state.
-    // Map TimeoutError to ContainerError.
-    return Observable.forkJoin(...observables$)
-      .timeout(timeout)
-      .catch((error: Error) => Observable.throw(new ContainerError(Container.ERROR.TIMEOUT, error)))
-      .switchMap(() => this.setStateComplete(state));
+  protected moduleDependencies(mod: IModule): string[] {
+    return Object.keys(mod.dependencies).map((k) => mod.dependencies[k]);
   }
 
-  protected setModuleState(name: string, state: boolean): void {
+  protected moduleDependants(mod: IModule): string[] {
+    const dependants: string[] = [];
+    this.modules.map((m) => {
+      const dependant = Object.keys(m.dependencies).reduce((previous, key) => {
+        return previous || (m.dependencies[key] === mod.name);
+      }, false);
+
+      if (dependant) {
+        dependants.push(m.name);
+      }
+    });
+    return dependants;
+  }
+
+  protected moduleState(name: string, state: boolean): Observable<void> {
     this.modules$.value[name] = state;
     this.modules$.next(this.modules$.value);
+    return Observable.of(undefined);
   }
 
-  protected setStateComplete(state: boolean): Observable<void> {
-    const message = state ? Container.LOG.UP : Container.LOG.DOWN;
-    this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
-    return Observable.of(undefined);
+  protected containerState(observables$: Array<Observable<void>>, state: boolean, timeout = 10000): Observable<void> {
+    return Observable.forkJoin(...observables$)
+      .timeout(timeout)
+      .catch((error) => Observable.throw(new ContainerError(Container.ERROR.STATE, error)))
+      .map(() => {
+        const message = state ? Container.LOG.UP : Container.LOG.DOWN;
+        this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
+      });
   }
 
 }
