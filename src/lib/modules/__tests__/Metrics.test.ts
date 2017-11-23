@@ -4,7 +4,7 @@ import { Metrics } from "../Metrics";
 class TestMetrics extends Metrics {
   public static readonly NAME: string = "TestMetrics";
   protected onMessage(metric: ContainerMetricMessage): void {
-    // TODO: Test this.
+    // TODO(MEDIUM): Add Container metrics tests.
   }
 }
 

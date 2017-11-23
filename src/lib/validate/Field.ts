@@ -3,7 +3,7 @@ import * as validator from "validator";
 import { ErrorChain } from "../error";
 import * as Validate from "./Validate";
 
-// TODO: Improve operator field documentation/testing.
+// TODO(MEDIUM): Improve operator field documentation/testing.
 
 /** Field error codes. */
 export enum EFieldError {
