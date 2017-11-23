@@ -124,15 +124,18 @@ export class Container {
   }
 
   /** Register a named module in container. */
-  public registerModule<T extends IModuleConstructor>(
-    name: string,
-    instance: T,
-  ): Container {
+  public registerModule(name: string, instance: IModuleConstructor): Container {
     const functionOptions: RegisterNameAndFunctionPair = {
       [name]: [this.moduleFactory.bind(this, name, instance), { lifetime: Lifetime.SINGLETON }],
     };
     this.container.registerFunction(functionOptions);
     this.moduleState(name, false);
+    return this;
+  }
+
+  /** Register named modules in container. */
+  public registerModules(modules: { [name: string]: IModuleConstructor }): Container {
+    Object.keys(modules).map((name) => this.registerModule(name, modules[name]));
     return this;
   }
 
