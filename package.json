@@ -33,14 +33,14 @@
     "rxjs": "^5.5.2"
   },
   "optionalDependencies": {
-    "@types/moment-timezone": "^0.5.1",
+    "@types/moment-timezone": "^0.5.2",
     "@types/validator": "^6.3.0",
     "moment-timezone": "^0.5.14",
     "validator": "^9.1.1"
   },
   "devDependencies": {
     "@types/del": "^3.0.0",
-    "@types/jest": "^21.1.6",
+    "@types/jest": "^21.1.8",
     "@types/node": "^8.0.53",
     "@types/yargs": "^8.0.2",
     "del": "^3.0.0",

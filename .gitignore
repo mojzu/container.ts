@@ -2,6 +2,7 @@
 # <https://git-scm.com/docs/gitignore>
 /.fusebox
 /coverage
+/docs/_book
 /node_modules
 /*.log
 /*.tgz
