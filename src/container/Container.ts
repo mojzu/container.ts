@@ -1,10 +1,4 @@
-import {
-  AwilixContainer,
-  createContainer,
-  Lifetime,
-  RegisterNameAndFunctionPair,
-  ResolutionMode,
-} from "awilix";
+import { asFunction, asValue, AwilixContainer, createContainer, ResolutionMode } from "awilix";
 import { ErrorChain } from "../lib/error";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata } from "./Log";
@@ -125,10 +119,8 @@ export class Container {
 
   /** Register a named module in container. */
   public registerModule(name: string, instance: IModuleConstructor): Container {
-    const functionOptions: RegisterNameAndFunctionPair = {
-      [name]: [this.moduleFactory.bind(this, name, instance), { lifetime: Lifetime.SINGLETON }],
-    };
-    this.container.registerFunction(functionOptions);
+    const factoryFunction = this.moduleFactory.bind(this, name, instance);
+    this.container.register({ [name]: asFunction(factoryFunction).singleton() });
     this.moduleState(name, false);
     return this;
   }
@@ -141,7 +133,7 @@ export class Container {
 
   /** Register a value of type in container. */
   public registerValue<T>(name: string, value: T): Container {
-    this.container.registerValue(name, value);
+    this.container.register({ [name]: asValue(value) });
     return this;
   }
 
