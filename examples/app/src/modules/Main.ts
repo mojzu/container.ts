@@ -15,21 +15,17 @@ export class Main extends Process {
   public readonly workerName = "Worker";
   public worker$: Observable<ScriptsProcess>;
 
-  public up(): Observable<void> {
+  public up(): void {
     super.up();
 
-    // Wait for scripts module.
-    return this.container.waitUp(Scripts.NAME)
-      .map(() => {
-        // Start worker process.
-        this.worker$ = this.scripts.startWorker(this.workerName, "worker.js", {
-          uptimeLimit: "PT5M", // Restart worker process every 5 minutes.
-        });
+    // Start worker process.
+    this.worker$ = this.scripts.startWorker(this.workerName, "worker.js", {
+      uptimeLimit: "PT5M", // Restart worker process every 5 minutes.
+    });
 
-        this.worker$.subscribe(() => {
-          this.debug("worker started");
-        });
-      });
+    this.worker$.subscribe(() => {
+      this.debug("worker started");
+    });
   }
 
 }

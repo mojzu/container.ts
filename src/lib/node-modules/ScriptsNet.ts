@@ -55,6 +55,7 @@ export class ScriptsNet extends Scripts {
     return super.down();
   }
 
+  // TODO(HIGH): Fix worker restarts when using ScriptsNet module.
   public startWorker(name: string, target: string, options: IScriptsWorkerOptions = {}): Observable<ScriptsProcess> {
     // Create socket connection to server and start worker when connected.
     return this.createConnection()

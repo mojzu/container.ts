@@ -33,18 +33,13 @@ class AppModule extends Module {
   // name are called. Up/down may also return an observable to perform asynchronous
   // actions, or void if none are required.
   public up(): Observable<void> | void {
-    // Modules may wait for their dependencies to signal up using container methods.
-    // An equivalent 'waitDown' method is also available.
-    return this.container.waitUp(Process.NAME)
-      .map(() => {
-        // All modules have debug, log and metric instances.
-        // Logs and metrics are sent to the container which can then be
-        // handled by a logging/metrics module.
-        // The logger interface is based on syslog, and metrics on StatsD.
-        this.debug("something to debug");
-        this.log.info("something to log", { meta: "information" });
-        this.metric.increment("counter");
-      });
+    // All modules have debug, log and metric instances.
+    // Logs and metrics are sent to the container which can then be
+    // handled by a logging/metrics module.
+    // The logger interface is based on syslog, and metrics on StatsD.
+    this.debug("something to debug");
+    this.log.info("something to log", { meta: "information" });
+    this.metric.increment("counter");
   }
 
   public down(): Observable<void> | void {
