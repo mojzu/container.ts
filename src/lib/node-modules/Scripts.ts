@@ -231,7 +231,7 @@ export class Scripts extends Module {
     WORKER_UPTIME_LIMIT: "ScriptsWorkerUptimeLimit",
   };
 
-  public readonly path = this.getPath();
+  public readonly path = this.envPath;
   public readonly workers: { [name: string]: IScriptsWorker } = {};
 
   public constructor(name: string, opts: IModuleOpts) {
@@ -353,7 +353,7 @@ export class Scripts extends Module {
     return observable$;
   }
 
-  protected getPath(): string {
+  protected get envPath(): string {
     return NodeValidate.isDirectory(path.resolve(this.environment.get(Scripts.ENV.PATH)));
   }
 

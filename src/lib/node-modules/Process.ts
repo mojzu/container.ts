@@ -76,8 +76,8 @@ export class Process extends Module {
   }
 
   public get title(): string { return Process.title; }
-  public readonly version = this.getVersion();
-  public readonly nodeEnvironment = this.getNodeEnv();
+  public readonly version = this.envVersion;
+  public readonly nodeEnvironment = this.envNodeEnv;
 
   /** Override in subclass to change metric interval. */
   public get metricInterval(): number { return 60000; }
@@ -111,7 +111,7 @@ export class Process extends Module {
     super(name, opts);
 
     // Set process title.
-    Process.setTitle(this.getName());
+    Process.setTitle(this.envName);
 
     // Debug environment variables.
     this.debug(`${Process.ENV.NAME}="${this.title}"`);
@@ -133,15 +133,15 @@ export class Process extends Module {
     process.on("SIGINT", this.onSignal.bind(this, "SIGINT"));
   }
 
-  protected getName(): string {
+  protected get envName(): string {
     return Validate.isString(this.environment.get(Process.ENV.NAME) || "node");
   }
 
-  protected getVersion(): string {
+  protected get envVersion(): string {
     return Validate.isString(this.environment.get(Process.ENV.VERSION) || "1.0.0");
   }
 
-  protected getNodeEnv(): string {
+  protected get envNodeEnv(): string {
     return Validate.isString(this.environment.get(Process.ENV.NODE_ENV) || "production");
   }
 

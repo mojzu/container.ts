@@ -13,7 +13,7 @@ export abstract class Logs extends Module {
   };
 
   /** Parsed application logs level. */
-  protected readonly level = this.parseLevel(this.getLevel());
+  protected readonly level = this.parseLevel(this.envLevel);
 
   public constructor(name: string, opts: IModuleOpts) {
     super(name, opts);
@@ -30,7 +30,7 @@ export abstract class Logs extends Module {
   protected abstract onMessage(log: ContainerLogMessage): void;
 
   /** Get log level from environment or default to warning. */
-  protected getLevel(): string {
+  protected get envLevel(): string {
     return Validate.isString(this.environment.get(Logs.ENV.LEVEL) || "warning");
   }
 
