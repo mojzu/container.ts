@@ -187,7 +187,7 @@ export class Container {
               .switchMap(() => this.moduleState(mod.name, true));
           });
       });
-    return this.containerState(observables$, false, timeout);
+    return this.containerState(observables$, true, timeout);
   }
 
   /** Signal modules to leave operational state. */
