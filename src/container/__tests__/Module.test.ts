@@ -5,7 +5,7 @@ import { IModuleDependencies } from "../Types";
 // TODO(MEDIUM): Add tests for Module up/down order.
 
 class Test1 extends Module {
-  public static readonly NAME = "Test1";
+  public static readonly moduleName: string = "Test1";
   // public up(): void {
   //   console.log("1UP!");
   // }
@@ -15,7 +15,7 @@ class Test1 extends Module {
 }
 
 class Test2 extends Module {
-  public static readonly NAME = "Test2";
+  public static readonly moduleName: string = "Test2";
   public get dependencies(): IModuleDependencies {
     return { test1: Test1, test3: Test3 };
   }
@@ -28,7 +28,7 @@ class Test2 extends Module {
 }
 
 class Test3 extends Module {
-  public static readonly NAME = "Test3";
+  public static readonly moduleName: string = "Test3";
   public get dependencies(): IModuleDependencies {
     return { test1: Test1 };
   }

@@ -4,7 +4,7 @@ import { Validate } from "../validate";
 export abstract class Logs extends Module {
 
   /** Default module name. */
-  public static readonly NAME: string = "Logs";
+  public static readonly moduleName: string = "Logs";
 
   /** Environment variable names. */
   public static readonly ENV = {
@@ -15,8 +15,8 @@ export abstract class Logs extends Module {
   /** Parsed application logs level. */
   protected readonly level = this.parseLevel(this.envLevel);
 
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
 
     // Debug environment variables.
     this.debug(`${Logs.ENV.LEVEL}="${ELogLevel[this.level]}"`);

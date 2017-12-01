@@ -27,7 +27,7 @@ export interface IAssetsReadOptions {
 export class Assets extends Module {
 
   /** Default module name. */
-  public static readonly NAME: string = "Assets";
+  public static readonly moduleName: string = "Assets";
 
   /** Environment variable names. */
   public static readonly ENV = {
@@ -44,8 +44,8 @@ export class Assets extends Module {
   protected readonly path = this.envPath;
   protected readonly cache: IAssetsCache = {};
 
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
 
     // Debug environment variables.
     this.debug(`${Assets.ENV.PATH}="${this.path}"`);

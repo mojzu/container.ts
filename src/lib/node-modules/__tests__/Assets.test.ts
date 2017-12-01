@@ -10,7 +10,7 @@ describe("Assets", () => {
   const CONTAINER = new Container("Test", ENVIRONMENT)
     .registerModule(Assets);
 
-  const ASSETS = CONTAINER.resolve<Assets>(Assets.NAME);
+  const ASSETS = CONTAINER.resolve<Assets>(Assets.moduleName);
 
   beforeAll(async () => {
     await CONTAINER.up().toPromise();
@@ -22,7 +22,7 @@ describe("Assets", () => {
 
   it("#Assets", () => {
     expect(ASSETS).toBeDefined();
-    expect(ASSETS.name).toEqual(Assets.NAME);
+    expect(ASSETS.moduleName).toEqual(Assets.moduleName);
   });
 
   it("#readFile without encoding", async () => {

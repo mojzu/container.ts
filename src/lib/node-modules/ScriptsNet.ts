@@ -12,7 +12,7 @@ import {
 export class ScriptsNet extends Scripts {
 
   /** Default module name. */
-  public static readonly NAME: string = "Scripts";
+  public static readonly moduleName: string = "Scripts";
 
   /** Log names. */
   public static readonly LOG = Object.assign({}, Scripts.LOG, {
@@ -34,8 +34,8 @@ export class ScriptsNet extends Scripts {
     return address.port;
   }
 
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
 
     // Log server error events.
     this.error$.subscribe((error) => this.log.error(new ScriptsError(error)));

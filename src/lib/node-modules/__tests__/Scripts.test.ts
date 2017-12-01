@@ -12,7 +12,7 @@ describe("Scripts", () => {
   const CONTAINER = new Container("Test", ENVIRONMENT)
     .registerModules([Scripts, TestModule]);
 
-  const SCRIPTS = CONTAINER.resolve<Scripts>(Scripts.NAME);
+  const SCRIPTS = CONTAINER.resolve<Scripts>(Scripts.moduleName);
 
   beforeAll(async () => {
     await CONTAINER.up().toPromise();
@@ -24,7 +24,7 @@ describe("Scripts", () => {
 
   it("#Scripts", () => {
     expect(SCRIPTS).toBeDefined();
-    expect(SCRIPTS.name).toEqual(Scripts.NAME);
+    expect(SCRIPTS.moduleName).toEqual(Scripts.moduleName);
   });
 
   it("#fork", async () => {

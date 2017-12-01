@@ -4,7 +4,7 @@ import { ChildProcess } from "../../ChildProcess";
 
 class TestModule extends Module {
 
-  public static readonly NAME: string = "Test";
+  public static readonly moduleName: string = "Test";
 
   public get dependencies(): IModuleDependencies {
     return { childProcess: ChildProcess };
@@ -12,8 +12,8 @@ class TestModule extends Module {
 
   protected readonly childProcess: ChildProcess;
 
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
 
     // Responds to ping events from parent process.
     this.childProcess.listen<number>("ping")

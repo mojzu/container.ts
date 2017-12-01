@@ -39,7 +39,7 @@ export class ProcessError extends ErrorChain {
 export class Process extends Module {
 
   /** Default module name. */
-  public static readonly NAME: string = "Process";
+  public static readonly moduleName: string = "Process";
 
   /** Environment variable names. */
   public static readonly ENV = {
@@ -107,8 +107,8 @@ export class Process extends Module {
     };
   }
 
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
 
     // Set process title.
     Process.setTitle(this.envName);

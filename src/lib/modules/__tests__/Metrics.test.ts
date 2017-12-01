@@ -2,7 +2,7 @@ import { Container, ContainerMetricMessage } from "../../../container";
 import { Metrics } from "../Metrics";
 
 class TestMetrics extends Metrics {
-  public static readonly NAME: string = "TestMetrics";
+  public static readonly moduleName: string = "TestMetrics";
   protected onMessage(metric: ContainerMetricMessage): void {
     // TODO(MEDIUM): Add Container metrics tests.
   }
@@ -26,7 +26,7 @@ describe("Metric", () => {
 
   it("#TestMetrics", () => {
     expect(METRICS).toBeDefined();
-    expect(METRICS.name).toEqual(TestMetrics.NAME);
+    expect(METRICS.moduleName).toEqual(TestMetrics.moduleName);
   });
 
 });

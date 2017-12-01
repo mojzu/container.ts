@@ -4,7 +4,7 @@ import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata } from "./Log";
 import { EMetricType, IMetricTags } from "./Metric";
 import { BehaviorSubject, Observable, Subject } from "./RxJS";
-import { IModule, IModuleConstructor, IModuleOpts, IModuleState } from "./Types";
+import { IModule, IModuleConstructor, IModuleState } from "./Types";
 
 /** Command line arguments interface matching 'yargs' package. */
 export interface IContainerArguments {
@@ -124,14 +124,14 @@ export class Container {
    * Throws an error if module of name is already registered.
    */
   public registerModule(instance: IModuleConstructor): Container {
-    if (this.moduleRegistered(instance.NAME)) {
+    if (this.moduleRegistered(instance.moduleName)) {
       throw new ContainerError(Container.ERROR.MODULE_REGISTERED);
     }
 
     // TODO(MEDIUM): Create separate scope for modules.
     const factoryFunction = this.moduleFactory.bind(this, instance);
-    this.container.register({ [instance.NAME]: asFunction(factoryFunction).singleton() });
-    this.moduleState(instance.NAME, false);
+    this.container.register({ [instance.moduleName]: asFunction(factoryFunction).singleton() });
+    this.moduleState(instance.moduleName, false);
     return this;
   }
 
@@ -182,11 +182,11 @@ export class Container {
 
             if (up$ == null) {
               // Module up returned void, set state now.
-              return this.moduleState(mod.name, true);
+              return this.moduleState(mod.moduleName, true);
             }
             // Observable returned, update state on next.
             return up$
-              .switchMap(() => this.moduleState(mod.name, true));
+              .switchMap(() => this.moduleState(mod.moduleName, true));
           });
       });
     return this.containerState(observables$, true, timeout);
@@ -202,11 +202,11 @@ export class Container {
 
             if (down$ == null) {
               // Module down returned void, set state now.
-              return this.moduleState(mod.name, false);
+              return this.moduleState(mod.moduleName, false);
             }
             // Observable returned, update state on next.
             return down$
-              .switchMap(() => this.moduleState(mod.name, false));
+              .switchMap(() => this.moduleState(mod.moduleName, false));
           });
       });
     return this.containerState(observables$, false, timeout);
@@ -236,23 +236,23 @@ export class Container {
       .take(1);
   }
 
-  protected moduleFactory<T extends IModuleConstructor>(instance: T, opts: IModuleOpts): IModule {
-    return new instance(instance.NAME, opts);
+  protected moduleFactory<T extends IModuleConstructor>(instance: T, opts: any): IModule {
+    return new instance({ moduleName: instance.moduleName, opts });
   }
 
   protected moduleDependencies(mod: IModule): string[] {
-    return Object.keys(mod.dependencies).map((k) => mod.dependencies[k].NAME);
+    return Object.keys(mod.dependencies).map((k) => mod.dependencies[k].moduleName);
   }
 
   protected moduleDependants(mod: IModule): string[] {
     const dependants: string[] = [];
     this.modules.map((m) => {
       const dependant = Object.keys(m.dependencies).reduce((previous, key) => {
-        return previous || (m.dependencies[key].NAME === mod.name);
+        return previous || (m.dependencies[key].moduleName === mod.moduleName);
       }, false);
 
       if (dependant) {
-        dependants.push(m.name);
+        dependants.push(m.moduleName);
       }
     });
     return dependants;

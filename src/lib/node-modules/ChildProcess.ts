@@ -78,7 +78,7 @@ export interface IProcessSend {
 export class ChildProcess extends Process implements IProcessSend {
 
   /** Default module name. */
-  public static readonly NAME: string = "ChildProcess";
+  public static readonly moduleName: string = "ChildProcess";
 
   /** Default values. */
   public static readonly DEFAULT = {
@@ -291,8 +291,8 @@ export class ChildProcess extends Process implements IProcessSend {
 
   protected currentIdentifier = 0;
 
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
 
     // Listen for a socket message to accept handle.
     process.once("message", (type: string, socket: net.Socket) => {

@@ -213,7 +213,7 @@ export class ScriptsProcess implements IProcessSend {
 export class Scripts extends Module {
 
   /** Default module name. */
-  public static readonly NAME: string = "Scripts";
+  public static readonly moduleName: string = "Scripts";
 
   /** Environment variable names. */
   public static readonly ENV = {
@@ -234,8 +234,8 @@ export class Scripts extends Module {
   public readonly path = this.envPath;
   public readonly workers: { [name: string]: IScriptsWorker } = {};
 
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
 
     // Debug environment variables.
     this.debug(`${Scripts.ENV.PATH}="${this.path}"`);

@@ -11,7 +11,7 @@ describe("ScriptsNet", () => {
   const CONTAINER = new Container("Test", ENVIRONMENT)
     .registerModules([ScriptsNet, TestModule]);
 
-  const SCRIPTS = CONTAINER.resolve<ScriptsNet>(ScriptsNet.NAME);
+  const SCRIPTS = CONTAINER.resolve<ScriptsNet>(ScriptsNet.moduleName);
 
   beforeAll(async () => {
     await CONTAINER.up().toPromise();
@@ -23,7 +23,7 @@ describe("ScriptsNet", () => {
 
   it("#ScriptsNet", () => {
     expect(SCRIPTS).toBeDefined();
-    expect(SCRIPTS.name).toEqual(ScriptsNet.NAME);
+    expect(SCRIPTS.moduleName).toEqual(ScriptsNet.moduleName);
   });
 
   it("#call", async () => {

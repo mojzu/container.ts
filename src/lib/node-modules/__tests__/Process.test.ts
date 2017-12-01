@@ -11,7 +11,7 @@ describe("Process", () => {
   const CONTAINER = new Container("Test", ENVIRONMENT)
     .registerModule(Process);
 
-  const PROCESS = CONTAINER.resolve<Process>(Process.NAME);
+  const PROCESS = CONTAINER.resolve<Process>(Process.moduleName);
 
   beforeAll(async () => {
     await CONTAINER.up().toPromise();
@@ -23,7 +23,7 @@ describe("Process", () => {
 
   it("#Process", () => {
     expect(PROCESS).toBeDefined();
-    expect(PROCESS.name).toEqual(Process.NAME);
+    expect(PROCESS.moduleName).toEqual(Process.moduleName);
     expect(PROCESS.version).toEqual("1.2.3");
     expect(PROCESS.nodeEnvironment).toEqual("development");
   });

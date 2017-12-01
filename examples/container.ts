@@ -9,13 +9,13 @@ class AppModule extends Module {
 
   // Modules must have a name used to register them within a container.
   // This name is used to resolve module dependencies from a container.
-  public static readonly NAME: string = "AppModule";
+  public static readonly moduleName: string = "AppModule";
 
   // Override the 'dependencies' getter to define module dependencies.
   public get dependencies(): IModuleDependencies {
     // Key is the name of the property on this class to inject (see 'proc' below).
     // Value is the name of the module to inject into the property (see 'NAME' above).
-    return { proc: Process.NAME };
+    return { proc: Process };
   }
 
   // Injected module dependency.
@@ -23,8 +23,8 @@ class AppModule extends Module {
 
   // Optionally override the class constructor.
   // Module dependencies are available after 'super' has been called.
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
     // Dependencies are available now.
     // ...
   }
@@ -63,8 +63,7 @@ ENVIRONMENT
 // Create container using environment and register modules.
 // Optionally pass in command line arguments provided by 'yargs' package.
 const CONTAINER = new Container("Main", ENVIRONMENT, argv)
-  .registerModule(Process.NAME, Process)
-  .registerModule(AppModule.NAME, AppModule);
+  .registerModules([Process, AppModule]);
 
 // Signal operational.
 // The 'Process' module automatically calls container.down when

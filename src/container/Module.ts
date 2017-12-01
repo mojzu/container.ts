@@ -56,7 +56,7 @@ export class ModuleMetric extends Metric {
 export class Module implements IModule {
 
   /** Default module name. */
-  public static readonly NAME: string = "Module";
+  public static readonly moduleName: string = "Module";
 
   /** Error names. */
   public static readonly ERROR = {
@@ -65,6 +65,9 @@ export class Module implements IModule {
 
   /** Module container reference. */
   public readonly container: Container;
+
+  /** Module name. */
+  public readonly moduleName: string;
 
   /** Module log interface. */
   public readonly log: ModuleLog;
@@ -79,18 +82,15 @@ export class Module implements IModule {
   public get environment(): Environment { return this.container.environment; }
 
   /** Module container and module names. */
-  public get namespace(): string { return `${this.container.name}.${this.name}`; }
+  public get namespace(): string { return `${this.container.name}.${this.moduleName}`; }
 
   /** Module dependencies hook, override if required. */
   public get dependencies(): IModuleDependencies { return {}; }
 
-  public constructor(
-    /** Module name. */
-    public readonly name: string,
-    opts: IModuleOpts,
-  ) {
+  public constructor(opts: IModuleOpts) {
     // Resolve container instance and construct log, metric and debug instances.
-    this.container = opts[Container.REFERENCE];
+    this.moduleName = opts.moduleName;
+    this.container = opts.opts[Container.REFERENCE];
     this.log = new ModuleLog(this.container, this.namespace);
     this.metric = new ModuleMetric(this.container, this.namespace);
     this.debug = Debug(this.namespace);
@@ -100,7 +100,7 @@ export class Module implements IModule {
     try {
       Object.keys(this.dependencies).map((key) => {
         const target = this.dependencies[key];
-        this[key] = opts[target.NAME];
+        this[key] = opts.opts[target.moduleName];
       });
     } catch (error) {
       throw new ModuleError(Module.ERROR.DEPENDENCY, error);
