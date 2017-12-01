@@ -241,7 +241,7 @@ export class Scripts extends Module {
     this.debug(`${Scripts.ENV.PATH}="${this.path}"`);
   }
 
-  public down(): void | Observable<void> {
+  public moduleDown(): void | Observable<void> {
     const observables$: Array<Observable<any>> = [];
 
     // Wait for worker processes to exit if connected.

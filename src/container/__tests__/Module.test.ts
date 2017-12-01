@@ -6,36 +6,36 @@ import { IModuleDependencies } from "../Types";
 
 class Test1 extends Module {
   public static readonly moduleName: string = "Test1";
-  // public up(): void {
+  // public moduleUp(): void {
   //   console.log("1UP!");
   // }
-  // public down(): void {
+  // public moduleDown(): void {
   //   console.log("1DOWN!");
   // }
 }
 
 class Test2 extends Module {
   public static readonly moduleName: string = "Test2";
-  public get dependencies(): IModuleDependencies {
+  public get moduleDependencies(): IModuleDependencies {
     return { test1: Test1, test3: Test3 };
   }
-  // public up(): void {
+  // public moduleUp(): void {
   //   console.log("2UP!");
   // }
-  // public down(): void {
+  // public moduleDown(): void {
   //   console.log("2DOWN!");
   // }
 }
 
 class Test3 extends Module {
   public static readonly moduleName: string = "Test3";
-  public get dependencies(): IModuleDependencies {
+  public get moduleDependencies(): IModuleDependencies {
     return { test1: Test1 };
   }
-  // public up(): void {
+  // public moduleUp(): void {
   //   console.log("3UP!");
   // }
-  // public down(): void {
+  // public moduleDown(): void {
   //   console.log("3DOWN!");
   // }
 }

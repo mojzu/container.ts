@@ -63,11 +63,14 @@ export class Module implements IModule {
     DEPENDENCY: "ModuleDependencyError",
   };
 
-  /** Module container reference. */
-  public readonly container: Container;
-
   /** Module name. */
   public readonly moduleName: string;
+
+  /** Module dependencies hook, override if required. */
+  public get moduleDependencies(): IModuleDependencies { return {}; }
+
+  /** Module container reference. */
+  public readonly container: Container;
 
   /** Module log interface. */
   public readonly log: ModuleLog;
@@ -84,9 +87,6 @@ export class Module implements IModule {
   /** Module container and module names. */
   public get namespace(): string { return `${this.container.name}.${this.moduleName}`; }
 
-  /** Module dependencies hook, override if required. */
-  public get dependencies(): IModuleDependencies { return {}; }
-
   public constructor(opts: IModuleOpts) {
     // Resolve container instance and construct log, metric and debug instances.
     this.moduleName = opts.moduleName;
@@ -98,8 +98,8 @@ export class Module implements IModule {
     // Inject dependency values into instance.
     // Error is thrown by awilix if resolution failed.
     try {
-      Object.keys(this.dependencies).map((key) => {
-        const target = this.dependencies[key];
+      Object.keys(this.moduleDependencies).map((key) => {
+        const target = this.moduleDependencies[key];
         this[key] = opts.opts[target.moduleName];
       });
     } catch (error) {
@@ -108,9 +108,9 @@ export class Module implements IModule {
   }
 
   /** Module operational state. */
-  public up(): void | Observable<void> { }
+  public moduleUp(): void | Observable<void> { }
 
   /** Module non-operational state. */
-  public down(): void | Observable<void> { }
+  public moduleDown(): void | Observable<void> { }
 
 }

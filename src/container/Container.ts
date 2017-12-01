@@ -178,7 +178,7 @@ export class Container {
       .map((mod) => {
         return this.waitUp(...this.moduleDependencies(mod))
           .switchMap(() => {
-            const up$ = mod.up();
+            const up$ = mod.moduleUp();
 
             if (up$ == null) {
               // Module up returned void, set state now.
@@ -198,7 +198,7 @@ export class Container {
       .map((mod) => {
         return this.waitDown(...this.moduleDependants(mod))
           .switchMap(() => {
-            const down$ = mod.down();
+            const down$ = mod.moduleDown();
 
             if (down$ == null) {
               // Module down returned void, set state now.
@@ -241,14 +241,14 @@ export class Container {
   }
 
   protected moduleDependencies(mod: IModule): string[] {
-    return Object.keys(mod.dependencies).map((k) => mod.dependencies[k].moduleName);
+    return Object.keys(mod.moduleDependencies).map((k) => mod.moduleDependencies[k].moduleName);
   }
 
   protected moduleDependants(mod: IModule): string[] {
     const dependants: string[] = [];
     this.modules.map((m) => {
-      const dependant = Object.keys(m.dependencies).reduce((previous, key) => {
-        return previous || (m.dependencies[key].moduleName === mod.moduleName);
+      const dependant = Object.keys(m.moduleDependencies).reduce((previous, key) => {
+        return previous || (m.moduleDependencies[key].moduleName === mod.moduleName);
       }, false);
 
       if (dependant) {

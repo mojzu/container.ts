@@ -124,7 +124,7 @@ export class Process extends Module {
   }
 
   /** Try to read process information asset file, handle process events. */
-  public up(): void {
+  public moduleUp(): void {
     // Log process information.
     this.log.info(Process.LOG.INFORMATION, this.information);
 

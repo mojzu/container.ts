@@ -6,7 +6,7 @@ class TestModule extends Module {
 
   public static readonly moduleName: string = "Test";
 
-  public get dependencies(): IModuleDependencies {
+  public get moduleDependencies(): IModuleDependencies {
     return { childProcess: ChildProcess };
   }
 

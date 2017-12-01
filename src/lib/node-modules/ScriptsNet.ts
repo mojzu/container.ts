@@ -41,18 +41,18 @@ export class ScriptsNet extends Scripts {
     this.error$.subscribe((error) => this.log.error(new ScriptsError(error)));
   }
 
-  public up(): Observable<void> {
-    const up$ = super.up() || Observable.of(undefined);
+  public moduleUp(): Observable<void> {
+    const up$ = super.moduleUp() || Observable.of(undefined);
     const listen$ = Observable.bindNodeCallback<void>(this.server.listen.bind(this.server))();
     return Observable.forkJoin(up$, listen$).map(() => {
       this.log.info(ScriptsNet.LOG.UP, { port: this.port });
     });
   }
 
-  public down() {
+  public moduleDown() {
     this.server.close();
     this.log.info(ScriptsNet.LOG.DOWN);
-    return super.down();
+    return super.moduleDown();
   }
 
   // TODO(HIGH): Fix worker restarts when using ScriptsNet module.

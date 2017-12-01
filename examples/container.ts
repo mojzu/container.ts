@@ -12,7 +12,7 @@ class AppModule extends Module {
   public static readonly moduleName: string = "AppModule";
 
   // Override the 'dependencies' getter to define module dependencies.
-  public get dependencies(): IModuleDependencies {
+  public get moduleDependencies(): IModuleDependencies {
     // Key is the name of the property on this class to inject (see 'proc' below).
     // Value is the name of the module to inject into the property (see 'NAME' above).
     return { proc: Process };
@@ -32,7 +32,7 @@ class AppModule extends Module {
   // Up/down hooks are called when the modules container methods of the same
   // name are called. Up/down may also return an observable to perform asynchronous
   // actions, or void if none are required.
-  public up(): Observable<void> | void {
+  public moduleUp(): Observable<void> | void {
     // All modules have debug, log and metric instances.
     // Logs and metrics are sent to the container which can then be
     // handled by a logging/metrics module.
@@ -42,7 +42,7 @@ class AppModule extends Module {
     this.metric.increment("counter");
   }
 
-  public down(): Observable<void> | void {
+  public moduleDown(): Observable<void> | void {
     // ...
   }
 
