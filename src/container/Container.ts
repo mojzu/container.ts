@@ -67,7 +67,9 @@ export class Container {
 
   /** Error names. */
   public static readonly ERROR = {
-    STATE: "ContainerStateError",
+    UP: "ContainerUpError",
+    DOWN: "ContainerDownError",
+    MODULE_REGISTERED: "ContainerModuleRegisteredError",
   };
 
   /** Log names. */
@@ -117,8 +119,16 @@ export class Container {
     return this.container.createScope();
   }
 
-  /** Register a named module in container. */
+  /**
+   * Register a named module in container.
+   * Throws an error if module of name is already registered.
+   */
   public registerModule(instance: IModuleConstructor): Container {
+    if (this.moduleRegistered(instance.NAME)) {
+      throw new ContainerError(Container.ERROR.MODULE_REGISTERED);
+    }
+
+    // TODO(MEDIUM): Create separate scope for modules.
     const factoryFunction = this.moduleFactory.bind(this, instance);
     this.container.register({ [instance.NAME]: asFunction(factoryFunction).singleton() });
     this.moduleState(instance.NAME, false);
@@ -248,6 +258,10 @@ export class Container {
     return dependants;
   }
 
+  protected moduleRegistered(name: string): boolean {
+    return (this.modules$.value[name] != null);
+  }
+
   protected moduleState(name: string, state: boolean): Observable<void> {
     this.modules$.value[name] = state;
     this.modules$.next(this.modules$.value);
@@ -257,7 +271,10 @@ export class Container {
   protected containerState(observables$: Array<Observable<void>>, state: boolean, timeout = 10000): Observable<void> {
     return Observable.forkJoin(...observables$)
       .timeout(timeout)
-      .catch((error) => Observable.throw(new ContainerError(Container.ERROR.STATE, error)))
+      .catch((error) => {
+        const name = state ? Container.ERROR.UP : Container.ERROR.DOWN;
+        return Observable.throw(new ContainerError(name, error));
+      })
       .map(() => {
         const message = state ? Container.LOG.UP : Container.LOG.DOWN;
         this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);

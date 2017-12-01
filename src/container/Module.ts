@@ -66,9 +66,6 @@ export class Module implements IModule {
   /** Module container reference. */
   public readonly container: Container;
 
-  /** Module name. */
-  public readonly name: string;
-
   /** Module log interface. */
   public readonly log: ModuleLog;
 
@@ -87,9 +84,12 @@ export class Module implements IModule {
   /** Module dependencies hook, override if required. */
   public get dependencies(): IModuleDependencies { return {}; }
 
-  public constructor(name: string, opts: IModuleOpts) {
-    // Set name, resolve container instance and construct log, debug instances.
-    this.name = name;
+  public constructor(
+    /** Module name. */
+    public readonly name: string,
+    opts: IModuleOpts,
+  ) {
+    // Resolve container instance and construct log, metric and debug instances.
     this.container = opts[Container.REFERENCE];
     this.log = new ModuleLog(this.container, this.namespace);
     this.metric = new ModuleMetric(this.container, this.namespace);

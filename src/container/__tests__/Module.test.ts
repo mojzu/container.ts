@@ -1,4 +1,4 @@
-import { Container } from "../Container";
+import { Container, ContainerError } from "../Container";
 import { Module } from "../Module";
 import { IModuleDependencies } from "../Types";
 
@@ -51,6 +51,15 @@ describe("Module", () => {
 
   it("#down", async () => {
     await CONTAINER.down().toPromise();
+  });
+
+  it("#registerModules throws error for duplicates", () => {
+    try {
+      new Container("Invalid").registerModules([ Test1, Test1 ]);
+      fail();
+    } catch (error) {
+      expect(error instanceof ContainerError).toEqual(true);
+    }
   });
 
 });
