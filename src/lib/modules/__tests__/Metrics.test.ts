@@ -12,7 +12,7 @@ describe("Metric", () => {
 
   const NAME = "Test";
   const CONTAINER = new Container(NAME)
-    .registerModule(TestMetrics.NAME, TestMetrics);
+    .registerModule(TestMetrics);
 
   const METRICS = CONTAINER.resolve<TestMetrics>(TestMetrics.name);
 

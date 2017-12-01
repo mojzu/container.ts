@@ -9,7 +9,7 @@ describe("Process", () => {
     .set(Process.ENV.NODE_ENV, "development");
 
   const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModule(Process.NAME, Process);
+    .registerModule(Process);
 
   const PROCESS = CONTAINER.resolve<Process>(Process.NAME);
 

@@ -7,7 +7,7 @@ export interface IModuleOpts {
 
 /** Module dependencies. */
 export interface IModuleDependencies {
-  [key: string]: string;
+  [key: string]: IModuleConstructor;
 }
 
 /** Module constructor interface. */

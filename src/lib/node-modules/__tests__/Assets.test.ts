@@ -8,7 +8,7 @@ describe("Assets", () => {
     .set(Assets.ENV.PATH, path.resolve(__dirname, "assets"));
 
   const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModule(Assets.NAME, Assets);
+    .registerModule(Assets);
 
   const ASSETS = CONTAINER.resolve<Assets>(Assets.NAME);
 

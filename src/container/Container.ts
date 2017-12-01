@@ -118,16 +118,16 @@ export class Container {
   }
 
   /** Register a named module in container. */
-  public registerModule(name: string, instance: IModuleConstructor): Container {
-    const factoryFunction = this.moduleFactory.bind(this, name, instance);
-    this.container.register({ [name]: asFunction(factoryFunction).singleton() });
-    this.moduleState(name, false);
+  public registerModule(instance: IModuleConstructor): Container {
+    const factoryFunction = this.moduleFactory.bind(this, instance);
+    this.container.register({ [instance.NAME]: asFunction(factoryFunction).singleton() });
+    this.moduleState(instance.NAME, false);
     return this;
   }
 
   /** Register named modules in container. */
-  public registerModules(modules: { [name: string]: IModuleConstructor }): Container {
-    Object.keys(modules).map((name) => this.registerModule(name, modules[name]));
+  public registerModules(modules: IModuleConstructor[]): Container {
+    modules.map((mod) => this.registerModule(mod));
     return this;
   }
 
@@ -226,19 +226,19 @@ export class Container {
       .take(1);
   }
 
-  protected moduleFactory<T extends IModuleConstructor>(name: string, instance: T, opts: IModuleOpts): IModule {
-    return new instance(name, opts);
+  protected moduleFactory<T extends IModuleConstructor>(instance: T, opts: IModuleOpts): IModule {
+    return new instance(instance.NAME, opts);
   }
 
   protected moduleDependencies(mod: IModule): string[] {
-    return Object.keys(mod.dependencies).map((k) => mod.dependencies[k]);
+    return Object.keys(mod.dependencies).map((k) => mod.dependencies[k].NAME);
   }
 
   protected moduleDependants(mod: IModule): string[] {
     const dependants: string[] = [];
     this.modules.map((m) => {
       const dependant = Object.keys(m.dependencies).reduce((previous, key) => {
-        return previous || (m.dependencies[key] === mod.name);
+        return previous || (m.dependencies[key].NAME === mod.name);
       }, false);
 
       if (dependant) {

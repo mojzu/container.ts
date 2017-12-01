@@ -17,7 +17,7 @@ describe("Logs", () => {
 
   const NAME = "Test";
   const CONTAINER = new Container(NAME)
-    .registerModule(TestLogs.NAME, TestLogs);
+    .registerModule(TestLogs);
 
   const LOGS = CONTAINER.resolve<TestLogs>(TestLogs.NAME);
 

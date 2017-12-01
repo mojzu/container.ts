@@ -10,8 +10,7 @@ describe("Scripts", () => {
     .set(Scripts.ENV.PATH, path.resolve(__dirname, "scripts"));
 
   const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModule(Scripts.NAME, Scripts)
-    .registerModule(TestModule.NAME, TestModule);
+    .registerModules([Scripts, TestModule]);
 
   const SCRIPTS = CONTAINER.resolve<Scripts>(Scripts.NAME);
 

@@ -7,7 +7,7 @@ class TestModule extends Module {
   public static readonly NAME: string = "Test";
 
   public get dependencies(): IModuleDependencies {
-    return { childProcess: ChildProcess.NAME };
+    return { childProcess: ChildProcess };
   }
 
   protected readonly childProcess: ChildProcess;
@@ -52,8 +52,7 @@ const ENVIRONMENT = new Environment(process.env);
 // Create container instance with name and environment.
 // Populate container for dependency injection.
 const CONTAINER = new Container("Server", ENVIRONMENT)
-  .registerModule(ChildProcess.NAME, ChildProcess)
-  .registerModule(TestModule.NAME, TestModule);
+  .registerModules([ChildProcess, TestModule]);
 
 // Signal operational.
 CONTAINER.up()

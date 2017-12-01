@@ -25,7 +25,7 @@ describe("Container", () => {
   it("#Container#registerModule", () => {
     const name = "test";
     const container = new Container(name);
-    expect(container.registerModule(Module.NAME, Module) instanceof Container).toEqual(true);
+    expect(container.registerModule(Module) instanceof Container).toEqual(true);
     const testModule = container.resolve<Module>(Module.NAME);
     expect(testModule instanceof Module);
     expect(testModule.container).toEqual(container);

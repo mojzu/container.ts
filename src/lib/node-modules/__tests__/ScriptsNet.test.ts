@@ -9,8 +9,7 @@ describe("ScriptsNet", () => {
     .set(ScriptsNet.ENV.PATH, path.resolve(__dirname, "scripts"));
 
   const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModule(ScriptsNet.NAME, ScriptsNet)
-    .registerModule(TestModule.NAME, TestModule);
+    .registerModules([ScriptsNet, TestModule]);
 
   const SCRIPTS = CONTAINER.resolve<ScriptsNet>(ScriptsNet.NAME);
 

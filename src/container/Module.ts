@@ -100,7 +100,7 @@ export class Module implements IModule {
     try {
       Object.keys(this.dependencies).map((key) => {
         const target = this.dependencies[key];
-        this[key] = opts[target];
+        this[key] = opts[target.NAME];
       });
     } catch (error) {
       throw new ModuleError(Module.ERROR.DEPENDENCY, error);

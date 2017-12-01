@@ -17,7 +17,7 @@ class Test1 extends Module {
 class Test2 extends Module {
   public static readonly NAME = "Test2";
   public get dependencies(): IModuleDependencies {
-    return { test1: Test1.NAME, test3: Test3.NAME };
+    return { test1: Test1, test3: Test3 };
   }
   // public up(): void {
   //   console.log("2UP!");
@@ -30,7 +30,7 @@ class Test2 extends Module {
 class Test3 extends Module {
   public static readonly NAME = "Test3";
   public get dependencies(): IModuleDependencies {
-    return { test1: Test1.NAME };
+    return { test1: Test1 };
   }
   // public up(): void {
   //   console.log("3UP!");
@@ -43,9 +43,7 @@ class Test3 extends Module {
 describe("Module", () => {
 
   const CONTAINER = new Container("Test")
-    .registerModule(Test1.NAME, Test1)
-    .registerModule(Test2.NAME, Test2)
-    .registerModule(Test3.NAME, Test3);
+    .registerModules([Test1, Test2, Test3]);
 
   it("#up", async () => {
     await CONTAINER.up().toPromise();
