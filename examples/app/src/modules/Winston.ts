@@ -5,12 +5,12 @@ import * as winston from "winston";
 
 export class Winston extends Logs {
 
-  public static readonly NAME: string = "Winston";
+  public static readonly moduleName: string = "Winston";
 
   protected readonly logger: winston.LoggerInstance;
 
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
 
     // Construct Winston logger with console transport.
     this.logger = new winston.Logger({

@@ -4,10 +4,10 @@ import { Observable } from "rxjs/Observable";
 
 export class Main extends Process {
 
-  public static readonly NAME: string = "Main";
+  public static readonly moduleName: string = "Main";
 
-  public get dependencies(): IModuleDependencies {
-    return { scripts: Scripts.NAME };
+  public get moduleDependencies(): IModuleDependencies {
+    return { scripts: Scripts };
   }
 
   public readonly scripts: Scripts;
@@ -15,8 +15,8 @@ export class Main extends Process {
   public readonly workerName = "Worker";
   public worker$: Observable<ScriptsProcess>;
 
-  public up(): void {
-    super.up();
+  public moduleUp(): void {
+    super.moduleUp();
 
     // Start worker process.
     this.worker$ = this.scripts.startWorker(this.workerName, "worker.js", {

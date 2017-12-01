@@ -6,7 +6,7 @@ import { Main } from "./Main";
 
 export class Rollbar extends Logs {
 
-  public static readonly NAME: string = "Rollbar";
+  public static readonly moduleName: string = "Rollbar";
 
   /** Environment variable names. */
   public static ENV = Object.assign(Logs.ENV, {
@@ -16,15 +16,15 @@ export class Rollbar extends Logs {
     REPORT_LEVEL: "ROLLBAR_REPORT_LEVEL",
   });
 
-  public get dependencies(): IModuleDependencies {
-    return { process: Main.NAME };
+  public get moduleDependencies(): IModuleDependencies {
+    return { process: Main };
   }
 
   private readonly process: Main;
   private readonly rollbar: rollbar;
 
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
 
     // Get access token from environment.
     // Get report level from environment or fall back on log level.

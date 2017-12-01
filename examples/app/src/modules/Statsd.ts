@@ -5,7 +5,7 @@ import * as StatsdClient from "statsd-client";
 
 export class Statsd extends Metrics {
 
-  public static readonly NAME: string = "Statsd";
+  public static readonly moduleName: string = "Statsd";
 
   /** Environment variable names. */
   public static ENV = {
@@ -17,8 +17,8 @@ export class Statsd extends Metrics {
 
   protected readonly statsd: any;
 
-  public constructor(name: string, opts: IModuleOpts) {
-    super(name, opts);
+  public constructor(opts: IModuleOpts) {
+    super(opts);
 
     // Get host and port environment values.
     const host = Validate.isString(this.environment.get(Statsd.ENV.HOST));
