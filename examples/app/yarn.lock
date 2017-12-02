@@ -747,14 +747,14 @@ console-polyfill@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/console-polyfill/-/console-polyfill-0.3.0.tgz#84900902a18c47a5eba932be75fa44d23e8af861"
 
-container.ts@^0.53.0:
-  version "0.53.0"
-  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.53.0.tgz#40692ae069b39e18eb472c4fb70d4461ce16de26"
+container.ts@^0.55.0:
+  version "0.55.0"
+  resolved "https://registry.yarnpkg.com/container.ts/-/container.ts-0.55.0.tgz#e6cc2f21528db824e646d3867115ff60197c3678"
   dependencies:
     "@types/debug" "^0.0.30"
     awilix "^2.12.0"
     debug "^3.1.0"
-    rxjs "^5.5.2"
+    rxjs "^5.5.3"
   optionalDependencies:
     "@types/moment-timezone" "^0.5.2"
     "@types/validator" "^6.3.0"
@@ -3085,7 +3085,7 @@ rx@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/rx/-/rx-4.1.0.tgz#a5f13ff79ef3b740fe30aa803fb09f98805d4782"
 
-rxjs@^5.5.2, rxjs@^5.5.3:
+rxjs@^5.5.3:
   version "5.5.3"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.5.3.tgz#b62227e74b84f4e77bdf440e50b5ee01a1bc7dcd"
   dependencies:

@@ -16,10 +16,6 @@ export class Rollbar extends Logs {
     REPORT_LEVEL: "ROLLBAR_REPORT_LEVEL",
   });
 
-  public get moduleDependencies(): IModuleDependencies {
-    return { process: Main };
-  }
-
   private readonly process: Main;
   private readonly rollbar: rollbar;
 
@@ -45,6 +41,10 @@ export class Rollbar extends Logs {
       captureUncaught: true,
       captureUnhandledRejections: true,
     });
+  }
+
+  public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
+    return super.moduleDependencies(...prev, { process: Main });
   }
 
   /** Rollbar handler for incoming log messages. */

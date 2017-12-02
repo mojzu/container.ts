@@ -6,14 +6,14 @@ export class Main extends Process {
 
   public static readonly moduleName: string = "Main";
 
-  public get moduleDependencies(): IModuleDependencies {
-    return { scripts: Scripts };
-  }
-
   public readonly scripts: Scripts;
 
   public readonly workerName = "Worker";
   public worker$: Observable<ScriptsProcess>;
+
+  public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
+    return super.moduleDependencies(...prev, { scripts: Scripts });
+  }
 
   public moduleUp(): void {
     super.moduleUp();
