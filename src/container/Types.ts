@@ -20,7 +20,7 @@ export interface IModuleConstructor {
 /** Container module. */
 export interface IModule {
   moduleName: string;
-  moduleDependencies: IModuleDependencies;
+  moduleDependencies(...previous: IModuleDependencies[]): IModuleDependencies;
   moduleUp(): void | Observable<void>;
   moduleDown(): void | Observable<void>;
 }

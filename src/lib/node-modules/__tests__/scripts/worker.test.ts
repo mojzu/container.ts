@@ -6,10 +6,6 @@ class TestModule extends Module {
 
   public static readonly moduleName: string = "Test";
 
-  public get moduleDependencies(): IModuleDependencies {
-    return { childProcess: ChildProcess };
-  }
-
   protected readonly childProcess: ChildProcess;
 
   public constructor(opts: IModuleOpts) {
@@ -20,6 +16,10 @@ class TestModule extends Module {
       .subscribe((data) => {
         this.childProcess.event<number>("pong", { data: data * 2 });
       });
+  }
+
+  public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
+    return super.moduleDependencies(...prev, { childProcess: ChildProcess });
   }
 
   // Test method called from parent process.

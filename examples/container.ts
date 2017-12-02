@@ -11,13 +11,6 @@ class AppModule extends Module {
   // This name is used to resolve module dependencies from a container.
   public static readonly moduleName: string = "AppModule";
 
-  // Override the 'dependencies' getter to define module dependencies.
-  public get moduleDependencies(): IModuleDependencies {
-    // Key is the name of the property on this class to inject (see 'proc' below).
-    // Value is the name of the module to inject into the property (see 'NAME' above).
-    return { proc: Process };
-  }
-
   // Injected module dependency.
   protected readonly proc: Process;
 
@@ -27,6 +20,13 @@ class AppModule extends Module {
     super(opts);
     // Dependencies are available now.
     // ...
+  }
+
+  // Override the 'dependencies' getter to define module dependencies.
+  public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
+    // Key is the name of the property on this class to inject (see 'proc' below).
+    // Value is the name of the module to inject into the property (see 'NAME' above).
+    return super.moduleDependencies(...prev, { proc: Process });
   }
 
   // Up/down hooks are called when the modules container methods of the same

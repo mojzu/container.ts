@@ -16,8 +16,8 @@ class Test1 extends Module {
 
 class Test2 extends Module {
   public static readonly moduleName: string = "Test2";
-  public get moduleDependencies(): IModuleDependencies {
-    return { test1: Test1, test3: Test3 };
+  public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
+    return super.moduleDependencies(...prev, { test1: Test1, test3: Test3 });
   }
   // public moduleUp(): void {
   //   console.log("2UP!");
@@ -29,8 +29,9 @@ class Test2 extends Module {
 
 class Test3 extends Module {
   public static readonly moduleName: string = "Test3";
-  public get moduleDependencies(): IModuleDependencies {
-    return { test1: Test1 };
+  public readonly test1: Test1;
+  public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
+    return super.moduleDependencies(...prev, { test1: Test1 });
   }
   // public moduleUp(): void {
   //   console.log("3UP!");
@@ -40,10 +41,18 @@ class Test3 extends Module {
   // }
 }
 
+class Test4 extends Test3 {
+  public static readonly moduleName: string = "Test4";
+  public readonly test2: Test2;
+  public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
+    return super.moduleDependencies(...prev, { test2: Test2 });
+  }
+}
+
 describe("Module", () => {
 
-  const CONTAINER = new Container("Test")
-    .registerModules([Test1, Test2, Test3]);
+  const CONTAINER = new Container("Test1")
+    .registerModules([Test1, Test2, Test3, Test4]);
 
   it("#up", async () => {
     await CONTAINER.up().toPromise();
@@ -60,6 +69,12 @@ describe("Module", () => {
     } catch (error) {
       expect(error instanceof ContainerError).toEqual(true);
     }
+  });
+
+  it("#moduleDependencies inherited dependencies work", () => {
+    const t4 = CONTAINER.resolve<Test4>(Test4.moduleName);
+    expect(t4.test1 instanceof Test1).toEqual(true);
+    expect(t4.test2 instanceof Test2).toEqual(true);
   });
 
 });

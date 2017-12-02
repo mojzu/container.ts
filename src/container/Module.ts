@@ -66,9 +66,6 @@ export class Module implements IModule {
   /** Module name. */
   public readonly moduleName: string;
 
-  /** Module dependencies hook, override if required. */
-  public get moduleDependencies(): IModuleDependencies { return {}; }
-
   /** Module container reference. */
   public readonly container: Container;
 
@@ -98,13 +95,19 @@ export class Module implements IModule {
     // Inject dependency values into instance.
     // Error is thrown by awilix if resolution failed.
     try {
-      Object.keys(this.moduleDependencies).map((key) => {
-        const target = this.moduleDependencies[key];
+      const dependencies = this.moduleDependencies();
+      Object.keys(dependencies).map((key) => {
+        const target = dependencies[key];
         this[key] = opts.opts[target.moduleName];
       });
     } catch (error) {
       throw new ModuleError(Module.ERROR.DEPENDENCY, error);
     }
+  }
+
+  /** Module dependencies hook, override if required. */
+  public moduleDependencies(...previous: IModuleDependencies[]): IModuleDependencies {
+    return Object.assign({}, ...previous);
   }
 
   /** Module operational state. */

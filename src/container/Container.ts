@@ -241,14 +241,16 @@ export class Container {
   }
 
   protected moduleDependencies(mod: IModule): string[] {
-    return Object.keys(mod.moduleDependencies).map((k) => mod.moduleDependencies[k].moduleName);
+    const dependencies = mod.moduleDependencies();
+    return Object.keys(dependencies).map((k) => dependencies[k].moduleName);
   }
 
   protected moduleDependants(mod: IModule): string[] {
     const dependants: string[] = [];
     this.modules.map((m) => {
-      const dependant = Object.keys(m.moduleDependencies).reduce((previous, key) => {
-        return previous || (m.moduleDependencies[key].moduleName === mod.moduleName);
+      const dependencies = m.moduleDependencies();
+      const dependant = Object.keys(dependencies).reduce((previous, key) => {
+        return previous || (dependencies[key].moduleName === mod.moduleName);
       }, false);
 
       if (dependant) {
