@@ -1,6 +1,6 @@
 import * as net from "net";
 import * as process from "process";
-import { IContainerLogMessage, IModuleOpts, Module } from "../../container";
+import { IContainerLogMessage, IModuleOptions, Module } from "../../container";
 import { Observable, Subject } from "../../container/RxJS";
 import { ErrorChain, IErrorChainSerialised } from "../error";
 import { IProcessStatus, Process, ProcessError } from "./Process";
@@ -291,8 +291,8 @@ export class ChildProcess extends Process implements IProcessSend {
 
   protected currentIdentifier = 0;
 
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
 
     // Listen for a socket message to accept handle.
     process.once("message", (type: string, socket: net.Socket) => {

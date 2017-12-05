@@ -5,7 +5,7 @@ import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./Log";
 import { EMetricType, IMetricTags, Metric } from "./Metric";
 import { Observable } from "./RxJS";
-import { IModule, IModuleDependencies, IModuleOpts } from "./Types";
+import { IModule, IModuleDependencies, IModuleOptions } from "./Types";
 
 /** Module error class. */
 export class ModuleError extends ErrorChain {
@@ -84,10 +84,10 @@ export class Module implements IModule {
   /** Module container and module names. */
   public get namespace(): string { return `${this.container.name}.${this.moduleName}`; }
 
-  public constructor(opts: IModuleOpts) {
+  public constructor(options: IModuleOptions) {
     // Resolve container instance and construct log, metric and debug instances.
-    this.moduleName = opts.moduleName;
-    this.container = opts.opts[Container.REFERENCE];
+    this.moduleName = options.moduleName;
+    this.container = options.opts[Container.REFERENCE];
     this.log = new ModuleLog(this.container, this.namespace);
     this.metric = new ModuleMetric(this.container, this.namespace);
     this.debug = Debug(this.namespace);
@@ -98,14 +98,14 @@ export class Module implements IModule {
       const dependencies = this.moduleDependencies();
       Object.keys(dependencies).map((key) => {
         const target = dependencies[key];
-        this[key] = opts.opts[target.moduleName];
+        this[key] = options.opts[target.moduleName];
       });
     } catch (error) {
       throw new ModuleError(Module.ERROR.DEPENDENCY, error);
     }
   }
 
-  /** Module dependencies hook, override if required. */
+  /** Module dependencies hook. */
   public moduleDependencies(...previous: IModuleDependencies[]): IModuleDependencies {
     return Object.assign({}, ...previous);
   }

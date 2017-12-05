@@ -1,4 +1,4 @@
-import { ContainerLogMessage, ELogLevel, IModuleOpts, Module } from "../../container";
+import { ContainerLogMessage, ELogLevel, IModuleOptions, Module } from "../../container";
 import { Validate } from "../validate";
 
 export abstract class Logs extends Module {
@@ -15,8 +15,8 @@ export abstract class Logs extends Module {
   /** Parsed application logs level. */
   protected readonly level = this.parseLevel(this.envLevel);
 
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
 
     // Debug environment variables.
     this.debug(`${Logs.ENV.LEVEL}="${ELogLevel[this.level]}"`);

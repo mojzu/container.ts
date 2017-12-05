@@ -64,7 +64,7 @@ describe("Module", () => {
 
   it("#registerModules throws error for duplicates", () => {
     try {
-      new Container("Invalid").registerModules([ Test1, Test1 ]);
+      new Container("Invalid").registerModules([Test1, Test1]);
       fail();
     } catch (error) {
       expect(error instanceof ContainerError).toEqual(true);

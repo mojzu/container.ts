@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { IModuleOpts, Module } from "../../container";
+import { IModuleOptions, Module } from "../../container";
 import { Observable } from "../../container/RxJS";
 import { ErrorChain } from "../error";
 import { NodeValidate } from "../node-validate";
@@ -44,8 +44,8 @@ export class Assets extends Module {
   protected readonly path = this.envPath;
   protected readonly cache: IAssetsCache = {};
 
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
 
     // Debug environment variables.
     this.debug(`${Assets.ENV.PATH}="${this.path}"`);

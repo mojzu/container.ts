@@ -1,6 +1,6 @@
 import * as os from "os";
 import * as process from "process";
-import { IModuleOpts, Module } from "../../container";
+import { IModuleOptions, Module } from "../../container";
 import { Observable } from "../../container/RxJS";
 import { ErrorChain } from "../error";
 import { Validate } from "../validate";
@@ -107,8 +107,8 @@ export class Process extends Module {
     };
   }
 
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
 
     // Set process title.
     Process.setTitle(this.envName);

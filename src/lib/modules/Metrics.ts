@@ -1,12 +1,12 @@
-import { ContainerMetricMessage, IModuleOpts, Module } from "../../container";
+import { ContainerMetricMessage, IModuleOptions, Module } from "../../container";
 
 export abstract class Metrics extends Module {
 
   /** Default module name. */
   public static readonly moduleName: string = "Metrics";
 
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
 
     // Subscribe to container metric messages.
     this.container.metrics$

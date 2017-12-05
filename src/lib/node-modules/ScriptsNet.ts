@@ -1,5 +1,5 @@
 import * as net from "net";
-import { IModuleOpts } from "../../container";
+import { IModuleOptions } from "../../container";
 import { Observable } from "../../container/RxJS";
 import {
   IScriptsWorkerOptions,
@@ -34,8 +34,8 @@ export class ScriptsNet extends Scripts {
     return address.port;
   }
 
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
 
     // Log server error events.
     this.error$.subscribe((error) => this.log.error(new ScriptsError(error)));

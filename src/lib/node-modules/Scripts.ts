@@ -6,7 +6,7 @@ import {
   IContainerMetricMessage,
   IEnvironmentVariables,
   ILogMetadata,
-  IModuleOpts,
+  IModuleOptions,
   Module,
 } from "../../container";
 import { BehaviorSubject, Observable, Subject } from "../../container/RxJS";
@@ -234,8 +234,8 @@ export class Scripts extends Module {
   public readonly path = this.envPath;
   public readonly workers: { [name: string]: IScriptsWorker } = {};
 
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
 
     // Debug environment variables.
     this.debug(`${Scripts.ENV.PATH}="${this.path}"`);

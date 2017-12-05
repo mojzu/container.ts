@@ -1,4 +1,4 @@
-import { Container, Environment, IModuleDependencies, IModuleOpts, Module } from "../../../../container";
+import { Container, Environment, IModuleDependencies, IModuleOptions, Module } from "../../../../container";
 import { Observable } from "../../../../container/RxJS";
 import { ChildProcess } from "../../ChildProcess";
 
@@ -8,8 +8,8 @@ class TestModule extends Module {
 
   protected readonly childProcess: ChildProcess;
 
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
 
     // Responds to ping events from parent process.
     this.childProcess.listen<number>("ping")
