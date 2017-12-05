@@ -1,3 +1,4 @@
+import { assign } from "lodash";
 import * as net from "net";
 import { IModuleOptions } from "../../container";
 import { Observable } from "../../container/RxJS";
@@ -15,7 +16,7 @@ export class ScriptsNet extends Scripts {
   public static readonly moduleName: string = "Scripts";
 
   /** Log names. */
-  public static readonly LOG = Object.assign({}, Scripts.LOG, {
+  public static readonly LOG = assign({}, Scripts.LOG, {
     UP: "ScriptsNetUp",
     DOWN: "ScriptsNetDown",
     CONNECTION: "ScriptsNetWorkerConnection",

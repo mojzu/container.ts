@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import { assign } from "lodash";
 import * as path from "path";
 import { IModuleOptions, Module } from "../../container";
 import { Observable } from "../../container/RxJS";
@@ -36,7 +37,7 @@ export class Assets extends Module {
   };
 
   /** Error names. */
-  public static readonly ERROR = Object.assign({}, Module.ERROR, {
+  public static readonly ERROR = assign({}, Module.ERROR, {
     READ_FILE: "AssetsReadFileError",
     JSON_PARSE: "AssetsJsonParseError",
   });
