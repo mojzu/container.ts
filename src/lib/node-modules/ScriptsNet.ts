@@ -25,9 +25,9 @@ export class ScriptsNet extends Scripts {
   /** Scripts server for connecting workers. */
   public readonly server: net.Server = net.createServer();
 
-  protected readonly close$ = Observable.fromEvent<void>(this.server as any, "close");
-  protected readonly connection$ = Observable.fromEvent<net.Socket>(this.server as any, "connection");
-  protected readonly error$ = Observable.fromEvent<any>(this.server as any, "error");
+  protected readonly close$: Observable<void>;
+  protected readonly connection$: Observable<net.Socket>;
+  protected readonly error$: Observable<any>;
 
   /** Get server port number. */
   public get port(): number {
@@ -37,6 +37,11 @@ export class ScriptsNet extends Scripts {
 
   public constructor(options: IModuleOptions) {
     super(options);
+
+    // Setup event handlers.
+    this.close$ = Observable.fromEvent<void>(this.server as any, "close");
+    this.connection$ = Observable.fromEvent<net.Socket>(this.server as any, "connection");
+    this.error$ = Observable.fromEvent<any>(this.server as any, "error");
 
     // Log server error events.
     this.error$.subscribe((error) => this.log.error(new ScriptsError(error)));

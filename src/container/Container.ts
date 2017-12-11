@@ -1,4 +1,4 @@
-import { asFunction, asValue, AwilixContainer, createContainer, ResolutionMode } from "awilix";
+import { asFunction, asValue, AwilixContainer, createContainer, InjectionMode } from "awilix";
 import { ErrorChain } from "../lib/error";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata } from "./Log";
@@ -110,7 +110,7 @@ export class Container {
     public readonly argv: IContainerArguments = { _: [], $0: "" },
   ) {
     this.environment = environment;
-    this.container = createContainer({ resolutionMode: ResolutionMode.PROXY });
+    this.container = createContainer({ injectionMode: InjectionMode.PROXY });
     this.registerValue<Container>(Container.REFERENCE, this);
   }
 
