@@ -1,9 +1,11 @@
 
+/** Error chain data type. */
 export interface IErrorChain {
   name: string;
   value?: any;
 }
 
+/** Serialised error chain item type. */
 export interface IErrorChainItem extends IErrorChain {
   stack: string;
   message?: string;
@@ -13,16 +15,21 @@ export interface IErrorChainItem extends IErrorChain {
   syscall?: string;
 }
 
+/** Serialised error chain items. */
 export interface IErrorChainSerialised {
   ErrorChain: IErrorChainItem[];
 }
 
+/**
+ * ErrorChain class.
+ * Serialisable, chained errors utility.
+ */
 export class ErrorChain {
 
   /** Error names. */
   public static readonly ERROR = {
-    SERIALISE: "SerialiseError",
-    DESERIALISE: "DeserialiseError",
+    SERIALISE: "ErrorChainSerialiseError",
+    DESERIALISE: "ErrorChainDeserialiseError",
   };
 
   /** Returns true if error instance of ErrorChain. */
@@ -33,6 +40,16 @@ export class ErrorChain {
   /** Returns true if error instance of Error or ErrorChain */
   public static isError(error: any): error is Error | ErrorChain {
     return (error instanceof Error) || (error instanceof ErrorChain);
+  }
+
+  /** Returns name representation of error argument. */
+  public static errorName(error: any): string {
+    if (ErrorChain.isErrorChain(error)) {
+      return error.joinNames();
+    } else if (ErrorChain.isError(error) && (error.name != null)) {
+      return error.name;
+    }
+    return String(error);
   }
 
   /** Construct error message from data and optional cause. */
@@ -74,9 +91,9 @@ export class ErrorChain {
   }
 
   /** Return deserialised ErrorChain instance of serialised data. */
-  public static deserialise(serialised: IErrorChainSerialised): ErrorChain | null {
+  public static deserialise(serialised: IErrorChainSerialised): ErrorChain | undefined {
     try {
-      let chained: ErrorChain | null = null;
+      let chained: ErrorChain | undefined;
 
       serialised.ErrorChain.reduceRight((p, current) => {
         chained = new ErrorChain(current, chained || undefined);
@@ -90,11 +107,11 @@ export class ErrorChain {
     }
   }
 
-  public name: string;
-  public stack?: string;
-  public message?: string;
-  public value?: any;
-  public cause?: ErrorChain | Error;
+  public readonly name: string;
+  public readonly stack?: string;
+  public readonly message?: string;
+  public readonly value?: any;
+  public readonly cause?: ErrorChain | Error;
 
   public constructor(data: IErrorChain, cause?: ErrorChain | Error) {
     const error = new Error(ErrorChain.messageConstructor(data, cause));
@@ -124,9 +141,9 @@ export class ErrorChain {
     return names.join(separator);
   }
 
+  /** Return serialised data for this chained error. */
   public serialise(): IErrorChainSerialised {
     try {
-      // Serialise this error object.
       let chained: IErrorChainItem[] = [{
         name: this.name,
         stack: String(this.stack || ""),
@@ -153,5 +170,3 @@ export class ErrorChain {
   }
 
 }
-
-export default ErrorChain;

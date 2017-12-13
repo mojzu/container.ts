@@ -1,4 +1,5 @@
 import { asFunction, asValue, AwilixContainer, createContainer, InjectionMode } from "awilix";
+import { keys } from "lodash";
 import { ErrorChain } from "../lib/error";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata } from "./Log";
@@ -6,13 +7,13 @@ import { EMetricType, IMetricTags } from "./Metric";
 import { BehaviorSubject, Observable, Subject } from "./RxJS";
 import { IModule, IModuleConstructor, IModuleState } from "./Types";
 
-/** Command line arguments interface matching 'yargs' package. */
+/** Command line arguments interface matching `yargs` package. */
 export interface IContainerArguments {
-  /** Non-option arguments */
+  /** Non-option arguments. */
   _: string[];
-  /** The script name or node command */
+  /** The script name or node command. */
   $0: string;
-  /** All remaining options */
+  /** All remaining options. */
   [argName: string]: any;
 }
 
@@ -59,11 +60,11 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
   ) { }
 }
 
-/** Wrapper around awilix library. */
+/**
+ * Container class.
+ * Wrapper around awilix library.
+ */
 export class Container {
-
-  /** Container reference name used internally by modules. */
-  public static readonly REFERENCE = "_container";
 
   /** Error names. */
   public static readonly ERROR = {
@@ -78,6 +79,12 @@ export class Container {
     DOWN: "ContainerDown",
   };
 
+  /** Scope key names. */
+  public static readonly SCOPE = {
+    /** Container reference name resolved internally by modules. */
+    CONTAINER: "Container",
+  };
+
   /** Root container. */
   public readonly container: AwilixContainer;
 
@@ -86,7 +93,7 @@ export class Container {
 
   /** Array of registered module names. */
   public get moduleNames(): string[] {
-    return Object.keys(this.modules$.value);
+    return keys(this.modules$.value);
   }
 
   /** Array of registered modules. */
@@ -102,36 +109,35 @@ export class Container {
 
   /** Creates a new container in proxy resolution mode. */
   public constructor(
-    /** Container name, used to namespace modules. */
+    /** Required container name, used to namespace modules. */
     public readonly name: string,
-    /** Container environment. */
+    /** Optional container environment. */
     public readonly environment = new Environment(),
     /** Optional command line arguments. */
     public readonly argv: IContainerArguments = { _: [], $0: "" },
   ) {
     this.environment = environment;
     this.container = createContainer({ injectionMode: InjectionMode.PROXY });
-    this.registerValue<Container>(Container.REFERENCE, this);
+    this.registerValue<Container>(Container.SCOPE.CONTAINER, this);
   }
 
-  /** Create scope from container. */
+  /** Create scoped container from root container. */
   public createScope(): AwilixContainer {
     return this.container.createScope();
   }
 
   /**
-   * Register a named module in container.
+   * Register a module in container.
    * Throws an error if module of name is already registered.
    */
-  public registerModule(instance: IModuleConstructor): Container {
-    if (this.moduleRegistered(instance.moduleName)) {
+  public registerModule(moduleClass: IModuleConstructor): Container {
+    if (this.moduleRegistered(moduleClass.moduleName)) {
       throw new ContainerError(Container.ERROR.MODULE_REGISTERED);
     }
 
-    // TODO(MEDIUM): Create separate scope for modules.
-    const factoryFunction = this.moduleFactory.bind(this, instance);
-    this.container.register({ [instance.moduleName]: asFunction(factoryFunction).singleton() });
-    this.moduleState(instance.moduleName, false);
+    const factoryFunction = this.moduleFactory.bind(this, moduleClass);
+    this.container.register({ [moduleClass.moduleName]: asFunction(factoryFunction).singleton() });
+    this.moduleState(moduleClass.moduleName, false);
     return this;
   }
 
@@ -172,7 +178,10 @@ export class Container {
     return this.metrics$.filter((m) => m.type === type);
   }
 
-  /** Signal modules to enter operational state. */
+  /**
+   * Signal modules to enter operational state.
+   * Module hook method `moduleUp` called in order of dependencies.
+   */
   public up(timeout?: number): Observable<void> {
     const observables$ = this.modules
       .map((mod) => {
@@ -192,11 +201,14 @@ export class Container {
     return this.containerState(observables$, true, timeout);
   }
 
-  /** Signal modules to leave operational state. */
+  /**
+   * Signal modules to leave operational state.
+   * Module hook method `moduleDown` called in order of dependents.
+   */
   public down(timeout?: number): Observable<void> {
     const observables$ = this.modules
       .map((mod) => {
-        return this.waitDown(...this.moduleDependants(mod))
+        return this.waitDown(...this.moduleDependents(mod))
           .switchMap(() => {
             const down$ = mod.moduleDown();
 
@@ -236,40 +248,46 @@ export class Container {
       .take(1);
   }
 
-  protected moduleFactory<T extends IModuleConstructor>(instance: T, opts: any): IModule {
-    return new instance({ moduleName: instance.moduleName, opts });
+  /** Create a new instance of module class. */
+  protected moduleFactory<T extends IModuleConstructor>(moduleClass: T, opts: any): IModule {
+    return new moduleClass({ moduleName: moduleClass.moduleName, opts });
   }
 
+  /** Returns list of module names which are dependencies of target module. */
   protected moduleDependencies(mod: IModule): string[] {
     const dependencies = mod.moduleDependencies();
-    return Object.keys(dependencies).map((k) => dependencies[k].moduleName);
+    return keys(dependencies).map((k) => dependencies[k].moduleName);
   }
 
-  protected moduleDependants(mod: IModule): string[] {
-    const dependants: string[] = [];
+  /** Returns list of module names which are dependents of target module. */
+  protected moduleDependents(mod: IModule): string[] {
+    const dependents: string[] = [];
     this.modules.map((m) => {
       const dependencies = m.moduleDependencies();
-      const dependant = Object.keys(dependencies).reduce((previous, key) => {
+      const dependent = keys(dependencies).reduce((previous, key) => {
         return previous || (dependencies[key].moduleName === mod.moduleName);
       }, false);
 
-      if (dependant) {
-        dependants.push(m.moduleName);
+      if (dependent) {
+        dependents.push(m.moduleName);
       }
     });
-    return dependants;
+    return dependents;
   }
 
+  /** Returns true if module is already registered in container. */
   protected moduleRegistered(name: string): boolean {
     return (this.modules$.value[name] != null);
   }
 
+  /** Update observable modules state for target module. */
   protected moduleState(name: string, state: boolean): Observable<void> {
-    this.modules$.value[name] = state;
-    this.modules$.next(this.modules$.value);
+    const next = { ...this.modules$.value, [name]: state };
+    this.modules$.next(next);
     return Observable.of(undefined);
   }
 
+  /** Internal handler for `up` and `down` methods of class. */
   protected containerState(observables$: Array<Observable<void>>, state: boolean, timeout = 10000): Observable<void> {
     return Observable.forkJoin(...observables$)
       .timeout(timeout)

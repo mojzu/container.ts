@@ -1,5 +1,6 @@
 import { ContainerMetricMessage, IModuleOptions, Module } from "../../container";
 
+/** Abstract container metrics handler module. */
 export abstract class Metrics extends Module {
 
   /** Default module name. */
@@ -10,10 +11,10 @@ export abstract class Metrics extends Module {
 
     // Subscribe to container metric messages.
     this.container.metrics$
-      .subscribe((metric) => this.onMessage(metric));
+      .subscribe((metric) => this.metricsOnMessage(metric));
   }
 
   /** Abstract handler for incoming metric messages. */
-  protected abstract onMessage(metric: ContainerMetricMessage): void;
+  protected abstract metricsOnMessage(metric: ContainerMetricMessage): void;
 
 }

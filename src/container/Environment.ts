@@ -1,3 +1,4 @@
+import { assign } from "lodash";
 
 /** Environment variables object. */
 export interface IEnvironmentVariables {
@@ -10,12 +11,12 @@ export class Environment {
   public readonly variables: IEnvironmentVariables;
 
   public constructor(...variables: IEnvironmentVariables[]) {
-    this.variables = Object.assign({}, ...variables);
+    this.variables = assign({}, ...variables);
   }
 
   /** Returns a copy of environment. */
-  public copy(variables: IEnvironmentVariables = {}): Environment {
-    return new Environment(Object.assign({}, this.variables, variables));
+  public copy(...variables: IEnvironmentVariables[]): Environment {
+    return new Environment(assign({}, this.variables, ...variables));
   }
 
   /** Get an environment variable value or undefined. */

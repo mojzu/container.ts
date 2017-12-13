@@ -53,7 +53,7 @@ export abstract class Log {
     return this.log(ELogLevel.Notice, message, metadata, ...args);
   }
 
-  /** Informational messages */
+  /** Informational messages. */
   public info(message: ILogMessage, metadata: ILogMetadata = {}, ...args: any[]): void {
     return this.log(ELogLevel.Informational, message, metadata, ...args);
   }

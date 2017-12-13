@@ -5,7 +5,7 @@ type ITestLogsCallback = (log: ContainerLogMessage) => void;
 
 class TestLogs extends Logs {
   public static readonly moduleName: string = "TestLogs";
-  protected onMessage(log: ContainerLogMessage): void {
+  protected logsOnMessage(log: ContainerLogMessage): void {
     const callback: ITestLogsCallback = log.args[0];
     if (callback != null) {
       callback(log);

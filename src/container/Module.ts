@@ -1,4 +1,5 @@
 import * as Debug from "debug";
+import { assign, keys } from "lodash";
 import { ErrorChain } from "../lib/error";
 import { Container } from "./Container";
 import { Environment } from "./Environment";
@@ -85,9 +86,9 @@ export class Module implements IModule {
   public get namespace(): string { return `${this.container.name}.${this.moduleName}`; }
 
   public constructor(options: IModuleOptions) {
-    // Resolve container instance and construct log, metric and debug instances.
+    // Resolve container instance and construct instance properties.
     this.moduleName = options.moduleName;
-    this.container = options.opts[Container.REFERENCE];
+    this.container = options.opts[Container.SCOPE.CONTAINER];
     this.log = new ModuleLog(this.container, this.namespace);
     this.metric = new ModuleMetric(this.container, this.namespace);
     this.debug = Debug(this.namespace);
@@ -96,7 +97,7 @@ export class Module implements IModule {
     // Error is thrown by awilix if resolution failed.
     try {
       const dependencies = this.moduleDependencies();
-      Object.keys(dependencies).map((key) => {
+      keys(dependencies).map((key) => {
         const target = dependencies[key];
         this[key] = options.opts[target.moduleName];
       });
@@ -107,13 +108,13 @@ export class Module implements IModule {
 
   /** Module dependencies hook. */
   public moduleDependencies(...previous: IModuleDependencies[]): IModuleDependencies {
-    return Object.assign({}, ...previous);
+    return assign({}, ...previous);
   }
 
-  /** Module operational state. */
+  /** Module operational state hook. */
   public moduleUp(): void | Observable<void> { }
 
-  /** Module non-operational state. */
+  /** Module non-operational state hook. */
   public moduleDown(): void | Observable<void> { }
 
 }

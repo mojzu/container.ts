@@ -3,8 +3,8 @@ import { Metrics } from "../Metrics";
 
 class TestMetrics extends Metrics {
   public static readonly moduleName: string = "TestMetrics";
-  protected onMessage(metric: ContainerMetricMessage): void {
-    // TODO(MEDIUM): Add Container metrics tests.
+  protected metricsOnMessage(metric: ContainerMetricMessage): void {
+    // TODO(M): Add Container metrics tests.
   }
 }
 

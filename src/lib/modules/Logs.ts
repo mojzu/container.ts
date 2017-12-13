@@ -1,6 +1,7 @@
 import { ContainerLogMessage, ELogLevel, IModuleOptions, Module } from "../../container";
 import { Validate } from "../validate";
 
+/** Abstract container logs handler module. */
 export abstract class Logs extends Module {
 
   /** Default module name. */
@@ -13,29 +14,29 @@ export abstract class Logs extends Module {
   };
 
   /** Parsed application logs level. */
-  protected readonly level = this.parseLevel(this.envLevel);
+  protected readonly logsLevel = this.logsParseLevel(this.logsEnvLevel);
 
   public constructor(options: IModuleOptions) {
     super(options);
 
     // Debug environment variables.
-    this.debug(`${Logs.ENV.LEVEL}="${ELogLevel[this.level]}"`);
+    this.debug(`${Logs.ENV.LEVEL}="${ELogLevel[this.logsLevel]}"`);
 
     // Subscribe to container log messages filtered by level.
-    this.container.filterLogs(this.level)
-      .subscribe((log) => this.onMessage(log));
+    this.container.filterLogs(this.logsLevel)
+      .subscribe((log) => this.logsOnMessage(log));
   }
 
   /** Abstract handler for incoming log messages. */
-  protected abstract onMessage(log: ContainerLogMessage): void;
+  protected abstract logsOnMessage(log: ContainerLogMessage): void;
 
-  /** Get log level from environment or default to warning. */
-  protected get envLevel(): string {
+  /** Get log level from environment, defaults to warning. */
+  protected get logsEnvLevel(): string {
     return Validate.isString(this.environment.get(Logs.ENV.LEVEL) || "warning");
   }
 
   /** Convert environment log level string to level index, defaults to warning. */
-  protected parseLevel(level?: string): ELogLevel {
+  protected logsParseLevel(level?: string): ELogLevel {
     switch ((level || "").toLowerCase()) {
       case "emerg":
       case "emergency": {

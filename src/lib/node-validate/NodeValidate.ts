@@ -23,6 +23,7 @@ export interface INodeValidateBuffer {
   encoding?: string;
 }
 
+/** Validate that value is a valid Node.js Buffer. */
 export function isBuffer(value = "", options: INodeValidateBuffer = {}): Buffer {
   let buf = null;
 
@@ -38,6 +39,7 @@ export function isBuffer(value = "", options: INodeValidateBuffer = {}): Buffer 
   return buf;
 }
 
+/** Validate that value is a valid path to a file. */
 export function isFile(value = ""): string {
   let isValid = false;
 
@@ -54,6 +56,7 @@ export function isFile(value = ""): string {
   return value;
 }
 
+/** Validate that value is a valid path to a directory. */
 export function isDirectory(value = ""): string {
   let isValid = false;
 
