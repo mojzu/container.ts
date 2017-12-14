@@ -25,7 +25,7 @@ describe("Process", () => {
     expect(PROCESS).toBeDefined();
     expect(PROCESS.moduleName).toEqual(Process.moduleName);
     expect(PROCESS.version).toEqual("1.2.3");
-    expect(PROCESS.nodeEnvironment).toEqual("development");
+    expect(PROCESS.nodeEnv).toEqual("development");
   });
 
 });

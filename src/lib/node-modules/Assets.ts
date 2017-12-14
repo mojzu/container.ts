@@ -2,9 +2,9 @@ import * as fs from "fs";
 import { assign } from "lodash";
 import * as path from "path";
 import { IModuleOptions, Module } from "../../container";
-import { Observable } from "../../container/RxJS";
 import { ErrorChain } from "../error";
 import { NodeValidate } from "../node-validate";
+import { Observable } from "./RxJS";
 
 /** Assets files may be cached when read. */
 export interface IAssetsCache {
@@ -42,77 +42,78 @@ export class Assets extends Module {
     JSON_PARSE: "AssetsJsonParseError",
   });
 
-  protected readonly path = this.envPath;
-  protected readonly cache: IAssetsCache = {};
+  protected readonly assetsPath = this.assetsEnvPath;
+  protected readonly assetsCache: IAssetsCache = {};
 
   public constructor(options: IModuleOptions) {
     super(options);
 
     // Debug environment variables.
-    this.debug(`${Assets.ENV.PATH}="${this.path}"`);
+    this.debug(`${Assets.ENV.PATH}="${this.assetsPath}"`);
   }
 
   /** Returns true if target file is cached. */
   public isCached(target: string, encoding?: string): boolean {
     const cacheKey = `${target}:${encoding}`;
-    return (this.cache[cacheKey] != null);
+    return (this.assetsCache[cacheKey] != null);
   }
 
   // Overload signature for correct return types.
-  public readFile(target: string, options?: { cache?: boolean }): Observable<Buffer>;
-  public readFile(target: string, options: IAssetsReadOptions): Observable<string>;
+  public readFile(target: string, options?: { cache?: boolean }): Promise<Buffer>;
+  public readFile(target: string, options: IAssetsReadOptions): Promise<string>;
 
   /**
    * Read asset file contents.
    * If encoding is specified a string is returned, else a Buffer.
-   * File is cached by default.
    */
-  public readFile(target: string, options: IAssetsReadOptions = { cache: true }): Observable<Buffer | string> {
-    return this.read<Buffer | string>(target, options);
+  public readFile(target: string, options: IAssetsReadOptions = { cache: true }): Promise<Buffer | string> {
+    return this.assetsRead<Buffer | string>(target, options);
   }
 
   /** Read asset file contents and parse JSON object. */
-  public readJson<T>(target: string, options: IAssetsReadOptions = { encoding: "utf8", cache: true }): Observable<T> {
-    return this.read<string>(target, options)
+  public readJson<T>(target: string, options: IAssetsReadOptions = { encoding: "utf8", cache: true }): Promise<T> {
+    return Observable.fromPromise(this.assetsRead<string>(target, options))
       .map((data) => {
         try {
           return JSON.parse(data);
         } catch (error) {
           throw new AssetsError(Assets.ERROR.JSON_PARSE, target, error);
         }
-      });
+      })
+      .toPromise();
   }
 
-  protected get envPath(): string {
+  protected get assetsEnvPath(): string {
     return NodeValidate.isDirectory(path.resolve(this.environment.get(Assets.ENV.PATH)));
   }
 
-  protected read<T extends string | Buffer>(target: string, options: IAssetsReadOptions = {}): Observable<T> {
+  protected async assetsRead<T extends string | Buffer>(target: string, options: IAssetsReadOptions = {}): Promise<T> {
     const cacheKey = `${target}:${options.encoding}`;
 
     // Assets are read only, if contents defined in cache, return now.
     if (!!options.cache) {
-      if (this.cache[cacheKey] != null) {
-        const value: T = this.cache[cacheKey] as any;
-        return Observable.of(value);
+      if (this.assetsCache[cacheKey] != null) {
+        const value: T = this.assetsCache[cacheKey] as any;
+        return value;
       }
     }
 
     try {
       // Check file exists, read file contents asynchronously.
-      const filePath = NodeValidate.isFile(path.resolve(this.path, target));
-      const readFileCallback = fs.readFile.bind(this, filePath, options.encoding);
-      const readFile = Observable.bindNodeCallback<T>(readFileCallback);
+      const filePath = NodeValidate.isFile(path.resolve(this.assetsPath, target));
+      const readFile = (callback: any) => fs.readFile(filePath, options.encoding, callback);
+      const readFileBind = Observable.bindNodeCallback<T>(readFile);
 
-      return readFile()
+      return await readFileBind()
         .do((data) => {
+          // Save to cache if enabled in options.
           if (!!options.cache) {
-            // Save to cache if enabled in options.
-            this.cache[cacheKey] = data;
+            this.assetsCache[cacheKey] = data;
           }
-        });
+        })
+        .toPromise();
     } catch (error) {
-      return Observable.throw(new AssetsError(Assets.ERROR.READ_FILE, target, error));
+      throw new AssetsError(Assets.ERROR.READ_FILE, target, error);
     }
   }
 

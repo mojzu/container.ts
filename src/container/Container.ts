@@ -131,13 +131,13 @@ export class Container {
    * Throws an error if module of name is already registered.
    */
   public registerModule(moduleClass: IModuleConstructor): Container {
-    if (this.moduleRegistered(moduleClass.moduleName)) {
+    if (this.containerModuleRegistered(moduleClass.moduleName)) {
       throw new ContainerError(Container.ERROR.MODULE_REGISTERED);
     }
 
-    const factoryFunction = this.moduleFactory.bind(this, moduleClass);
+    const factoryFunction = (opts: any) => this.containerModuleFactory(moduleClass, opts);
     this.container.register({ [moduleClass.moduleName]: asFunction(factoryFunction).singleton() });
-    this.moduleState(moduleClass.moduleName, false);
+    this.containerModuleState(moduleClass.moduleName, false);
     return this;
   }
 
@@ -185,17 +185,17 @@ export class Container {
   public up(timeout?: number): Observable<void> {
     const observables$ = this.modules
       .map((mod) => {
-        return this.waitUp(...this.moduleDependencies(mod))
+        return this.containerWhenModulesUp(...this.containerModuleDependencies(mod))
           .switchMap(() => {
             const up$ = mod.moduleUp();
 
             if (up$ == null) {
               // Module up returned void, set state now.
-              return this.moduleState(mod.moduleName, true);
+              return this.containerModuleState(mod.moduleName, true);
             }
             // Observable returned, update state on next.
             return up$
-              .switchMap(() => this.moduleState(mod.moduleName, true));
+              .switchMap(() => this.containerModuleState(mod.moduleName, true));
           });
       });
     return this.containerState(observables$, true, timeout);
@@ -208,24 +208,24 @@ export class Container {
   public down(timeout?: number): Observable<void> {
     const observables$ = this.modules
       .map((mod) => {
-        return this.waitDown(...this.moduleDependents(mod))
+        return this.containerWhenModulesDown(...this.containerModuleDependents(mod))
           .switchMap(() => {
             const down$ = mod.moduleDown();
 
             if (down$ == null) {
               // Module down returned void, set state now.
-              return this.moduleState(mod.moduleName, false);
+              return this.containerModuleState(mod.moduleName, false);
             }
             // Observable returned, update state on next.
             return down$
-              .switchMap(() => this.moduleState(mod.moduleName, false));
+              .switchMap(() => this.containerModuleState(mod.moduleName, false));
           });
       });
     return this.containerState(observables$, false, timeout);
   }
 
   /** Wait for modules to enter operational state before calling next. */
-  protected waitUp(...modules: string[]): Observable<void> {
+  protected containerWhenModulesUp(...modules: string[]): Observable<void> {
     return this.modules$
       .filter((states) => {
         return modules.reduce((previous, current) => {
@@ -237,7 +237,7 @@ export class Container {
   }
 
   /** Wait for modules to leave operational state before calling next. */
-  protected waitDown(...modules: string[]): Observable<void> {
+  protected containerWhenModulesDown(...modules: string[]): Observable<void> {
     return this.modules$
       .filter((states) => {
         return !modules.reduce((previous, current) => {
@@ -249,18 +249,18 @@ export class Container {
   }
 
   /** Create a new instance of module class. */
-  protected moduleFactory<T extends IModuleConstructor>(moduleClass: T, opts: any): IModule {
+  protected containerModuleFactory<T extends IModuleConstructor>(moduleClass: T, opts: any): IModule {
     return new moduleClass({ moduleName: moduleClass.moduleName, opts });
   }
 
   /** Returns list of module names which are dependencies of target module. */
-  protected moduleDependencies(mod: IModule): string[] {
+  protected containerModuleDependencies(mod: IModule): string[] {
     const dependencies = mod.moduleDependencies();
     return keys(dependencies).map((k) => dependencies[k].moduleName);
   }
 
   /** Returns list of module names which are dependents of target module. */
-  protected moduleDependents(mod: IModule): string[] {
+  protected containerModuleDependents(mod: IModule): string[] {
     const dependents: string[] = [];
     this.modules.map((m) => {
       const dependencies = m.moduleDependencies();
@@ -276,12 +276,12 @@ export class Container {
   }
 
   /** Returns true if module is already registered in container. */
-  protected moduleRegistered(name: string): boolean {
+  protected containerModuleRegistered(name: string): boolean {
     return (this.modules$.value[name] != null);
   }
 
   /** Update observable modules state for target module. */
-  protected moduleState(name: string, state: boolean): Observable<void> {
+  protected containerModuleState(name: string, state: boolean): Observable<void> {
     const next = { ...this.modules$.value, [name]: state };
     this.modules$.next(next);
     return Observable.of(undefined);

@@ -26,26 +26,26 @@ describe("Assets", () => {
   });
 
   it("#readFile without encoding", async () => {
-    const data = await ASSETS.readFile("test.txt", { cache: false }).toPromise();
+    const data = await ASSETS.readFile("test.txt", { cache: false });
     expect(data instanceof Buffer).toEqual(true);
     expect(ASSETS.isCached("test.txt")).toEqual(false);
   });
 
   it("#readFile with encoding", async () => {
-    const text = await ASSETS.readFile("test.txt", { cache: true, encoding: "utf8" }).toPromise();
+    const text = await ASSETS.readFile("test.txt", { cache: true, encoding: "utf8" });
     expect(typeof text === "string").toEqual(true);
     expect(ASSETS.isCached("test.txt", "utf8")).toEqual(true);
   });
 
   it("#readJson", async () => {
-    const json = await ASSETS.readJson("test.json").toPromise();
+    const json = await ASSETS.readJson("test.json");
     expect(typeof json === "object").toEqual(true);
     expect(ASSETS.isCached("test.json", "utf8")).toEqual(true);
   });
 
   it("#readJson parse error", async () => {
     try {
-      await ASSETS.readJson("invalid.json").toPromise();
+      await ASSETS.readJson("invalid.json");
       fail();
     } catch (error) {
       expect(error instanceof AssetsError).toEqual(true);
@@ -55,7 +55,7 @@ describe("Assets", () => {
 
   it("#readJson does not exist", async () => {
     try {
-      await ASSETS.readJson("doesnotexist.json").toPromise();
+      await ASSETS.readJson("doesnotexist.json");
       fail();
     } catch (error) {
       expect(error instanceof AssetsError).toEqual(true);

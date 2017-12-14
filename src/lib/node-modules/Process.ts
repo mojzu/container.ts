@@ -1,9 +1,9 @@
 import * as os from "os";
 import * as process from "process";
 import { IModuleOptions, Module } from "../../container";
-import { Observable } from "../../container/RxJS";
 import { ErrorChain } from "../error";
 import { Validate } from "../validate";
+import { Observable } from "./RxJS";
 
 /** Process runtime information interface. */
 export interface IProcessInformation {
@@ -76,18 +76,19 @@ export class Process extends Module {
   }
 
   public get title(): string { return Process.title; }
-  public readonly version = this.envVersion;
-  public readonly nodeEnvironment = this.envNodeEnv;
+  public readonly version = this.processEnvVersion;
+  public readonly nodeEnv = this.processEnvNodeEnv;
 
   /** Override in subclass to change metric interval. */
   public get metricInterval(): number { return 60000; }
 
+  /** Get Node.js process information. */
   public get information(): IProcessInformation {
     return {
       name: this.container.name,
       title: this.title,
       version: this.version,
-      environment: this.nodeEnvironment,
+      environment: this.nodeEnv,
       arch: process.arch,
       platform: process.platform,
       nodeVersion: process.version,
@@ -99,6 +100,7 @@ export class Process extends Module {
     };
   }
 
+  /** Get Node.js process status. */
   public get status(): IProcessStatus {
     return {
       uptime: process.uptime(),
@@ -111,16 +113,16 @@ export class Process extends Module {
     super(options);
 
     // Set process title.
-    Process.setTitle(this.envName);
+    Process.setTitle(this.processEnvName);
 
     // Debug environment variables.
     this.debug(`${Process.ENV.NAME}="${this.title}"`);
     this.debug(`${Process.ENV.VERSION}="${this.version}"`);
-    this.debug(`${Process.ENV.NODE_ENV}="${this.nodeEnvironment}"`);
+    this.debug(`${Process.ENV.NODE_ENV}="${this.nodeEnv}"`);
 
     // Process metrics on interval.
     Observable.interval(this.metricInterval)
-      .subscribe(() => this.getProcessMetrics(this.status));
+      .subscribe(() => this.processMetrics(this.status));
   }
 
   /** Try to read process information asset file, handle process events. */
@@ -129,24 +131,24 @@ export class Process extends Module {
     this.log.info(Process.LOG.INFORMATION, this.information);
 
     // Process end signal handlers.
-    process.on("SIGTERM", this.onSignal.bind(this, "SIGTERM"));
-    process.on("SIGINT", this.onSignal.bind(this, "SIGINT"));
+    process.on("SIGTERM", () => this.processOnSignal("SIGTERM"));
+    process.on("SIGINT", () => this.processOnSignal("SIGINT"));
   }
 
-  protected get envName(): string {
+  protected get processEnvName(): string {
     return Validate.isString(this.environment.get(Process.ENV.NAME) || "node");
   }
 
-  protected get envVersion(): string {
+  protected get processEnvVersion(): string {
     return Validate.isString(this.environment.get(Process.ENV.VERSION) || "1.0.0");
   }
 
-  protected get envNodeEnv(): string {
+  protected get processEnvNodeEnv(): string {
     return Validate.isString(this.environment.get(Process.ENV.NODE_ENV) || "production");
   }
 
   /** Container down when process termination signal received. */
-  protected onSignal(signal: string): void {
+  protected processOnSignal(signal: string): void {
     this.log.info(Process.LOG.SIGNAL, { signal });
     this.container.down()
       .subscribe({
@@ -161,7 +163,7 @@ export class Process extends Module {
       });
   }
 
-  protected getProcessMetrics(status: IProcessStatus): void {
+  protected processMetrics(status: IProcessStatus): void {
     this.metric.gauge(Process.METRIC.USER_CPU_USAGE, status.cpuUsage.user);
     this.metric.gauge(Process.METRIC.SYSTEM_CPU_USAGE, status.cpuUsage.system);
     this.metric.gauge(Process.METRIC.RSS_MEMORY_USAGE, status.memoryUsage.rss);
