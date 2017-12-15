@@ -1,4 +1,5 @@
 import * as childProcess from "child_process";
+import * as Debug from "debug";
 import * as _ from "lodash";
 import { Socket } from "net";
 import * as ipc from "node-ipc";
@@ -245,7 +246,7 @@ export class Scripts extends Module {
     // Configure IPC for worker scripts.
     ipc.config.appspace = `${this.process.title}.`;
     ipc.config.id = this.namespace;
-    ipc.config.logger = this.debug;
+    ipc.config.logger = Debug(`node-ipc:${this.namespace}`);
     ipc.serve(() => {
       ipc.server.on("connect", (socket: Socket) => {
         this.ipcConnections$.next(this.scriptsIpcOnConnect(socket));
@@ -352,7 +353,10 @@ export class Scripts extends Module {
 
         // Wait for IPC socket connection unless disabled.
         if (!options.disableIpc) {
-          connection$ = this.ipcConnections$.take(1);
+          connection$ = this.ipcConnections$
+            .timeout(1000)
+            .catch((error) => Observable.throw(new ScriptsError(error)))
+            .take(1);
         }
 
         return Observable.forkJoin(
@@ -363,9 +367,7 @@ export class Scripts extends Module {
       .map(([proc, socket]) => {
         proc.ipcSocket = socket;
         return proc;
-      })
-      .timeout(1000)
-      .catch((error) => Observable.throw(new ScriptsError(error)));
+      });
   }
 
   public stopWorker(name: string): Observable<string | number> {

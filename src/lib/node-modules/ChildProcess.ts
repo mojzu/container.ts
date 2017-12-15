@@ -1,3 +1,4 @@
+import * as Debug from "debug";
 import { assign } from "lodash";
 import * as ipc from "node-ipc";
 import { IModuleOptions, Module } from "../../container";
@@ -172,7 +173,7 @@ export class ChildProcess extends Process implements IProcessSend {
     // Configure IPC and handle messages.
     ipc.config.appspace = `${this.title}.`;
     ipc.config.id = this.namespace;
-    ipc.config.logger = this.debug;
+    ipc.config.logger = Debug(`node-ipc:${this.namespace}`);
     ipc.connectTo(this.childProcessIpcId, () => {
       const emitter = ipc.of[this.childProcessIpcId];
       emitter.on("message", (data: any) => this.messages$.next(data));
