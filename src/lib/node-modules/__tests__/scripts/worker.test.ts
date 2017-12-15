@@ -36,6 +36,14 @@ class TestModule extends Module {
     return Observable.of("\nHello, world!\n");
   }
 
+  public testCall4(data: number): Observable<number> {
+    return Observable.of(data);
+  }
+
+  public testCall5(data: number): Observable<number> {
+    return this.childProcess.call("Test", "testCall5", { args: [data] });
+  }
+
   // public testLinkCall(data: number): Observable<string> {
   //   return this.childProcess.call("Test", "testCall3");
   // }

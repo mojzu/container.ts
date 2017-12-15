@@ -172,8 +172,7 @@ export class ChildProcess extends Process implements IProcessSend {
     // Configure IPC and handle messages.
     ipc.config.appspace = `${this.title}.`;
     ipc.config.id = this.namespace;
-    // TODO(L): Integrate log options.
-    ipc.config.silent = true;
+    ipc.config.logger = this.debug;
     ipc.connectTo(this.childProcessIpcId, () => {
       const emitter = ipc.of[this.childProcessIpcId];
       emitter.on("message", (data: any) => this.messages$.next(data));
@@ -195,7 +194,8 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Send message via IPC. */
   public send<T>(type: EProcessMessageType, data: IProcessMessageData<T>): void {
     const emitter = ipc.of[this.childProcessIpcId];
-    emitter.emit("message", { type, data });
+    const message: IProcessMessage<T> = { type, data };
+    emitter.emit("message", message);
   }
 
   /** Send event with optional data via IPC. */

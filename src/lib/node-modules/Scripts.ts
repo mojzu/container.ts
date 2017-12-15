@@ -77,7 +77,7 @@ export class ScriptsProcessError extends ErrorChain {
 export class ScriptsProcess implements IProcessSend {
 
   /** IPC socket set if acquired. */
-  public socket?: Socket;
+  public ipcSocket?: Socket;
 
   public readonly exit$: Observable<number | string>;
   public readonly messages$ = new Subject<IProcessMessage<any>>();
@@ -121,6 +121,7 @@ export class ScriptsProcess implements IProcessSend {
     // Handle IPC messages from scripts module.
     this.scripts.ipcMessages$
       .takeUntil(this.exit$)
+      .filter((message) => message.socket === this.ipcSocket)
       .subscribe((message) => {
         this.messages$.next(message.data);
       });
@@ -137,8 +138,9 @@ export class ScriptsProcess implements IProcessSend {
 
   /** Send message via IPC. */
   public send<T>(type: EProcessMessageType, data: IProcessMessageData<T>): void {
-    if ((this.socket != null) && this.socket.writable) {
-      ipc.server.emit(this.socket, "message", { type, data });
+    if ((this.ipcSocket != null) && this.ipcSocket.writable) {
+      const message: IProcessMessage<T> = { type, data };
+      ipc.server.emit(this.ipcSocket, "message", message);
     }
   }
 
@@ -209,6 +211,13 @@ export class Scripts extends Module {
     WORKER_UPTIME_LIMIT: "ScriptsWorkerUptimeLimit",
   };
 
+  /** Metric names. */
+  public static readonly METRIC = {
+    IPC_CONNECT: "ScriptsIpcConnect",
+    IPC_ERROR: "ScriptsIpcError",
+    IPC_MESSAGE: "ScriptsIpcMessage",
+  };
+
   /** Observable stream of sockets connected via IPC. */
   public readonly ipcConnections$ = new Subject<Socket>();
 
@@ -236,8 +245,7 @@ export class Scripts extends Module {
     // Configure IPC for worker scripts.
     ipc.config.appspace = `${this.process.title}.`;
     ipc.config.id = this.namespace;
-    // TODO(L): Integrate log options.
-    ipc.config.silent = true;
+    ipc.config.logger = this.debug;
     ipc.serve(() => {
       ipc.server.on("connect", (socket: Socket) => {
         this.ipcConnections$.next(this.scriptsIpcOnConnect(socket));
@@ -339,7 +347,7 @@ export class Scripts extends Module {
       });
 
     return worker.next$
-      .switchMap<any, [ScriptsProcess, Socket]>((proc) => {
+      .switchMap<ScriptsProcess, [ScriptsProcess, Socket]>((proc) => {
         let connection$: Observable<Socket | undefined> = Observable.of(undefined);
 
         // Wait for IPC socket connection unless disabled.
@@ -352,12 +360,12 @@ export class Scripts extends Module {
           connection$,
         );
       })
-      .timeout(1000)
-      .catch((error) => Observable.throw(new ScriptsError(error)))
       .map(([proc, socket]) => {
-        proc.socket = socket;
+        proc.ipcSocket = socket;
         return proc;
-      });
+      })
+      .timeout(1000)
+      .catch((error) => Observable.throw(new ScriptsError(error)));
   }
 
   public stopWorker(name: string): Observable<string | number> {
@@ -391,18 +399,19 @@ export class Scripts extends Module {
   }
 
   protected scriptsIpcOnConnect(socket: Socket): Socket {
-    // TODO(L): Metrics collection/logging.
+    this.metric.increment(Scripts.METRIC.IPC_CONNECT);
     return socket;
   }
 
   protected scriptsIpcOnError(error: any): ScriptsError {
+    this.metric.increment(Scripts.METRIC.IPC_ERROR, 1, { error: ErrorChain.errorName(error) });
     const chained = new ScriptsError(error);
     this.log.error(chained);
     return chained;
   }
 
   protected scriptsIpcOnMessage(data: any, socket: Socket): IScriptsIpcMessage {
-    // TODO(L): Metrics collection/logging.
+    this.metric.increment(Scripts.METRIC.IPC_MESSAGE);
     return { socket, data };
   }
 
