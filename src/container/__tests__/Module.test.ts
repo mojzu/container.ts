@@ -2,16 +2,14 @@ import { Container, ContainerError } from "../Container";
 import { Module } from "../Module";
 import { IModuleDependencies } from "../Types";
 
-// TODO(MEDIUM): Add tests for Module up/down order.
+// Tests for Module up/down order.
+const moduleUpOrder: number[] = [];
+const moduleDownOrder: number[] = [];
 
 class Test1 extends Module {
   public static readonly moduleName: string = "Test1";
-  // public moduleUp(): void {
-  //   console.log("1UP!");
-  // }
-  // public moduleDown(): void {
-  //   console.log("1DOWN!");
-  // }
+  public moduleUp(): void { moduleUpOrder.push(1); }
+  public moduleDown(): void { moduleDownOrder.push(1); }
 }
 
 class Test2 extends Module {
@@ -19,12 +17,8 @@ class Test2 extends Module {
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test1: Test1, test3: Test3 });
   }
-  // public moduleUp(): void {
-  //   console.log("2UP!");
-  // }
-  // public moduleDown(): void {
-  //   console.log("2DOWN!");
-  // }
+  public moduleUp(): void { moduleUpOrder.push(2); }
+  public moduleDown(): void { moduleDownOrder.push(2); }
 }
 
 class Test3 extends Module {
@@ -33,12 +27,8 @@ class Test3 extends Module {
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test1: Test1 });
   }
-  // public moduleUp(): void {
-  //   console.log("3UP!");
-  // }
-  // public moduleDown(): void {
-  //   console.log("3DOWN!");
-  // }
+  public moduleUp(): void { moduleUpOrder.push(3); }
+  public moduleDown(): void { moduleDownOrder.push(3); }
 }
 
 class Test4 extends Test3 {
@@ -47,6 +37,8 @@ class Test4 extends Test3 {
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test2: Test2 });
   }
+  public moduleUp(): void { moduleUpOrder.push(4); }
+  public moduleDown(): void { moduleDownOrder.push(4); }
 }
 
 describe("Module", () => {
@@ -56,10 +48,12 @@ describe("Module", () => {
 
   it("#up", async () => {
     await CONTAINER.up().toPromise();
+    expect(moduleUpOrder).toEqual([1, 3, 2, 4]);
   });
 
   it("#down", async () => {
     await CONTAINER.down().toPromise();
+    expect(moduleDownOrder).toEqual([4, 2, 3, 1]);
   });
 
   it("#registerModules throws error for duplicates", () => {

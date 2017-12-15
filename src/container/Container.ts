@@ -35,10 +35,10 @@ export interface IContainerLogMessage {
 /** Log message class for stream of module logs. */
 export class ContainerLogMessage implements IContainerLogMessage {
   public constructor(
-    public level: ELogLevel,
-    public message: ILogMessage,
-    public metadata: ILogMetadata,
-    public args: any[],
+    public readonly level: ELogLevel,
+    public readonly message: ILogMessage,
+    public readonly metadata: ILogMetadata,
+    public readonly args: any[],
   ) { }
 }
 
@@ -48,15 +48,17 @@ export interface IContainerMetricMessage {
   name: string;
   value: any;
   tags: IMetricTags;
+  args: any[];
 }
 
 /** Metric message class for stream of module metrics. */
 export class ContainerMetricMessage implements IContainerMetricMessage {
   public constructor(
-    public type: EMetricType,
-    public name: string,
-    public value: any,
-    public tags: IMetricTags,
+    public readonly type: EMetricType,
+    public readonly name: string,
+    public readonly value: any,
+    public readonly tags: IMetricTags,
+    public readonly args: any[],
   ) { }
 }
 
@@ -164,8 +166,8 @@ export class Container {
   }
 
   /** Send metric message of type for module. */
-  public sendMetric(type: EMetricType, name: string, value: any, tags: IMetricTags): void {
-    this.metrics$.next(new ContainerMetricMessage(type, name, value, tags));
+  public sendMetric(type: EMetricType, name: string, value: any, tags: IMetricTags, args: any[]): void {
+    this.metrics$.next(new ContainerMetricMessage(type, name, value, tags, args));
   }
 
   /** Observable stream of module logs filtered by level. */

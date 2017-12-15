@@ -5,6 +5,7 @@ import { Process } from "../Process";
 import { Scripts } from "../Scripts";
 import { TestModule } from "./Mock";
 
+const WN = "Worker";
 const timeout = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 describe("Scripts", () => {
@@ -37,17 +38,17 @@ describe("Scripts", () => {
   });
 
   it("#startWorker", async () => {
-    const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.isConnected).toEqual(true);
     await timeout(500); // Otherwise 'SIGTERM' exit code is returned.
 
-    const code = await SCRIPTS.stopWorker("Worker").toPromise();
+    const code = await SCRIPTS.stopWorker(WN).toPromise();
     expect(code).toEqual(0);
   });
 
   it("#startWorker#restartLimit", (done) => {
     let restarts = 0;
-    SCRIPTS.startWorker("Worker", "script.test.js", { disableIpc: true, restartLimit: 3 })
+    SCRIPTS.startWorker(WN, "script.test.js", { disableIpc: true, restartLimit: 3 })
       .subscribe({
         next: (worker) => {
           restarts += 1;
@@ -60,11 +61,19 @@ describe("Scripts", () => {
       });
   });
 
+  it("#startWorker ipc timeout", async () => {
+    try {
+      await SCRIPTS.startWorker(WN, "script.test.js", { restart: false }).take(1).toPromise();
+      fail();
+    } catch (error) {
+      expect(error instanceof ErrorChain).toEqual(true);
+      expect(error.joinNames()).toEqual("ScriptsError.TimeoutError");
+    }
+  });
+
   it("#ScriptsProcess#call function does not exist", async () => {
-    const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.isConnected).toEqual(true);
-    // TODO(H): Wait for IPC.
-    await timeout(500);
 
     try {
       await worker.call("Test", "doesNotExist").toPromise();
@@ -74,69 +83,59 @@ describe("Scripts", () => {
       expect(error.joinNames()).toEqual("ProcessError.TypeError");
     }
 
-    const code = await SCRIPTS.stopWorker("Worker").toPromise();
+    const code = await SCRIPTS.stopWorker(WN).toPromise();
     expect(code).toEqual(0);
   });
 
   it("#ScriptsProcess#call", async () => {
-    const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.isConnected).toEqual(true);
-    // TODO(H): Wait for IPC.
-    await timeout(500);
 
     const result = await worker.call<number>("Test", "testCall1", { args: [4] }).toPromise();
     expect(result).toEqual(8);
 
-    const code = await SCRIPTS.stopWorker("Worker").toPromise();
+    const code = await SCRIPTS.stopWorker(WN).toPromise();
     expect(code).toEqual(0);
   });
 
   it("#ScriptsProcess#ChildProcess#call", async () => {
-    const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.isConnected).toEqual(true);
-    // TODO(H): Wait for IPC.
-    await timeout(500);
 
     const result = await worker.call<number>("Test", "testCall2", { args: ["hello"] }).toPromise();
     expect(result).toEqual(5);
 
-    const code = await SCRIPTS.stopWorker("Worker").toPromise();
+    const code = await SCRIPTS.stopWorker(WN).toPromise();
     expect(code).toEqual(0);
   });
 
   it("#call", async () => {
-    const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.isConnected).toEqual(true);
-    // TODO(H): Wait for IPC.
-    await timeout(500);
 
     const result = await worker.call<number>("Test", "testCall3", { args: [4] }).toPromise();
     expect(result).toEqual("\nHello, world!\n");
 
-    const code = await SCRIPTS.stopWorker("Worker").toPromise();
+    const code = await SCRIPTS.stopWorker(WN).toPromise();
     expect(code).toEqual(0);
   });
 
   it("#ScriptsProcess#event", async () => {
-    const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.isConnected).toEqual(true);
-    // TODO(H): Wait for IPC.
-    await timeout(500);
 
     const pong$ = worker.listen("pong").take(1);
     worker.event<number>("ping", { data: 8 });
     const result = await pong$.toPromise();
     expect(result).toEqual(16);
 
-    const code = await SCRIPTS.stopWorker("Worker").toPromise();
+    const code = await SCRIPTS.stopWorker(WN).toPromise();
     expect(code).toEqual(0);
   });
 
   it("#ScriptsProcess#ChildProcess#call data size testing", async () => {
-    const worker = await SCRIPTS.startWorker("Worker", "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.isConnected).toEqual(true);
-    // TODO(H): Wait for IPC.
-    await timeout(500);
     const size = 1024;
 
     for (let i = 0; i < 10; i++) {
@@ -146,7 +145,7 @@ describe("Scripts", () => {
       // console.timeEnd("process");
     }
 
-    const code = await SCRIPTS.stopWorker("Worker").toPromise();
+    const code = await SCRIPTS.stopWorker(WN).toPromise();
     expect(code).toEqual(0);
   });
 

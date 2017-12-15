@@ -36,9 +36,9 @@ class TestModule extends Module {
     return Observable.of("\nHello, world!\n");
   }
 
-  public testLinkCall(data: number): Observable<string> {
-    return this.childProcess.call("Test", "testCall3", { channel: "link" });
-  }
+  // public testLinkCall(data: number): Observable<string> {
+  //   return this.childProcess.call("Test", "testCall3");
+  // }
 
   public testData(size: number): Observable<any[]> {
     return Observable.of(new Array(size).fill(Math.random()));

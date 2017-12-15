@@ -168,7 +168,7 @@ export class ScriptsProcess implements IProcessSend {
       }
       case EProcessMessageType.Metric: {
         const data: IContainerMetricMessage = message.data;
-        this.scripts.container.sendMetric(data.type, data.name, data.value, data.tags);
+        this.scripts.container.sendMetric(data.type, data.name, data.value, data.tags, data.args);
         break;
       }
       // Send event on internal event bus.
@@ -288,13 +288,6 @@ export class Scripts extends Module {
     };
     const process = this.fork(fileName, options);
 
-    // Acquire IPC socket if connected.
-    if (!options.disableIpc) {
-      this.ipcConnections$.take(1).subscribe((socket) => {
-        process.socket = socket;
-      });
-    }
-
     if (this.scriptsWorkers[name] == null) {
       // New worker, create new observables.
       const next$ = new BehaviorSubject<ScriptsProcess>(process);
@@ -345,7 +338,26 @@ export class Scripts extends Module {
         }
       });
 
-    return worker.next$;
+    return worker.next$
+      .switchMap<any, [ScriptsProcess, Socket]>((proc) => {
+        let connection$: Observable<Socket | undefined> = Observable.of(undefined);
+
+        // Wait for IPC socket connection unless disabled.
+        if (!options.disableIpc) {
+          connection$ = this.ipcConnections$.take(1);
+        }
+
+        return Observable.forkJoin(
+          Observable.of(proc),
+          connection$,
+        );
+      })
+      .timeout(1000)
+      .catch((error) => Observable.throw(new ScriptsError(error)))
+      .map(([proc, socket]) => {
+        proc.socket = socket;
+        return proc;
+      });
   }
 
   public stopWorker(name: string): Observable<string | number> {

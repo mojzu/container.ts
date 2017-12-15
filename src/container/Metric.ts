@@ -16,32 +16,32 @@ export interface IMetricTags extends Object {
 /** Abstract metric class. */
 export abstract class Metric {
 
-  /** Send i counter metric. */
-  public increment(name: string, value = 1, tags: IMetricTags = {}): void {
-    return this.metric(EMetricType.Increment, name, value, tags);
+  /** Send increment counter metric. */
+  public increment(name: string, value = 1, tags: IMetricTags = {}, ...args: any[]): void {
+    return this.metric(EMetricType.Increment, name, value, tags, ...args);
   }
 
   /** Send decrement counter metric. */
-  public decrement(name: string, value = -1, tags: IMetricTags = {}): void {
-    return this.metric(EMetricType.Decrement, name, value, tags);
+  public decrement(name: string, value = -1, tags: IMetricTags = {}, ...args: any[]): void {
+    return this.metric(EMetricType.Decrement, name, value, tags, ...args);
   }
 
   /** Send value metric. */
-  public gauge(name: string, value: number, tags: IMetricTags = {}): void {
-    return this.metric(EMetricType.Gauge, name, value, tags);
+  public gauge(name: string, value: number, tags: IMetricTags = {}, ...args: any[]): void {
+    return this.metric(EMetricType.Gauge, name, value, tags, ...args);
   }
 
   /** Send time metric in milliseconds. */
-  public timing(name: string, value: number | Date, tags: IMetricTags = {}): void {
-    return this.metric(EMetricType.Timing, name, value, tags);
+  public timing(name: string, value: number | Date, tags: IMetricTags = {}, ...args: any[]): void {
+    return this.metric(EMetricType.Timing, name, value, tags, ...args);
   }
 
   /** Send distribution value metric. */
-  public histogram(name: string, value: number, tags: IMetricTags = {}): void {
-    return this.metric(EMetricType.Histogram, name, value, tags);
+  public histogram(name: string, value: number, tags: IMetricTags = {}, ...args: any[]): void {
+    return this.metric(EMetricType.Histogram, name, value, tags, ...args);
   }
 
   /** Metric method provided by implementor. */
-  protected abstract metric(type: EMetricType, name: string, value: any, tags: IMetricTags): void;
+  protected abstract metric(type: EMetricType, name: string, value: any, tags: IMetricTags, ...args: any[]): void;
 
 }

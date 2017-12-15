@@ -46,9 +46,9 @@ export class ModuleMetric extends Metric {
    * Sends metric message to container bus for consumption by modules.
    * Adds module name to tags object by default.
    */
-  protected metric(type: EMetricType, name: string, value: any, tags: IMetricTags): void {
+  protected metric(type: EMetricType, name: string, value: any, tags: IMetricTags, ...args: any[]): void {
     tags.moduleName = this.name;
-    this.container.sendMetric(type, name, value, tags);
+    this.container.sendMetric(type, name, value, tags, args);
   }
 
 }
