@@ -1,8 +1,7 @@
-import { ContainerLogMessage, ELogLevel, IModuleDependencies, IModuleOpts } from "container.ts";
-import { Logs } from "container.ts/lib/node-modules";
+import { ContainerLogMessage, ELogLevel, IModuleDependencies, IModuleOptions } from "container.ts";
+import { Logs, Process } from "container.ts/lib/node-modules";
 import { Validate } from "container.ts/lib/validate";
 import * as rollbar from "rollbar";
-import { Main } from "./Main";
 
 export class Rollbar extends Logs {
 
@@ -16,11 +15,11 @@ export class Rollbar extends Logs {
     REPORT_LEVEL: "ROLLBAR_REPORT_LEVEL",
   });
 
-  private readonly process: Main;
+  private readonly process: Process;
   private readonly rollbar: rollbar;
 
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
 
     // Get access token from environment.
     // Get report level from environment or fall back on log level.
@@ -44,11 +43,11 @@ export class Rollbar extends Logs {
   }
 
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
-    return super.moduleDependencies(...prev, { process: Main });
+    return super.moduleDependencies(...prev, { process: Process });
   }
 
   /** Rollbar handler for incoming log messages. */
-  protected onMessage(log: ContainerLogMessage): void {
+  protected logsOnMessage(log: ContainerLogMessage): void {
     const callback = this.handleError.bind(this);
 
     // Map log level to rollbar log methods.
@@ -88,7 +87,7 @@ export class Rollbar extends Logs {
 
   /** Return rollbar report level. */
   protected reportLevel(value: string) {
-    const level = this.parseLevel(value);
+    const level = this.logsParseLevel(value);
     switch (level) {
       case ELogLevel.Emergency:
       case ELogLevel.Alert:

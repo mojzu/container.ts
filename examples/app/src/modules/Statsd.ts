@@ -1,4 +1,4 @@
-import { ContainerMetricMessage, EMetricType, IModuleOpts } from "container.ts";
+import { ContainerMetricMessage, EMetricType, IModuleOptions } from "container.ts";
 import { Metrics } from "container.ts/lib/node-modules";
 import { Validate } from "container.ts/lib/validate";
 import * as StatsdClient from "statsd-client";
@@ -17,8 +17,8 @@ export class Statsd extends Metrics {
 
   protected readonly statsd: any;
 
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
 
     // Get host and port environment values.
     const host = Validate.isString(this.environment.get(Statsd.ENV.HOST));
@@ -30,7 +30,7 @@ export class Statsd extends Metrics {
   }
 
   /** StatsD handler for incoming metric messages. */
-  protected onMessage(metric: ContainerMetricMessage): void {
+  protected metricsOnMessage(metric: ContainerMetricMessage): void {
     // Map type to statsd methods.
     switch (metric.type) {
       case EMetricType.Increment: {

@@ -1,9 +1,10 @@
-import { IModuleDependencies } from "container.ts";
-import { Process, Scripts, ScriptsProcess } from "container.ts/lib/node-modules";
+import { IModuleDependencies, Module } from "container.ts";
+import { Scripts, ScriptsProcess } from "container.ts/lib/node-modules";
 import { Observable } from "rxjs/Observable";
 
-export class Main extends Process {
+export class Main extends Module {
 
+  // TODO(H): Remove Scripts dependency on Process.
   public static readonly moduleName: string = "Main";
 
   public readonly scripts: Scripts;
@@ -16,11 +17,9 @@ export class Main extends Process {
   }
 
   public moduleUp(): void {
-    super.moduleUp();
-
     // Start worker process.
     this.worker$ = this.scripts.startWorker(this.workerName, "worker.js", {
-      uptimeLimit: "PT5M", // Restart worker process every 5 minutes.
+      uptimeLimit: "PT1M", // Restart worker process every 5 minutes.
     });
 
     this.worker$.subscribe(() => {
