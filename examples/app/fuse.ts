@@ -151,8 +151,23 @@ fuseBox.Sparky.task("start", ["clean", "pre-start", "configure"], () => {
     target.bundle.watch();
 
     // Start the main bundle on rebuild.
+    // Clean up previously started processes on rebuild.
     if (key === "main") {
-      target.bundle.completed((proc) => proc.start());
+      let previousProc: any;
+
+      target.bundle.completed((proc) => {
+        if (previousProc != null) {
+          previousProc.kill();
+        }
+        previousProc = proc.start();
+      });
+
+      process.on("SIGINT", () => {
+        if (previousProc != null) {
+          previousProc.kill();
+        }
+        process.exit(0);
+      });
     }
 
     return target.fuse.run();
