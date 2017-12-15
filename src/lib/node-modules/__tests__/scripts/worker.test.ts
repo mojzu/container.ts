@@ -1,6 +1,6 @@
 import { Container, Environment, IModuleDependencies, IModuleOptions, Module } from "../../../../container";
-import { Observable } from "../../../../container/RxJS";
 import { ChildProcess } from "../../ChildProcess";
+import { Observable } from "../../RxJS";
 
 class TestModule extends Module {
 
@@ -51,7 +51,7 @@ const ENVIRONMENT = new Environment(process.env);
 
 // Create container instance with name and environment.
 // Populate container for dependency injection.
-const CONTAINER = new Container("Server", ENVIRONMENT)
+const CONTAINER = new Container("Worker", ENVIRONMENT)
   .registerModules([ChildProcess, TestModule]);
 
 // Signal operational.

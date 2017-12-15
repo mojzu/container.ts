@@ -31,23 +31,17 @@ export interface IProcessCallOptions {
 /** Process call function signature. */
 export type IProcessCall<T> = (...args: any[]) => Observable<T>;
 
-/** Process call target data. */
-export interface IProcessCallTarget {
-  process: string;
-  module: string;
-  method: string;
-  uid: number;
-}
-
 /** Process call request message data. */
 export interface IProcessCallRequest {
-  target: IProcessCallTarget;
+  target: string;
+  method: string;
+  uid: number;
   args: any[];
 }
 
 /** Process call response message data. */
 export interface IProcessCallResponse<T> {
-  target: IProcessCallTarget;
+  uid: number;
   next?: T;
   error?: IErrorChainSerialised;
   complete?: boolean;
@@ -58,7 +52,8 @@ export type IProcessMessageData<T> = IContainerLogMessage
   | IContainerMetricMessage
   | IProcessEvent<T>
   | IProcessCallRequest
-  | IProcessCallResponse<T>;
+  | IProcessCallResponse<T>
+  | any;
 
 /** Process message type. */
 export interface IProcessMessage<T> extends Object {
@@ -68,3 +63,9 @@ export interface IProcessMessage<T> extends Object {
 
 /** Process accumulated exit callback return value(s). */
 export type IProcessExit = [number | null, string | null];
+
+/** Process send method interface. */
+export interface IProcessSend {
+  messages$: Observable<IProcessMessage<any>>;
+  send: (type: EProcessMessageType, data: IProcessMessageData<any>) => void;
+}
