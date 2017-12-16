@@ -1,7 +1,6 @@
 import * as fuseBox from "fuse-box";
 import * as path from "path";
 import { argv } from "yargs";
-
 import * as tools from "./tools";
 const CWD = path.resolve(__dirname);
 
