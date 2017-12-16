@@ -4,6 +4,8 @@ import { argv } from "yargs";
 import * as tools from "./tools";
 const CWD = path.resolve(__dirname);
 
+// TODO(H): Fix task errors return exit code 0.
+
 // Clean compiled files.
 fuseBox.Sparky.task("clean", () => {
   return tools.clean(CWD, [
