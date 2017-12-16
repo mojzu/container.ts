@@ -19,6 +19,7 @@ describe("Process", () => {
 
   afterAll(async () => {
     await CONTAINER.down().toPromise();
+    CONTAINER.destroy();
   });
 
   it("#Process", () => {

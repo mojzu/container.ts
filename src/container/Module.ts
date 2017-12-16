@@ -117,4 +117,7 @@ export class Module implements IModule {
   /** Module non-operational state hook. */
   public moduleDown(): void | Observable<void> { }
 
+  /** Module destruction hook. */
+  public moduleDestroy(): void { }
+
 }

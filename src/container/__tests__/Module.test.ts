@@ -5,11 +5,13 @@ import { IModuleDependencies } from "../Types";
 // Tests for Module up/down order.
 const moduleUpOrder: number[] = [];
 const moduleDownOrder: number[] = [];
+let moduleDestroy = 0;
 
 class Test1 extends Module {
   public static readonly moduleName: string = "Test1";
   public moduleUp(): void { moduleUpOrder.push(1); }
   public moduleDown(): void { moduleDownOrder.push(1); }
+  public moduleDestroy(): void { moduleDestroy++; }
 }
 
 class Test2 extends Module {
@@ -19,6 +21,7 @@ class Test2 extends Module {
   }
   public moduleUp(): void { moduleUpOrder.push(2); }
   public moduleDown(): void { moduleDownOrder.push(2); }
+  public moduleDestroy(): void { moduleDestroy++; }
 }
 
 class Test3 extends Module {
@@ -29,6 +32,7 @@ class Test3 extends Module {
   }
   public moduleUp(): void { moduleUpOrder.push(3); }
   public moduleDown(): void { moduleDownOrder.push(3); }
+  public moduleDestroy(): void { moduleDestroy++; }
 }
 
 class Test4 extends Test3 {
@@ -54,6 +58,11 @@ describe("Module", () => {
   it("#down", async () => {
     await CONTAINER.down().toPromise();
     expect(moduleDownOrder).toEqual([4, 2, 3, 1]);
+  });
+
+  it("#destroy", () => {
+    CONTAINER.destroy();
+    expect(moduleDestroy).toEqual(4);
   });
 
   it("#registerModules throws error for duplicates", () => {

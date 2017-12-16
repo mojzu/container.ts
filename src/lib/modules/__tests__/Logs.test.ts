@@ -27,6 +27,7 @@ describe("Logs", () => {
 
   afterAll(async () => {
     await CONTAINER.down().toPromise();
+    CONTAINER.destroy();
   });
 
   it("#TestLog", () => {

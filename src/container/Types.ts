@@ -23,6 +23,7 @@ export interface IModule {
   moduleDependencies(...previous: IModuleDependencies[]): IModuleDependencies;
   moduleUp(): void | Observable<void>;
   moduleDown(): void | Observable<void>;
+  moduleDestroy(): void;
 }
 
 /** Module state interface. */

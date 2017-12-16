@@ -69,8 +69,8 @@ export class Process extends Module {
   /** Set Node.js process title. */
   public static setTitle(name?: string): string {
     if (name != null) {
-      const untyped: any = process;
-      untyped.title = name;
+      const untypedProcess: any = process;
+      untypedProcess.title = name;
     }
     return process.title;
   }
@@ -152,12 +152,15 @@ export class Process extends Module {
     this.log.info(Process.LOG.SIGNAL, { signal });
     this.container.down()
       .subscribe({
-        next: () => process.exit(0),
+        next: () => {
+          this.container.destroy();
+          process.exit(0);
+        },
         error: (error) => {
-          // Try to log error and exit with error code.
+          // Write error to stderr and exit with error code.
           error = new ProcessError(error);
-          this.log.error(error);
           process.stderr.write(`${error}\n`);
+          this.container.destroy();
           process.exit(1);
         },
       });

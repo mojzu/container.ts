@@ -27,6 +27,7 @@ describe("Metric", () => {
 
   afterAll(async () => {
     await CONTAINER.down().toPromise();
+    CONTAINER.destroy();
   });
 
   it("#TestMetrics", () => {

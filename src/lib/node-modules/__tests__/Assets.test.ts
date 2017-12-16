@@ -18,6 +18,7 @@ describe("Assets", () => {
 
   afterAll(async () => {
     await CONTAINER.down().toPromise();
+    CONTAINER.destroy();
   });
 
   it("#Assets", () => {

@@ -226,6 +226,11 @@ export class Container {
     return this.containerState(observables$, false, timeout);
   }
 
+  /** Call modules destroy hooks before process exit. */
+  public destroy(): void {
+    this.modules.map((mod) => mod.moduleDestroy());
+  }
+
   /** Wait for modules to enter operational state before calling next. */
   protected containerWhenModulesUp(...modules: string[]): Observable<void> {
     return this.modules$

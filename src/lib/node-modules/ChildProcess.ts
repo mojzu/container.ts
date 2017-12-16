@@ -192,6 +192,11 @@ export class ChildProcess extends Process implements IProcessSend {
       .subscribe((metric) => this.send(EProcessMessageType.Metric, metric));
   }
 
+  public moduleDestroy(): void {
+    // Disconnect IPC client on process end.
+    ipc.disconnect(this.childProcessIpcId);
+  }
+
   /** Send message via IPC. */
   public send<T>(type: EProcessMessageType, data: IProcessMessageData<T>): void {
     const emitter = ipc.of[this.childProcessIpcId];

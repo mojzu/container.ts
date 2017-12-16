@@ -278,6 +278,11 @@ export class Scripts extends Module {
     }
   }
 
+  public moduleDestroy(): void {
+    // Stop IPC server on process end.
+    ipc.server.stop();
+  }
+
   /** Spawn new Node.js process using script file. */
   public fork(fileName: string, options: IScriptsOptions = {}): ScriptsProcess {
     const forkEnv = this.environment.copy(options.env || {});

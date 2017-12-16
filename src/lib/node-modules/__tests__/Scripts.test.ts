@@ -36,6 +36,7 @@ describe("Scripts", () => {
 
   afterAll(async () => {
     await CONTAINER.down().toPromise();
+    CONTAINER.destroy();
   });
 
   it("#Scripts", () => {
