@@ -1,5 +1,7 @@
 # Error
 
+TODO(H): Write this.
+
 An error object with chaining and serialisation support. Available from `container.ts/lib/error`.
 
 ```TypeScript

@@ -1,5 +1,7 @@
 # Developer
 
+TODO(H): Update this.
+
 Clone repository, install dependencies with `yarn install` and run scripts: `yarn run ...`
 
 | Script      | Description                                    |

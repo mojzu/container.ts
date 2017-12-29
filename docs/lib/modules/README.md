@@ -1,5 +1,7 @@
 # Modules
 
+TODO(H): Update this, split into files.
+
 Modules are split into `container.ts/lib/modules` and `container.ts/lib/node-modules`.
 
 Modules in `node-modules` depend on Node.js APIs.
