@@ -1,4 +1,4 @@
-import * as moment from "moment-timezone";
+import { DateTime, DateTimeOptions, Duration, DurationOptions } from "luxon";
 import * as validator from "validator";
 import { ErrorChain } from "../error";
 import { ISO3166, ISO639 } from "./data";
@@ -32,7 +32,7 @@ export enum EValidateError {
   InvalidCountry,
   InvalidLocale,
   InvalidTimeZone,
-  InvalidDate,
+  InvalidDateTime,
   InvalidDuration,
 }
 
@@ -533,56 +533,59 @@ export function isLocale(value = "", options: IValidateLocale = {}): string {
   }
 }
 
-/** Validate that value is a valid time zone defined in 'moment-timezone' library. */
+/** Validate that value is a valid time zone supported by 'luxon' library. */
 export function isTimeZone(value = ""): string {
+  let datetime: DateTime;
+
   try {
-    return isString(value, { values: moment.tz.names() });
+    datetime = DateTime.local().setZone(value);
   } catch (error) {
     throw new ValidateError(EValidateError.InvalidTimeZone, value, error);
   }
+
+  if (!datetime.isValid) {
+    throw new ValidateError(EValidateError.InvalidTimeZone, value);
+  }
+  return datetime.zoneName;
 }
 
-/** Validate.isDate options. */
-export interface IValidateDate {
-  /** Formatting hints passed to 'moment-timezone', defaults to ISO8601. */
-  format?: string | string[];
-  /** Timezone used for parsing, defaults to 'Etc/UTC'. */
-  timezone?: string;
-}
+/** Validate.isDateTime options. */
+export interface IValidateDateTime extends DateTimeOptions { }
 
-/** Validate that value is a valid date parsed by 'moment-timezone' library. */
-export function isDate(value = "", options: IValidateDate = {}): moment.Moment {
-  const format = options.format || moment.ISO_8601;
-  const timezone = options.timezone || "Etc/UTC";
-  let date: moment.Moment;
-  let isValid = false;
+/** Validate that value is a valid date and time parsed by 'luxon' library. */
+export function isDateTime(value = "", options: IValidateDateTime = {}): DateTime {
+  options.zone = options.zone || "UTC";
+  let datetime: DateTime;
 
   try {
-    date = moment.tz(value, format, timezone);
-    isValid = date.isValid();
+    datetime = DateTime.fromISO(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidDate, value, error);
+    throw new ValidateError(EValidateError.InvalidDateTime, value, error);
   }
 
-  if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidDate, value);
+  if (!datetime.isValid) {
+    throw new ValidateError(EValidateError.InvalidDateTime, value);
   }
-  return date;
+  return datetime;
 }
 
 /** Validate.isDuration options. */
-export interface IValidateDuration {
-  /** Optional unit of time passed to 'moment-timezone'. */
-  unit?: moment.unitOfTime.DurationConstructor;
-}
+export interface IValidateDuration extends DurationOptions { }
 
-/** Validate that value is a valid duration parsed by 'moment-timezone' library. */
-export function isDuration(value = "", options: IValidateDuration = {}): moment.Duration {
+/** Validate that value is a valid duration parsed by 'luxon' library. */
+export function isDuration(value = "", options: IValidateDuration = {}): Duration {
+  let duration: Duration;
+
   try {
-    return moment.duration(value, options.unit);
+    duration = Duration.fromISO(value, options);
   } catch (error) {
     throw new ValidateError(EValidateError.InvalidDuration, value, error);
   }
+
+  if (!duration.isValid) {
+    throw new ValidateError(EValidateError.InvalidDuration, value);
+  }
+  return duration;
 }
 
 /** Static validate methods container. */
@@ -614,6 +617,6 @@ export class Validate {
   public static isCountry = isCountry;
   public static isLocale = isLocale;
   public static isTimeZone = isTimeZone;
-  public static isDate = isDate;
+  public static isDateTime = isDateTime;
   public static isDuration = isDuration;
 }

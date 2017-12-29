@@ -179,11 +179,52 @@ describe("Validate", () => {
     expect(locale).toEqual("en_GB");
   });
 
+  it("#isLocale throws error for invalid input", () => {
+    try {
+      Validate.isLocale("ab_XY");
+      fail();
+    } catch (error) {
+      expect(error instanceof ValidateError).toEqual(true);
+    }
+  });
+
   // Time zone tests.
 
   it("#isTimeZone", () => {
     const timezone = Validate.isTimeZone("Europe/London");
     expect(timezone).toEqual("Europe/London");
+  });
+
+  it("#isTimeZone throws error for invalid input", () => {
+    try {
+      Validate.isTimeZone("foo/bar");
+      fail();
+    } catch (error) {
+      expect(error instanceof ValidateError).toEqual(true);
+    }
+  });
+
+  // Date time tests.
+
+  it("#isDateTime", () => {
+    const datetime = Validate.isDateTime("2016-05-25T09:24:15.123");
+    expect(datetime.isValid).toEqual(true);
+  });
+
+  it("#isDateTime throws error for invalid input", () => {
+    try {
+      Validate.isDateTime("fooTbar");
+      fail();
+    } catch (error) {
+      expect(error instanceof ValidateError).toEqual(true);
+    }
+  });
+
+  // Duration tests.
+
+  it("#isDuration", () => {
+    const duration = Validate.isDuration("PT2H7M");
+    expect(duration.isValid).toEqual(true);
   });
 
   // Email tests.

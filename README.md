@@ -13,5 +13,9 @@ Modular application framework library.
 -   [debug](https://www.npmjs.com/package/debug)
 -   [lodash](https://www.npmjs.com/package/lodash)
 -   [rxjs](https://www.npmjs.com/package/rxjs)
+
+Additional dependencies for `lib` subdirectory.
+
+-   [luxon](https://www.npmjs.com/package/luxon)
+-   [node-ipc](https://www.npmjs.com/package/node-ipc)
 -   [validator](https://www.npmjs.com/package/validator)
--   [moment-timezone](https://www.npmjs.com/package/moment-timezone)

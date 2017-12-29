@@ -1,4 +1,4 @@
-import * as moment from "moment-timezone";
+import { DateTime, Duration } from "luxon";
 import * as validator from "validator";
 import { ErrorChain } from "../error";
 import * as Validate from "./Validate";
@@ -449,26 +449,26 @@ export class TimeZoneField extends Field<string> {
   }
 }
 
-export class DateField extends Field<moment.Moment> {
-  public constructor(protected readonly options: Validate.IValidateDate = {}) {
+export class DateTimeField extends Field<DateTime> {
+  public constructor(protected readonly options: Validate.IValidateDateTime = {}) {
     super();
   }
-  public validate(value: string): moment.Moment {
-    return Validate.isDate(value, this.options);
+  public validate(value: string): DateTime {
+    return Validate.isDateTime(value, this.options);
   }
-  public format(value: moment.Moment): string {
-    return value.format();
+  public format(value: DateTime): string {
+    return value.toISO();
   }
 }
 
-export class DurationField extends Field<moment.Duration> {
+export class DurationField extends Field<Duration> {
   public constructor(protected readonly options: Validate.IValidateDuration = {}) {
     super();
   }
-  public validate(value: string): moment.Duration {
+  public validate(value: string): Duration {
     return Validate.isDuration(value, this.options);
   }
-  public format(value: moment.Duration): string {
-    return value.toISOString();
+  public format(value: Duration): string {
+    return value.toISO();
   }
 }
