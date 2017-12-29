@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.6",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -29,10 +29,10 @@
   "dependencies": {
     "@types/debug": "^0.0.30",
     "@types/lodash": "^4.14.91",
-    "awilix": "^3.0.0",
+    "awilix": "^3.0.1",
     "debug": "^3.1.0",
     "lodash": "^4.17.4",
-    "rxjs": "^5.5.5"
+    "rxjs": "^5.5.6"
   },
   "optionalDependencies": {
     "@types/moment-timezone": "^0.5.2",
@@ -44,21 +44,21 @@
   },
   "devDependencies": {
     "@types/del": "^3.0.0",
-    "@types/jest": "^21.1.8",
-    "@types/node": "^8.5.1",
+    "@types/jest": "^22.0.0",
+    "@types/node": "^8.5.2",
     "@types/yargs": "^10.0.0",
     "del": "^3.0.0",
     "fuse-box": "^2.4.0",
-    "jest": "^21.2.1",
-    "ts-jest": "^21.2.4",
-    "ts-node": "^4.0.2",
+    "jest": "^22.0.4",
+    "ts-jest": "^22.0.0",
+    "ts-node": "^4.1.0",
     "tslint": "^5.8.0",
     "typescript": "^2.6.2",
     "yargs": "^10.0.3"
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(tsx?)$",
     "testPathIgnorePatterns": [
@@ -72,7 +72,8 @@
       "tsx",
       "js",
       "jsx",
-      "json"
+      "json",
+      "node"
     ]
   }
 }
