@@ -1,4 +1,4 @@
-import { DateTime, DateTimeOptions, Duration, DurationOptions } from "luxon";
+import { DateTime, DateTimeOptions, Duration, DurationOptions, Interval } from "luxon";
 import * as validator from "validator";
 import { ErrorChain } from "../error";
 import { ISO3166, ISO639 } from "./data";
@@ -34,6 +34,7 @@ export enum EValidateError {
   InvalidTimeZone,
   InvalidDateTime,
   InvalidDuration,
+  InvalidInterval,
 }
 
 /** Validate error chain class. */
@@ -588,6 +589,25 @@ export function isDuration(value = "", options: IValidateDuration = {}): Duratio
   return duration;
 }
 
+/** Validate.isInterval options. */
+export interface IValidateInterval extends DateTimeOptions { }
+
+/** Validate that value is a valid date time interval parsed by 'luxon' library. */
+export function isInterval(value = "", options: IValidateInterval = {}): Interval {
+  let interval: Interval;
+
+  try {
+    interval = Interval.fromISO(value, options);
+  } catch (error) {
+    throw new ValidateError(EValidateError.InvalidInterval, value, error);
+  }
+
+  if (!interval.isValid) {
+    throw new ValidateError(EValidateError.InvalidInterval, value);
+  }
+  return interval;
+}
+
 /** Static validate methods container. */
 export class Validate {
   public static isBoolean = isBoolean;
@@ -619,4 +639,5 @@ export class Validate {
   public static isTimeZone = isTimeZone;
   public static isDateTime = isDateTime;
   public static isDuration = isDuration;
+  public static isInterval = isInterval;
 }

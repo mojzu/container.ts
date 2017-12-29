@@ -1,4 +1,4 @@
-import { DateTime, Duration } from "luxon";
+import { DateTime, Duration, Interval } from "luxon";
 import * as validator from "validator";
 import { ErrorChain } from "../error";
 import * as Validate from "./Validate";
@@ -469,6 +469,18 @@ export class DurationField extends Field<Duration> {
     return Validate.isDuration(value, this.options);
   }
   public format(value: Duration): string {
+    return value.toISO();
+  }
+}
+
+export class IntervalField extends Field<Interval> {
+  public constructor(protected readonly options: Validate.IValidateInterval = {}) {
+    super();
+  }
+  public validate(value: string): Interval {
+    return Validate.isInterval(value, this.options);
+  }
+  public format(value: Interval): string {
     return value.toISO();
   }
 }

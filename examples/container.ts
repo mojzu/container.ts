@@ -1,6 +1,6 @@
 import * as process from "process";
 import { argv } from "yargs";
-import { Container, Environment, IModuleDependencies, IModuleOpts, Module } from "../src/container";
+import { Container, Environment, IModuleDependencies, IModuleOptions, Module } from "../src/container";
 import { Observable } from "../src/container/RxJS";
 import { Process } from "../src/lib/node-modules";
 
@@ -16,8 +16,8 @@ class AppModule extends Module {
 
   // Optionally override the class constructor.
   // Module dependencies are available after 'super' has been called.
-  public constructor(opts: IModuleOpts) {
-    super(opts);
+  public constructor(options: IModuleOptions) {
+    super(options);
     // Dependencies are available now.
     // ...
   }
