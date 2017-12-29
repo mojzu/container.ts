@@ -152,6 +152,7 @@ fuseBox.Sparky.task("start", ["clean", "pre-start", "configure"], () => {
 
     // Start the main bundle on rebuild.
     // Clean up previously started processes on rebuild.
+    // TODO(H): Should it be necessary to kill processes here?
     if (key === "main") {
       let previousProc: any;
 
