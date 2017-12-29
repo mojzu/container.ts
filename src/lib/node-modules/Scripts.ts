@@ -425,8 +425,8 @@ export class Scripts extends Module {
   protected scriptsWorkerUptimeLimit(limit?: string): number | null {
     if (limit != null) {
       try {
-        const duration = NodeValidate.isDuration(limit);
-        return duration.asSeconds();
+        const duration = NodeValidate.isDuration(limit).shiftTo("seconds").toObject();
+        return duration.seconds || null;
       } catch (error) {
         throw new ScriptsError(error);
       }
