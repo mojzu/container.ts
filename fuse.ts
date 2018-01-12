@@ -43,7 +43,6 @@ fuseBox.Sparky.task("test-worker", () => {
     homeDir: "src",
     output: "src/lib/node-modules/__tests__/scripts/$name.js",
     target: "server",
-    plugins: [fuseBox.TypeScriptHelpers()],
   });
   fuse.bundle("script.test")
     .instructions(" > [lib/node-modules/__tests__/scripts/script.test.ts]");
