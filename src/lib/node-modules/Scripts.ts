@@ -214,9 +214,9 @@ export class Scripts extends Module {
 
   /** Metric names. */
   public static readonly METRIC = {
-    IPC_CONNECT: "ScriptsIpcConnect",
-    IPC_ERROR: "ScriptsIpcError",
-    IPC_MESSAGE: "ScriptsIpcMessage",
+    IPC_CONNECT: "Scripts.IpcConnect",
+    IPC_ERROR: "Scripts.IpcError",
+    IPC_MESSAGE: "Scripts.IpcMessage",
   };
 
   /** Observable stream of sockets connected via IPC. */

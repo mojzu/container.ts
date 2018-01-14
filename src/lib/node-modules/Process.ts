@@ -56,11 +56,11 @@ export class Process extends Module {
 
   /** Metric names. */
   public static readonly METRIC = {
-    USER_CPU_USAGE: "ProcessUserCpuUsage",
-    SYSTEM_CPU_USAGE: "ProcessSystemCpuUsage",
-    RSS_MEMORY_USAGE: "ProcessRssMemoryUsage",
-    HEAP_TOTAL_MEMORY_USAGE: "ProcessHeapTotalMemoryUsage",
-    HEAP_USED_MEMORY_USAGE: "ProcessHeapUsedMemoryUsage",
+    USER_CPU_USAGE: "Process.UserCpuUsage",
+    SYSTEM_CPU_USAGE: "Process.SystemCpuUsage",
+    RSS_MEMORY_USAGE: "Process.RssMemoryUsage",
+    HEAP_TOTAL_MEMORY_USAGE: "Process.HeapTotalMemoryUsage",
+    HEAP_USED_MEMORY_USAGE: "Process.HeapUsedMemoryUsage",
   };
 
   /** Get Node.js process title. */
