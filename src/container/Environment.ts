@@ -19,9 +19,9 @@ export class Environment {
     return new Environment(assign({}, this.variables, ...variables));
   }
 
-  /** Get an environment variable value or undefined. */
-  public get(name: string): string | undefined {
-    return this.variables[name];
+  /** Get an environment variable value, or default value or undefined. */
+  public get(name: string, orDefault?: string): string | undefined {
+    return this.variables[name] || orDefault;
   }
 
   /** Set an environment variable value. */

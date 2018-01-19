@@ -2,7 +2,7 @@ import * as os from "os";
 import * as process from "process";
 import { IModuleOptions, Module } from "../../container";
 import { ErrorChain } from "../error";
-import { Validate } from "../validate";
+import { isString } from "../validate";
 import { Observable } from "./RxJS";
 
 /** Process runtime information interface. */
@@ -76,8 +76,8 @@ export class Process extends Module {
   }
 
   public get title(): string { return Process.title; }
-  public readonly version = this.processEnvVersion;
-  public readonly nodeEnv = this.processEnvNodeEnv;
+  public readonly version = isString(this.environment.get(Process.ENV.VERSION, "1.0.0"));
+  public readonly nodeEnv = isString(this.environment.get(Process.ENV.NODE_ENV, "production"));
 
   /** Override in subclass to change metric interval. */
   public get metricInterval(): number { return 60000; }
@@ -113,7 +113,7 @@ export class Process extends Module {
     super(options);
 
     // Set process title.
-    Process.setTitle(this.processEnvName);
+    Process.setTitle(isString(this.environment.get(Process.ENV.NAME, "node")));
 
     // Debug environment variables.
     this.debug(`${Process.ENV.NAME}="${this.title}"`);
@@ -133,18 +133,6 @@ export class Process extends Module {
     // Process end signal handlers.
     process.on("SIGTERM", () => this.processOnSignal("SIGTERM"));
     process.on("SIGINT", () => this.processOnSignal("SIGINT"));
-  }
-
-  protected get processEnvName(): string {
-    return Validate.isString(this.environment.get(Process.ENV.NAME) || "node");
-  }
-
-  protected get processEnvVersion(): string {
-    return Validate.isString(this.environment.get(Process.ENV.VERSION) || "1.0.0");
-  }
-
-  protected get processEnvNodeEnv(): string {
-    return Validate.isString(this.environment.get(Process.ENV.NODE_ENV) || "production");
   }
 
   /** Container down when process termination signal received. */

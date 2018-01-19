@@ -1,9 +1,9 @@
-import * as fs from "fs";
+import { readFile } from "fs";
 import { assign } from "lodash";
-import * as path from "path";
+import { resolve } from "path";
 import { IModuleOptions, Module } from "../../container";
 import { ErrorChain } from "../error";
-import { NodeValidate } from "../node-validate";
+import { isDirectory, isFile } from "../node-validate";
 import { Observable } from "./RxJS";
 
 /** Assets files may be cached when read. */
@@ -42,7 +42,7 @@ export class Assets extends Module {
     JSON_PARSE: "AssetsJsonParseError",
   });
 
-  protected readonly assetsPath = this.assetsEnvPath;
+  protected readonly assetsPath = isDirectory(this.environment.get(Assets.ENV.PATH));
   protected readonly assetsCache: IAssetsCache = {};
 
   public constructor(options: IModuleOptions) {
@@ -83,10 +83,6 @@ export class Assets extends Module {
       .toPromise();
   }
 
-  protected get assetsEnvPath(): string {
-    return NodeValidate.isDirectory(path.resolve(this.environment.get(Assets.ENV.PATH)));
-  }
-
   protected async assetsRead<T extends string | Buffer>(target: string, options: IAssetsReadOptions = {}): Promise<T> {
     const cacheKey = `${target}:${options.encoding}`;
 
@@ -100,9 +96,9 @@ export class Assets extends Module {
 
     try {
       // Check file exists, read file contents asynchronously.
-      const filePath = NodeValidate.isFile(path.resolve(this.assetsPath, target));
-      const readFile = (callback: any) => fs.readFile(filePath, options.encoding, callback);
-      const readFileBind = Observable.bindNodeCallback<T>(readFile);
+      const filePath = isFile(resolve(this.assetsPath, target));
+      const readFileCallback = (callback: any) => readFile(filePath, options.encoding, callback);
+      const readFileBind = Observable.bindNodeCallback<T>(readFileCallback);
 
       return await readFileBind()
         .do((data) => {

@@ -1,5 +1,5 @@
 import { ContainerLogMessage, ELogLevel, IModuleOptions, Module } from "../../container";
-import { Validate } from "../validate";
+import { isString } from "../validate";
 
 /** Abstract container logs handler module. */
 export abstract class Logs extends Module {
@@ -13,8 +13,12 @@ export abstract class Logs extends Module {
     LEVEL: "LOGS_LEVEL",
   };
 
-  /** Parsed application logs level. */
-  protected readonly logsLevel = this.logsParseLevel(this.logsEnvLevel);
+  /**
+   * Parsed application logs level.
+   * Get log level from environment, defaults to warning.
+   */
+  protected readonly logsLevel = this.logsParseLevel(
+    isString(this.environment.get(Logs.ENV.LEVEL, "warning")));
 
   public constructor(options: IModuleOptions) {
     super(options);
@@ -29,11 +33,6 @@ export abstract class Logs extends Module {
 
   /** Abstract handler for incoming log messages. */
   protected abstract logsOnMessage(log: ContainerLogMessage): void;
-
-  /** Get log level from environment, defaults to warning. */
-  protected get logsEnvLevel(): string {
-    return Validate.isString(this.environment.get(Logs.ENV.LEVEL) || "warning");
-  }
 
   /** Convert environment log level string to level index, defaults to warning. */
   protected logsParseLevel(level?: string): ELogLevel {

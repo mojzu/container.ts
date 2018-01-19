@@ -1,9 +1,9 @@
-import * as childProcess from "child_process";
+import { ChildProcess as NodeChildProcess, fork } from "child_process";
 import * as Debug from "debug";
-import * as _ from "lodash";
+import { keys } from "lodash";
 import { Socket } from "net";
 import * as ipc from "node-ipc";
-import * as path from "path";
+import { resolve } from "path";
 import {
   IContainerLogMessage,
   IContainerMetricMessage,
@@ -14,7 +14,7 @@ import {
   Module,
 } from "../../container";
 import { ErrorChain } from "../error";
-import { NodeValidate } from "../node-validate";
+import { isDirectory, isDuration, isFile } from "../node-validate";
 import { ChildProcess } from "./ChildProcess";
 import { IProcessStatus, Process } from "./Process";
 import { BehaviorSubject, Observable, Subject } from "./RxJS";
@@ -89,7 +89,7 @@ export class ScriptsProcess implements IProcessSend {
   public constructor(
     public readonly scripts: Scripts,
     public readonly fileName: string,
-    public readonly process: childProcess.ChildProcess,
+    public readonly process: NodeChildProcess,
   ) {
     // Accumulate multiple callback arguments into array.
     const accumulator: () => IProcessExit = (...args: any[]) => args as any;
@@ -229,7 +229,7 @@ export class Scripts extends Module {
   public readonly ipcMessages$ = new Subject<IScriptsIpcMessage>();
 
   /** Absolute path to script files directory. */
-  protected readonly scriptsPath = this.scriptsEnvPath;
+  protected readonly scriptsPath = isDirectory(this.environment.get(Scripts.ENV.PATH));
 
   /** Workers state. */
   protected readonly scriptsWorkers: { [name: string]: IScriptsWorker } = {};
@@ -270,7 +270,7 @@ export class Scripts extends Module {
 
   /** Wait for worker processes to exit. */
   public moduleDown(): void | Observable<void> {
-    const observables$ = _.keys(this.scriptsWorkers).map((name) => {
+    const observables$ = keys(this.scriptsWorkers).map((name) => {
       return this.stopWorker(name);
     });
     if (observables$.length > 0) {
@@ -288,8 +288,8 @@ export class Scripts extends Module {
     const forkEnv = this.environment.copy(options.env || {});
 
     // Check script file exists and fork.
-    const filePath = NodeValidate.isFile(path.resolve(this.scriptsPath, fileName));
-    const process = childProcess.fork(filePath, options.args || [], { env: forkEnv.variables });
+    const filePath = isFile(resolve(this.scriptsPath, fileName));
+    const process = fork(filePath, options.args || [], { env: forkEnv.variables });
     return new ScriptsProcess(this, fileName, process);
   }
 
@@ -401,10 +401,6 @@ export class Scripts extends Module {
     return observable$;
   }
 
-  protected get scriptsEnvPath(): string {
-    return NodeValidate.isDirectory(path.resolve(this.environment.get(Scripts.ENV.PATH)));
-  }
-
   protected scriptsIpcOnConnect(socket: Socket): Socket {
     this.metric.increment(Scripts.METRIC.IPC_CONNECT);
     return socket;
@@ -425,7 +421,7 @@ export class Scripts extends Module {
   protected scriptsWorkerUptimeLimit(limit?: string): number | null {
     if (limit != null) {
       try {
-        const duration = NodeValidate.isDuration(limit).shiftTo("seconds").toObject();
+        const duration = isDuration(limit).shiftTo("seconds").toObject();
         return duration.seconds || null;
       } catch (error) {
         throw new ScriptsError(error);

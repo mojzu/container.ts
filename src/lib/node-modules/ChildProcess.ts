@@ -3,7 +3,7 @@ import { assign } from "lodash";
 import * as ipc from "node-ipc";
 import { IModuleOptions, Module } from "../../container";
 import { ErrorChain, IErrorChainSerialised } from "../error";
-import { Validate } from "../validate";
+import { isString } from "../validate";
 import { IProcessStatus, Process, ProcessError } from "./Process";
 import { Observable, Subject } from "./RxJS";
 import {
@@ -165,7 +165,7 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Observable stream of events received via IPC. */
   public readonly events$ = new Subject<IProcessEvent<any>>();
 
-  protected readonly childProcessIpcId = this.childProcessEnvIpcId;
+  protected readonly childProcessIpcId = isString(this.environment.get(ChildProcess.ENV.IPC_ID));
 
   public constructor(options: IModuleOptions) {
     super(options);
@@ -217,10 +217,6 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Make call to module.method in parent process. */
   public call<T>(target: string, method: string, options: IProcessCallOptions = {}): Observable<T> {
     return ChildProcess.ipcSendCallRequest<T>(this, this, target, method, options);
-  }
-
-  protected get childProcessEnvIpcId(): string {
-    return Validate.isString(this.environment.get(ChildProcess.ENV.IPC_ID));
   }
 
   /** Handle messages received from parent process. */
