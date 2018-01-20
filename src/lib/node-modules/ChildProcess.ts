@@ -31,7 +31,7 @@ export class ChildProcess extends Process implements IProcessSend {
 
   /** Event names. */
   public static readonly EVENT = {
-    STATUS: "ChildProcessStatus",
+    STATUS: "ChildProcess.Status",
   };
 
   public static ipcGenerateUid(): number {

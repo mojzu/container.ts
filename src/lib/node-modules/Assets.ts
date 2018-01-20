@@ -38,8 +38,8 @@ export class Assets extends Module {
 
   /** Error names. */
   public static readonly ERROR = assign({}, Module.ERROR, {
-    READ_FILE: "AssetsReadFileError",
-    JSON_PARSE: "AssetsJsonParseError",
+    READ_FILE: "Assets.ReadFileError",
+    JSON_PARSE: "Assets.JsonParseError",
   });
 
   protected readonly assetsPath = isDirectory(this.environment.get(Assets.ENV.PATH));

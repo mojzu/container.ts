@@ -70,15 +70,15 @@ export class Container {
 
   /** Error names. */
   public static readonly ERROR = {
-    UP: "ContainerUpError",
-    DOWN: "ContainerDownError",
-    MODULE_REGISTERED: "ContainerModuleRegisteredError",
+    UP: "Container.UpError",
+    DOWN: "Container.DownError",
+    MODULE_REGISTERED: "Container.ModuleRegisteredError",
   };
 
   /** Log names. */
   public static readonly LOG = {
-    UP: "ContainerUp",
-    DOWN: "ContainerDown",
+    UP: "Container.Up",
+    DOWN: "Container.Down",
   };
 
   /** Scope key names. */

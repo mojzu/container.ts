@@ -28,8 +28,8 @@ export class ErrorChain {
 
   /** Error names. */
   public static readonly ERROR = {
-    SERIALISE: "ErrorChainSerialiseError",
-    DESERIALISE: "ErrorChainDeserialiseError",
+    SERIALISE: "ErrorChain.SerialiseError",
+    DESERIALISE: "ErrorChain.DeserialiseError",
   };
 
   /** Returns true if error instance of ErrorChain. */

@@ -204,12 +204,12 @@ export class Scripts extends Module {
 
   /** Log names. */
   public static readonly LOG = {
-    WORKER_START: "ScriptsWorkerStart",
-    WORKER_STOP: "ScriptsWorkerStop",
-    WORKER_EXIT: "ScriptsWorkerExit",
-    WORKER_RESTART: "ScriptsWorkerRestart",
-    WORKER_RESTART_LIMIT: "ScriptsWorkerRestartLimit",
-    WORKER_UPTIME_LIMIT: "ScriptsWorkerUptimeLimit",
+    WORKER_START: "Scripts.WorkerStart",
+    WORKER_STOP: "Scripts.WorkerStop",
+    WORKER_EXIT: "Scripts.WorkerExit",
+    WORKER_RESTART: "Scripts.WorkerRestart",
+    WORKER_RESTART_LIMIT: "Scripts.WorkerRestartLimit",
+    WORKER_UPTIME_LIMIT: "Scripts.WorkerUptimeLimit",
   };
 
   /** Metric names. */

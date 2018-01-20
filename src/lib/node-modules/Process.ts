@@ -50,8 +50,8 @@ export class Process extends Module {
 
   /** Log names. */
   public static readonly LOG = {
-    INFORMATION: "ProcessInformation",
-    SIGNAL: "ProcessSignal",
+    INFORMATION: "Process.Information",
+    SIGNAL: "Process.Signal",
   };
 
   /** Metric names. */

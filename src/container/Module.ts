@@ -61,7 +61,7 @@ export class Module implements IModule {
 
   /** Error names. */
   public static readonly ERROR = {
-    DEPENDENCY: "ModuleDependencyError",
+    DEPENDENCY: "Module.DependencyError",
   };
 
   /** Module name. */
