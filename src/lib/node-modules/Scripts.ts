@@ -229,7 +229,7 @@ export class Scripts extends Module {
   public readonly ipcMessages$ = new Subject<IScriptsIpcMessage>();
 
   /** Absolute path to script files directory. */
-  protected readonly scriptsPath = isDirectory(this.environment.get(Scripts.ENV.PATH));
+  public readonly path = isDirectory(this.environment.get(Scripts.ENV.PATH));
 
   /** Workers state. */
   protected readonly scriptsWorkers: { [name: string]: IScriptsWorker } = {};
@@ -241,7 +241,7 @@ export class Scripts extends Module {
     super(options);
 
     // Debug environment variables.
-    this.debug(`${Scripts.ENV.PATH}="${this.scriptsPath}"`);
+    this.debug(`${Scripts.ENV.PATH}="${this.path}"`);
 
     // Configure IPC for worker scripts.
     ipc.config.appspace = `${this.process.title}.`;
@@ -288,7 +288,7 @@ export class Scripts extends Module {
     const forkEnv = this.environment.copy(options.env || {});
 
     // Check script file exists and fork.
-    const filePath = isFile(resolve(this.scriptsPath, fileName));
+    const filePath = isFile(resolve(this.path, fileName));
     const process = fork(filePath, options.args || [], { env: forkEnv.variables });
     return new ScriptsProcess(this, fileName, process);
   }

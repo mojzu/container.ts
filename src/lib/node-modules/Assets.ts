@@ -42,14 +42,17 @@ export class Assets extends Module {
     JSON_PARSE: "Assets.JsonParseError",
   });
 
-  protected readonly assetsPath = isDirectory(this.environment.get(Assets.ENV.PATH));
+  /** Absolute path to assets files directory. */
+  public readonly path = isDirectory(this.environment.get(Assets.ENV.PATH));
+
+  /** Internal assets cache. */
   protected readonly assetsCache: IAssetsCache = {};
 
   public constructor(options: IModuleOptions) {
     super(options);
 
     // Debug environment variables.
-    this.debug(`${Assets.ENV.PATH}="${this.assetsPath}"`);
+    this.debug(`${Assets.ENV.PATH}="${this.path}"`);
   }
 
   /** Returns true if target file is cached. */
@@ -96,7 +99,7 @@ export class Assets extends Module {
 
     try {
       // Check file exists, read file contents asynchronously.
-      const filePath = isFile(resolve(this.assetsPath, target));
+      const filePath = isFile(resolve(this.path, target));
       const readFileCallback = (callback: any) => readFile(filePath, options.encoding, callback);
       const readFileBind = Observable.bindNodeCallback<T>(readFileCallback);
 
