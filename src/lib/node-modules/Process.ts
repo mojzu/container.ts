@@ -45,7 +45,7 @@ export class Process extends Module {
   public static readonly ENV = {
     NAME: "PROCESS_NAME",
     VERSION: "PROCESS_VERSION",
-    NODE_ENV: "PROCESS_NODE_ENV",
+    NODE_ENV: "NODE_ENV",
   };
 
   /** Log names. */
