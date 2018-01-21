@@ -16,7 +16,7 @@ interface IData {
     booleanOptionalField?: boolean;
     stringOptionalField?: string;
   };
-  childSchema: {
+  schemaField: {
     booleanField: boolean;
     stringField: string;
   };
@@ -58,11 +58,11 @@ const dataSchema = validate.buildSchema({
     booleanOptionalField: optionalBooleanField,
     stringOptionalField: optionalStringField,
   },
-  // Child schemas.
-  childSchema: validate.buildSchema({
+  // Schema fields.
+  schemaField: new validate.SchemaField(validate.buildSchema({
     booleanField,
     stringField,
-  }),
+  })),
   // Array of fields.
   arrayOuter: [
     booleanField,
@@ -96,7 +96,7 @@ const inputData = {
   mapOptional: {
     booleanOptionalField: "10",
   },
-  childSchema: {
+  schemaField: {
     booleanField: "1",
     stringField: "foo",
   },

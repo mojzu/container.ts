@@ -1,6 +1,7 @@
 import { DateTime, Duration, Interval } from "luxon";
 import * as validator from "validator";
 import { ErrorChain } from "../error";
+import { ISchemaConstructor, ISchemaMask } from "./Schema";
 import * as Validate from "./Validate";
 
 // TODO(H): Improve operator field documentation/testing.
@@ -26,11 +27,11 @@ export class FieldError extends ErrorChain {
  * Format method takes typed input and returns string output.
  * Optional context available for additional validation/formatting information.
  */
-export abstract class Field<T, K = any> {
+export abstract class Field<T, K = object> {
 
-  public abstract validate(value?: string, context?: K): T | null;
+  public abstract validate(value?: string | object, context?: K): T | null;
 
-  public format(value: T, context?: K): string | null {
+  public format(value: T, context?: K): string | object | null {
     return validator.toString(value);
   }
 
@@ -60,7 +61,7 @@ export abstract class OperatorField<T, K> extends Field<T, K> {
 /** And field wrapper, all input fields used to validate/format values. */
 export class AndField<T, K> extends OperatorField<T, K> {
 
-  public validate(value: string, context?: any): T {
+  public validate(value: string, context?: K): T {
     let validated: T | null;
     try {
       validated = this.fields
@@ -75,8 +76,8 @@ export class AndField<T, K> extends OperatorField<T, K> {
     return validated;
   }
 
-  public format(value: T, context?: any): string {
-    let formatted: string | null;
+  public format(value: T, context?: K): string | object {
+    let formatted: string | object | null;
     try {
       formatted = this.fields
         .map((f) => f.format(value, context))
@@ -116,8 +117,8 @@ export class OrField<T, K> extends OperatorField<T, K> {
     return validated;
   }
 
-  public format(value: T, context?: any): string {
-    let formatted: string | null;
+  public format(value: T, context?: any): string | object {
+    let formatted: string | object | null;
     try {
       formatted = this.fields
         .map((f) => {
@@ -164,7 +165,7 @@ export class NotField<T, K> extends OperatorField<T, K> {
   }
 
   public format(value: T, context?: any): null {
-    let formatted: string | null;
+    let formatted: string | object | null;
     try {
       formatted = this.fields
         .map((f) => {
@@ -192,7 +193,7 @@ export class NotField<T, K> extends OperatorField<T, K> {
  */
 export class OptionalField<T, K> extends Field<T, K> {
 
-  protected readonly formatDefault: string | null;
+  protected readonly formatDefault: string | object | null;
 
   public constructor(
     protected readonly field: Field<T, K>,
@@ -217,7 +218,7 @@ export class OptionalField<T, K> extends Field<T, K> {
     }
   }
 
-  public format(value?: T, context?: any): string | null {
+  public format(value?: T, context?: any): string | object | null {
     try {
       if (value == null) {
         if (this.defaultValue == null) {
@@ -231,6 +232,23 @@ export class OptionalField<T, K> extends Field<T, K> {
     }
   }
 
+}
+
+export interface ISchemaFieldContext {
+  mask?: ISchemaMask;
+  keyRoot?: string;
+}
+
+export class SchemaField<T = object> extends Field<T> {
+  public constructor(protected readonly schema: ISchemaConstructor) {
+    super();
+  }
+  public validate(value: object, context: ISchemaFieldContext = {}): T {
+    return this.schema.validate(value, context.mask, context.keyRoot);
+  }
+  public format(value: T, context: ISchemaFieldContext): object {
+    return this.schema.format(value, context.mask, context.keyRoot);
+  }
 }
 
 export class BooleanField extends Field<boolean> {

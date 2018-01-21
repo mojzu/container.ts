@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.4",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",

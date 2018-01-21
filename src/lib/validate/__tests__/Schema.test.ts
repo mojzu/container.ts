@@ -1,4 +1,4 @@
-import { BooleanField, OptionalField, StringField } from "../Field";
+import { BooleanField, OptionalField, SchemaField, StringField } from "../Field";
 import { buildSchema } from "../Schema";
 
 const booleanField = new BooleanField();
@@ -21,7 +21,7 @@ interface IData {
     booleanOptionalField?: boolean;
     stringOptionalField?: string;
   };
-  childSchema: {
+  schemaField: {
     booleanField: boolean;
     stringField: string;
   };
@@ -58,11 +58,11 @@ const dataSchema = buildSchema({
     booleanOptionalField: optionalBooleanField,
     stringOptionalField: optionalStringField,
   },
-  // Child schemas.
-  childSchema: buildSchema({
+  // Schema fields.
+  schemaField: new SchemaField(buildSchema({
     booleanField,
     stringField,
-  }),
+  })),
   // Array of fields.
   arrayOuter: [
     booleanField,
@@ -98,7 +98,7 @@ describe("Schema", () => {
     mapOptional: {
       booleanOptionalField: "10",
     },
-    childSchema: {
+    schemaField: {
       booleanField: "1",
       stringField: "foo",
     },
@@ -147,10 +147,10 @@ describe("Schema", () => {
     }
   });
 
-  it("#ChildSchema", () => {
-    expect(validated.childSchema).toBeDefined();
-    expect(validated.childSchema.booleanField).toEqual(true);
-    expect(validated.childSchema.stringField).toEqual("foo");
+  it("#schemaField", () => {
+    expect(validated.schemaField).toBeDefined();
+    expect(validated.schemaField.booleanField).toEqual(true);
+    expect(validated.schemaField.stringField).toEqual("foo");
   });
 
   it("#Array", () => {
@@ -208,7 +208,7 @@ describe("Schema", () => {
       mapOuter: {
         booleanMapOuterField: true,
       },
-      childSchema: true,
+      schemaField: true,
     };
     const masked = dataSchema.validate<IData>(inputData, inputMask);
     expect(masked.booleanField).toEqual(true);
@@ -218,9 +218,9 @@ describe("Schema", () => {
     expect(masked.mapOuter.stringMapOuterField).toBeUndefined();
     expect(masked.mapOuter.mapInner).toBeUndefined();
     expect(masked.mapOptional).toBeUndefined();
-    expect(masked.childSchema).toBeDefined();
-    expect(masked.childSchema.booleanField).toEqual(true);
-    expect(masked.childSchema.stringField).toEqual("foo");
+    expect(masked.schemaField).toBeDefined();
+    expect(masked.schemaField.booleanField).toEqual(true);
+    expect(masked.schemaField.stringField).toEqual("foo");
     expect(masked.arrayOuter).toBeUndefined();
     expect(masked.wildcardMap).toBeUndefined();
     expect(masked.any).toBeUndefined();

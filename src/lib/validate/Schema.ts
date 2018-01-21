@@ -9,7 +9,7 @@ export class SchemaError extends ErrorChain {
 }
 
 export type ISchemaTypes = ISchemaArray | ISchemaMap;
-export type ISchemaFields = ISchemaTypes | Schema | Field<any>;
+export type ISchemaFields = ISchemaTypes | Field<any>;
 
 /** Schema array type, recursive type. */
 export interface ISchemaArray {
@@ -30,8 +30,7 @@ export interface ISchemaMask {
 export interface ISchemaMapHandlers {
   isSchemaArray?: (i: any, o: any, array: ISchemaArray, k: number | string, m?: ISchemaMask, kr?: string) => void;
   isSchemaMap?: (i: any, o: any, map: ISchemaMap, k: number | string, m?: ISchemaMask, kr?: string) => void;
-  isSchema?: (i: any, o: any, schema: ISchemaConstructor, k: number | string, m?: ISchemaMask, kr?: string) => void;
-  isField?: (i: any, o: any, field: Field<any>, k: number | string) => void;
+  isField?: (i: any, o: any, field: Field<any>, k: number | string, m?: ISchemaMask, kr?: string) => void;
 }
 
 /** Schema static interface. */
@@ -64,10 +63,7 @@ export abstract class Schema {
   /** Schema array or map, override in child classes. */
   public static readonly SCHEMA: ISchemaTypes = {};
 
-  /**
-   * Returns true if value is a Schema class object.
-   * Used to test for child schemas during validation/formatting.
-   */
+  /** Returns true if value is a Schema class object. */
   public static isSchema(value: any): boolean {
     const isFunction = (typeof value === "function");
     const hasSchemaProperty = (value.SCHEMA != null);
@@ -158,18 +154,10 @@ export abstract class Schema {
         out[key] = output;
       }
     },
-    isSchema: (inp, out, schema, key, submask, keyRoot) => {
-      // Call static method of child schema.
-      // Only assign output if at least one field validated.
-      const output = schema.validate(inp[key], submask, keyRoot);
-      if (Object.keys(output).length > 0) {
-        out[key] = output;
-      }
-    },
-    isField: (inp, out, field, key) => {
+    isField: (inp, out, field, key, mask, keyRoot) => {
       // Call validate method of field.
       // Only assign output if defined.
-      const output = field.validate(inp[key]);
+      const output = field.validate(inp[key], { mask, keyRoot });
       if (output != null) {
         out[key] = output;
       }
@@ -191,16 +179,9 @@ export abstract class Schema {
         out[key] = output;
       }
     },
-    isSchema: (inp, out, schema, key, submask, keyRoot) => {
-      // Call static method if child schema.
-      const output = schema.format(inp[key], submask, keyRoot);
-      if (Object.keys(output).length > 0) {
-        out[key] = output;
-      }
-    },
-    isField: (inp, out, field, key) => {
+    isField: (inp, out, field, key, mask, keyRoot) => {
       // Call format method of field.
-      const output = field.format(inp[key]);
+      const output = field.format(inp[key], { mask, keyRoot });
       if (output != null) {
         out[key] = output;
       }
@@ -232,13 +213,7 @@ export abstract class Schema {
     }
 
     try {
-      if (Schema.isSchema(value) && (!!handlers.isSchema)) {
-
-        // Value is child schema.
-        const childSchema: any = value;
-        handlers.isSchema(inp, out, childSchema, key, submask, subkeyRoot);
-
-      } else if ((value instanceof Field) && (!!handlers.isField)) {
+      if ((value instanceof Field) && (!!handlers.isField)) {
 
         // Value is field class instance.
         const field: Field<any> = value as any;
