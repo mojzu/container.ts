@@ -61,4 +61,8 @@ describe("Assets", () => {
     }
   });
 
+  it("reads directory", async () => {
+    const data = await ASSETS.readDirectory("");
+    expect(data).toEqual(["invalid.json", "test.json", "test.txt"]);
+  });
 });

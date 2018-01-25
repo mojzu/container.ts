@@ -1,4 +1,4 @@
-import { readFile } from "fs";
+import { readdir, readFile } from "fs";
 import { assign } from "lodash";
 import { resolve } from "path";
 import { promisify } from "util";
@@ -39,6 +39,7 @@ export class Assets extends Module {
   public static readonly ERROR = assign({}, Module.ERROR, {
     READ_FILE: "Assets.ReadFileError",
     JSON_PARSE: "Assets.JsonParseError",
+    READ_DIRECTORY: "Assets.ReadDirectoryError",
   });
 
   /** Absolute path to assets files directory. */
@@ -85,6 +86,16 @@ export class Assets extends Module {
     }
   }
 
+  /** Read contents of assets directory. */
+  public async readDirectory(target: string = ""): Promise<string[]> {
+    try {
+      const directoryPath = isDirectory(resolve(this.path, target));
+      const fsReaddir = promisify(readdir);
+      return await fsReaddir(directoryPath);
+    } catch (error) {
+      throw new AssetsError(Assets.ERROR.READ_DIRECTORY, target, error);
+    }
+  }
 
   protected async assetsRead(target: string, options: IAssetsReadOptions = {}): Promise<string | Buffer> {
     // Assets are read only, if contents defined in cache, return now.
