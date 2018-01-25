@@ -9,6 +9,8 @@ interface IGroup {
     theme: string;
     customer?: string;
   };
+  map: { [key: string]: string };
+  array: string[];
 }
 
 // Define field validators.
@@ -25,15 +27,27 @@ const groupSchema = validate.buildSchema({
     theme: optionalThemeField,
     customer: optionalCustomerField,
   },
+  map: { "*": customerField },
+  array: ["*", customerField],
 });
 
 // Validate input data.
-const input = {
+const input1 = {
   name: "GroupName",
   information: {
     theme: "customer",
     customer: "CustomerName",
   },
 };
-const validated = groupSchema.validate<IGroup>(input);
-process.stdout.write(`${JSON.stringify(validated, null, 2)}\n`);
+const validated1 = groupSchema.validate<IGroup>(input1);
+process.stdout.write(`${JSON.stringify(validated1, null, 2)}\n`);
+
+const input2 = {
+  name: "GroupName",
+  information: {
+  },
+  map: {},
+  array: [],
+};
+const validated2 = groupSchema.validate<IGroup>(input2);
+process.stdout.write(`${JSON.stringify(validated2, null, 2)}\n`);

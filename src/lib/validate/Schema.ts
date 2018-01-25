@@ -140,19 +140,11 @@ export abstract class Schema {
   protected static readonly validateMapHandlers: ISchemaMapHandlers = {
     isSchemaArray: (inp, out, array, key, submask, keyRoot) => {
       // Make recursive call for internal data arrays.
-      // Only assign output if array has length.
-      const output = Schema.validate<any[]>(inp[key], submask, keyRoot, array);
-      if (output.length > 0) {
-        out[key] = output;
-      }
+      out[key] = Schema.validate<any[]>(inp[key], submask, keyRoot, array);
     },
     isSchemaMap: (inp, out, map, key, submask, keyRoot) => {
       // Make recursive call for internal data maps.
-      // Only assign output if at least one field validated.
-      const output = Schema.validate(inp[key], submask, keyRoot, map);
-      if (Object.keys(output).length > 0) {
-        out[key] = output;
-      }
+      out[key] = Schema.validate(inp[key], submask, keyRoot, map);
     },
     isField: (inp, out, field, key, mask, keyRoot) => {
       // Call validate method of field.
@@ -167,17 +159,11 @@ export abstract class Schema {
   protected static readonly formatMapHandlers: ISchemaMapHandlers = {
     isSchemaArray: (inp, out, array, key, submask, keyRoot) => {
       // Make recursive call for internal data arrays.
-      const output = Schema.format<any[]>(inp[key], submask, keyRoot, array);
-      if (output.length > 0) {
-        out[key] = output;
-      }
+      out[key] = Schema.format<any[]>(inp[key], submask, keyRoot, array);
     },
     isSchemaMap: (inp, out, map, key, submask, keyRoot) => {
       // Make recursive call for internal data maps.
-      const output = Schema.format(inp[key], submask, keyRoot, map);
-      if (Object.keys(output).length > 0) {
-        out[key] = output;
-      }
+      out[key] = Schema.format(inp[key], submask, keyRoot, map);
     },
     isField: (inp, out, field, key, mask, keyRoot) => {
       // Call format method of field.
