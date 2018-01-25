@@ -1,10 +1,10 @@
 import { readFile } from "fs";
 import { assign } from "lodash";
 import { resolve } from "path";
+import { promisify } from "util";
 import { IModuleOptions, Module } from "../../container";
 import { ErrorChain } from "../error";
 import { isDirectory, isFile } from "../node-validate";
-import { Observable } from "./RxJS";
 
 /** Assets files may be cached when read. */
 export interface IAssetsCache {
@@ -26,7 +26,6 @@ export interface IAssetsReadOptions {
 
 /** Assets read only files module. */
 export class Assets extends Module {
-
   /** Default module name. */
   public static readonly moduleName: string = "Assets";
 
@@ -70,50 +69,45 @@ export class Assets extends Module {
    * If encoding is specified a string is returned, else a Buffer.
    */
   public readFile(target: string, options: IAssetsReadOptions = { cache: true }): Promise<Buffer | string> {
-    return this.assetsRead<Buffer | string>(target, options);
+    return this.assetsRead(target, options);
   }
 
   /** Read asset file contents and parse JSON object. */
-  public readJson<T>(target: string, options: IAssetsReadOptions = { encoding: "utf8", cache: true }): Promise<T> {
-    return Observable.fromPromise(this.assetsRead<string>(target, options))
-      .map((data) => {
-        try {
-          return JSON.parse(data);
-        } catch (error) {
-          throw new AssetsError(Assets.ERROR.JSON_PARSE, target, error);
-        }
-      })
-      .toPromise();
+  public async readJson<T>(
+    target: string,
+    options: IAssetsReadOptions = { encoding: "utf8", cache: true },
+  ): Promise<T> {
+    const data = await this.assetsRead(target, options) as string;
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      throw new AssetsError(Assets.ERROR.JSON_PARSE, target, error);
+    }
   }
 
-  protected async assetsRead<T extends string | Buffer>(target: string, options: IAssetsReadOptions = {}): Promise<T> {
-    const cacheKey = `${target}:${options.encoding}`;
 
+  protected async assetsRead(target: string, options: IAssetsReadOptions = {}): Promise<string | Buffer> {
     // Assets are read only, if contents defined in cache, return now.
+    const cacheKey = `${target}:${options.encoding}`;
     if (!!options.cache) {
       if (this.assetsCache[cacheKey] != null) {
-        const value: T = this.assetsCache[cacheKey] as any;
-        return value;
+        return this.assetsCache[cacheKey];
       }
     }
 
     try {
       // Check file exists, read file contents asynchronously.
       const filePath = isFile(resolve(this.path, target));
-      const readFileCallback = (callback: any) => readFile(filePath, options.encoding, callback);
-      const readFileBind = Observable.bindNodeCallback<T>(readFileCallback);
+      const fsReadFile = promisify(readFile);
+      const data = await fsReadFile(filePath, options.encoding);
 
-      return await readFileBind()
-        .do((data) => {
-          // Save to cache if enabled in options.
-          if (!!options.cache) {
-            this.assetsCache[cacheKey] = data;
-          }
-        })
-        .toPromise();
+      // Save to cache if enabled in options.
+      if (!!options.cache) {
+        this.assetsCache[cacheKey] = data;
+      }
+      return data;
     } catch (error) {
       throw new AssetsError(Assets.ERROR.READ_FILE, target, error);
     }
   }
-
 }

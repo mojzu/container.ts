@@ -2,9 +2,7 @@ import { BehaviorSubject } from "rxjs/BehaviorSubject";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 
-import "rxjs/add/observable/bindNodeCallback";
 import "rxjs/add/observable/fromEvent";
-import "rxjs/add/observable/fromPromise";
 import "rxjs/add/observable/interval";
 import "rxjs/add/observable/throw";
 import "rxjs/add/operator/do";
