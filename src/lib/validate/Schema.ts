@@ -1,3 +1,4 @@
+import { assign } from "lodash";
 import { ErrorChain } from "../error";
 import { Field } from "./Field";
 
@@ -38,6 +39,7 @@ export interface ISchemaConstructor {
   SCHEMA: ISchemaTypes;
   new(): Schema;
   isSchema(value: any): boolean;
+  extend(schema: ISchemaTypes): ISchemaConstructor;
   map(
     inp: any, out: any,
     schema: ISchemaTypes,
@@ -59,7 +61,6 @@ export function buildSchema(schema: ISchemaTypes = {}): ISchemaConstructor {
 }
 
 export abstract class Schema {
-
   /** Schema array or map, override in child classes. */
   public static readonly SCHEMA: ISchemaTypes = {};
 
@@ -68,6 +69,11 @@ export abstract class Schema {
     const isFunction = (typeof value === "function");
     const hasSchemaProperty = (value.SCHEMA != null);
     return (isFunction && hasSchemaProperty);
+  }
+
+  /** Construct new schema using this as a base. */
+  public static extend(schema: ISchemaTypes = {}): ISchemaConstructor {
+    return buildSchema(assign(this.SCHEMA, schema));
   }
 
   /**
@@ -239,5 +245,4 @@ export abstract class Schema {
 
     }
   }
-
 }

@@ -83,7 +83,6 @@ const dataSchema = buildSchema({
 });
 
 describe("Schema", () => {
-
   const inputData = {
     booleanField: "1",
     stringField: "foo",
@@ -227,4 +226,11 @@ describe("Schema", () => {
     expect(masked.wildcardArray).toBeUndefined();
   });
 
+  it("extended schema works", () => {
+    const extendedSchema = dataSchema.extend({
+      booleanField: stringField,
+    });
+    const data = extendedSchema.validate<IData>(inputData, { booleanField: true });
+    expect(typeof data.booleanField).toEqual("string");
+  });
 });
