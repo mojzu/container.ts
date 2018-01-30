@@ -36,13 +36,13 @@
   version "22.1.0"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-22.1.0.tgz#c1de03bbac66fac4cc741f7a69cb73bc01a1707c"
 
-"@types/lodash@^4.14.96":
-  version "4.14.96"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.96.tgz#49a402bb6984af7dd9a48cea3781744a3774bff1"
+"@types/lodash@^4.14.98":
+  version "4.14.98"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.98.tgz#aaf012ae443e657e7885e605a4c1b340db160609"
 
-"@types/luxon@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@types/luxon/-/luxon-0.2.3.tgz#e8fafc6fb6b4290a4b7c7bfeb60266dbb926002e"
+"@types/luxon@^0.2.4":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@types/luxon/-/luxon-0.2.4.tgz#3b8c47a812242eae1e9c48e35153500b3fdf229f"
 
 "@types/minimatch@*":
   version "3.0.3"
@@ -1298,6 +1298,10 @@ fstream@^1.0.0, fstream@^1.0.10, fstream@^1.0.2:
     mkdirp ">=0.5 0"
     rimraf "2"
 
+full-icu@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/full-icu/-/full-icu-1.2.0.tgz#6bd8bf565f696aab30df503de2d47b92d9f1046f"
+
 function-bind@^1.0.2, function-bind@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
@@ -2305,9 +2309,11 @@ lru-cache@^4.0.1:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
-luxon@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-0.3.1.tgz#627f78f5fea94ac19e1cf2900f398a9338422bbd"
+luxon@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-0.4.0.tgz#e7146ce52a6db7e82448438827860092d75bb8d6"
+  dependencies:
+    full-icu "^1.2.0"
 
 make-error@^1.1.1:
   version "1.3.2"
@@ -3460,9 +3466,9 @@ trim-right@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
 
-ts-jest@^22.0.1:
-  version "22.0.1"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-22.0.1.tgz#48942936a466c2e76e259b02e2f1356f1839afc3"
+ts-jest@^22.0.2:
+  version "22.0.2"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-22.0.2.tgz#d83eb2e3a2a4f3be098afea5a06d38547d528c72"
   dependencies:
     babel-core "^6.24.1"
     babel-plugin-istanbul "^4.1.4"
@@ -3473,7 +3479,7 @@ ts-jest@^22.0.1:
     jest-config "^22.0.1"
     pkg-dir "^2.0.0"
     source-map-support "^0.5.0"
-    yargs "^10.0.3"
+    yargs "^11.0.0"
 
 ts-node@^4.1.0:
   version "4.1.0"
@@ -3626,9 +3632,9 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
 
-validator@^9.2.0:
-  version "9.2.0"
-  resolved "https://registry.yarnpkg.com/validator/-/validator-9.2.0.tgz#ad216eed5f37cac31a6fe00ceab1f6b88bded03e"
+validator@^9.4.0:
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-9.4.0.tgz#c503ef88f7e6b8fb7688599267b309482d81ae60"
 
 vary@~1.1.2:
   version "1.1.2"

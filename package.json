@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "1.0.0-rc.5",
+  "version": "1.0.0-rc.6",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -30,19 +30,19 @@
   },
   "dependencies": {
     "@types/debug": "^0.0.30",
-    "@types/lodash": "^4.14.96",
+    "@types/lodash": "^4.14.98",
     "awilix": "^3.0.4",
     "debug": "^3.1.0",
     "lodash": "^4.17.4",
     "rxjs": "^5.5.6"
   },
   "optionalDependencies": {
-    "@types/luxon": "^0.2.3",
+    "@types/luxon": "^0.2.4",
     "@types/node-ipc": "^9.1.0",
     "@types/validator": "^6.3.0",
-    "luxon": "^0.3.1",
+    "luxon": "^0.4.0",
     "node-ipc": "^9.1.1",
-    "validator": "^9.2.0"
+    "validator": "^9.4.0"
   },
   "devDependencies": {
     "@types/del": "^3.0.0",
@@ -52,7 +52,7 @@
     "del": "^3.0.0",
     "fuse-box": "^3.0.2",
     "jest": "^22.1.4",
-    "ts-jest": "^22.0.1",
+    "ts-jest": "^22.0.2",
     "ts-node": "^4.1.0",
     "tslint": "^5.9.1",
     "typescript": "^2.6.2",
