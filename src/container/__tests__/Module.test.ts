@@ -65,12 +65,13 @@ describe("Module", () => {
     expect(moduleDestroy).toEqual(4);
   });
 
-  it("#registerModules throws error for duplicates", () => {
+  it("#registerModules throws error for duplicates", (done) => {
     try {
       new Container("Invalid").registerModules([Test1, Test1]);
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ContainerError).toEqual(true);
+      done();
     }
   });
 

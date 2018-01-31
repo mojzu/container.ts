@@ -41,23 +41,25 @@ describe("Assets", () => {
     expect(ASSETS.isCached("test.json", "utf8")).toEqual(true);
   });
 
-  it("returns parse error for invalid json", async () => {
+  it("returns parse error for invalid json", async (done) => {
     try {
       await ASSETS.readJson("invalid.json");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof AssetsError).toEqual(true);
       expect(error.name).toEqual(Assets.ERROR.JSON_PARSE);
+      done();
     }
   });
 
-  it("returns read file error for invalid path", async () => {
+  it("returns read file error for invalid path", async (done) => {
     try {
       await ASSETS.readJson("doesnotexist.json");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof AssetsError).toEqual(true);
       expect(error.name).toEqual(Assets.ERROR.READ_FILE);
+      done();
     }
   });
 

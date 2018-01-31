@@ -21,7 +21,6 @@ class TestModule extends Module {
 }
 
 describe("Scripts", () => {
-
   const ENVIRONMENT = new Environment()
     .set(Scripts.ENV.PATH, path.resolve(__dirname, "scripts"));
 
@@ -74,23 +73,24 @@ describe("Scripts", () => {
       });
   });
 
-  it("#startWorker ipc timeout", async () => {
+  it("#startWorker ipc timeout", async (done) => {
     try {
       await SCRIPTS.startWorker(WN, "script.test.js", { restart: false }).take(1).toPromise();
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ErrorChain).toEqual(true);
       expect(error.joinNames()).toEqual("ScriptsError.TimeoutError");
+      done();
     }
   });
 
-  it("#ScriptsProcess#call function does not exist", async () => {
+  it("#ScriptsProcess#call function does not exist", async (done) => {
     const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
     expect(worker.isConnected).toEqual(true);
 
     try {
       await worker.call("Test", "doesNotExist").toPromise();
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ErrorChain).toEqual(true);
       expect(error.joinNames()).toEqual("ProcessError.TypeError");
@@ -98,6 +98,7 @@ describe("Scripts", () => {
 
     const code = await SCRIPTS.stopWorker(WN).toPromise();
     expect(code).toEqual(0);
+    done();
   });
 
   it("#ScriptsProcess#call", async () => {
@@ -195,5 +196,4 @@ describe("Scripts", () => {
     const code = await SCRIPTS.stopWorker(WN).toPromise();
     expect(code).toEqual(0);
   });
-
 });

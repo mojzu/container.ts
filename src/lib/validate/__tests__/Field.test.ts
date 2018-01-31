@@ -9,7 +9,6 @@ import {
 } from "../Field";
 
 describe("Field", () => {
-
   const integerField = new IntegerField();
   const optionalIntegerField = new OptionalField(integerField, 1);
 
@@ -41,12 +40,13 @@ describe("Field", () => {
     expect(value).toEqual(42);
   });
 
-  it("#AndField validate fails", () => {
+  it("#AndField validate fails", (done) => {
     try {
       integerAndPortField.validate("123456789");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof FieldError).toEqual(true);
+      done();
     }
   });
 
@@ -67,13 +67,13 @@ describe("Field", () => {
     expect(value).toEqual("foo");
   });
 
-  it("#NotField validate fails", () => {
+  it("#NotField validate fails", (done) => {
     try {
       stringNotEmailField.validate("foo@example.com");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof FieldError).toEqual(true);
+      done();
     }
   });
-
 });

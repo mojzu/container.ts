@@ -2,7 +2,6 @@ import { ErrorChain } from "../../error";
 import { EValidateError, Validate, ValidateError } from "../Validate";
 
 describe("Validate", () => {
-
   const invalidBoolean = EValidateError[EValidateError.InvalidBoolean];
   const invalidString = EValidateError[EValidateError.InvalidString];
 
@@ -35,23 +34,25 @@ describe("Validate", () => {
     expect(value).toEqual(true);
   });
 
-  it("#isBoolean invalid type throws error", () => {
+  it("#isBoolean invalid type throws error", (done) => {
     try {
       Validate.isBoolean(42 as any);
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
 
   // Integer tests.
 
-  it("#isInterger throws error for invalid input", () => {
+  it("#isInterger throws error for invalid input", (done) => {
     try {
       Validate.isInteger("foo");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
 
@@ -61,12 +62,13 @@ describe("Validate", () => {
 
   // Float tests.
 
-  it("#isFloat throws error for invalid input", () => {
+  it("#isFloat throws error for invalid input", (done) => {
     try {
       Validate.isFloat("foo");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
 
@@ -96,41 +98,45 @@ describe("Validate", () => {
     expect(value).toEqual("foo");
   });
 
-  it("#isString invalid type as string", () => {
+  it("#isString invalid type as string", (done) => {
     try {
       Validate.isString(1 as any);
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
 
-  it("#isString empty string fails with default options", () => {
+  it("#isString empty string fails with default options", (done) => {
     try {
       Validate.isString("");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
 
-  it("#isString string is too long", () => {
+  it("#isString string is too long", (done) => {
     try {
       Validate.isString("foobar", { max: 3 });
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
       expect(error.message).toEqual(`${invalidString} "foobar"`);
+      done();
     }
   });
 
-  it("#isString string not in array", () => {
+  it("#isString string not in array", (done) => {
     try {
       Validate.isString("baz", { values: ["bar", "foo"] });
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
       expect(error.message).toEqual(`${invalidString} "baz"`);
+      done();
     }
   });
 
@@ -140,21 +146,23 @@ describe("Validate", () => {
     expect(Validate.isPort("3000")).toEqual(3000);
   });
 
-  it("#isPort throws error for invalid input", () => {
+  it("#isPort throws error for invalid input", (done) => {
     try {
       Validate.isPort("foo");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
 
-  it("#isPort throws error for out of range number", () => {
+  it("#isPort throws error for out of range number", (done) => {
     try {
       Validate.isPort("0");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
 
@@ -179,12 +187,13 @@ describe("Validate", () => {
     expect(locale).toEqual("en_GB");
   });
 
-  it("#isLocale throws error for invalid input", () => {
+  it("#isLocale throws error for invalid input", (done) => {
     try {
       Validate.isLocale("ab_XY");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
 
@@ -195,12 +204,13 @@ describe("Validate", () => {
     expect(timezone).toEqual("Europe/London");
   });
 
-  it("#isTimeZone throws error for invalid input", () => {
+  it("#isTimeZone throws error for invalid input", (done) => {
     try {
       Validate.isTimeZone("foo/bar");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
 
@@ -211,12 +221,13 @@ describe("Validate", () => {
     expect(datetime.isValid).toEqual(true);
   });
 
-  it("#isDateTime throws error for invalid input", () => {
+  it("#isDateTime throws error for invalid input", (done) => {
     try {
       Validate.isDateTime("fooTbar");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
 
@@ -229,13 +240,13 @@ describe("Validate", () => {
 
   // Email tests.
 
-  it("#isEmail throws error for invalid input", () => {
+  it("#isEmail throws error for invalid input", (done) => {
     try {
       Validate.isEmail("bar");
-      fail();
+      done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
+      done();
     }
   });
-
 });
