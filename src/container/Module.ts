@@ -17,7 +17,6 @@ export class ModuleError extends ErrorChain {
 
 /** Container module log class. */
 export class ModuleLog extends Log {
-
   public constructor(
     protected readonly container: Container,
     protected readonly name: string,
@@ -31,12 +30,10 @@ export class ModuleLog extends Log {
     metadata.moduleName = this.name;
     this.container.sendLog(level, message, metadata, args);
   }
-
 }
 
 /** Container module metric class. */
 export class ModuleMetric extends Metric {
-
   public constructor(
     protected readonly container: Container,
     protected readonly name: string,
@@ -50,12 +47,10 @@ export class ModuleMetric extends Metric {
     tags.moduleName = this.name;
     this.container.sendMetric(type, name, value, tags, args);
   }
-
 }
 
 /** Base class for container class modules with dependency injection. */
 export class Module implements IModule {
-
   /** Default module name. */
   public static readonly moduleName: string = "Module";
 
@@ -119,5 +114,4 @@ export class Module implements IModule {
 
   /** Module destruction hook. */
   public moduleDestroy(): void { }
-
 }

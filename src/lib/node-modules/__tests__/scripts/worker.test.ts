@@ -6,7 +6,7 @@ class TestModule extends Module {
 
   public static readonly moduleName: string = "Test";
 
-  protected readonly childProcess: ChildProcess;
+  protected readonly childProcess!: ChildProcess;
 
   public constructor(options: IModuleOptions) {
     super(options);

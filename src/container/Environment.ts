@@ -7,7 +7,6 @@ export interface IEnvironmentVariables {
 
 /** Environment variables class. */
 export class Environment {
-
   public readonly variables: IEnvironmentVariables;
 
   public constructor(...variables: IEnvironmentVariables[]) {
@@ -29,5 +28,4 @@ export class Environment {
     this.variables[name] = value;
     return this;
   }
-
 }

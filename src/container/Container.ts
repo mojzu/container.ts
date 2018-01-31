@@ -67,7 +67,6 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
  * Wrapper around awilix library.
  */
 export class Container {
-
   /** Error names. */
   public static readonly ERROR = {
     UP: "Container.UpError",
@@ -203,6 +202,8 @@ export class Container {
     return this.containerState(observables$, true, timeout);
   }
 
+  // TODO: Promise support for up/down methods.
+
   /**
    * Signal modules to leave operational state.
    * Module hook method `moduleDown` called in order of dependents.
@@ -307,5 +308,4 @@ export class Container {
         this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
       });
   }
-
 }

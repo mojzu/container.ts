@@ -15,7 +15,6 @@ export interface IMetricTags extends Object {
 
 /** Abstract metric class. */
 export abstract class Metric {
-
   /** Send increment counter metric. */
   public increment(name: string, value = 1, tags: IMetricTags = {}, ...args: any[]): void {
     return this.metric(EMetricType.Increment, name, value, tags, ...args);
@@ -43,5 +42,4 @@ export abstract class Metric {
 
   /** Metric method provided by implementor. */
   protected abstract metric(type: EMetricType, name: string, value: any, tags: IMetricTags, ...args: any[]): void;
-
 }

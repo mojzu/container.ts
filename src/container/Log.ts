@@ -22,7 +22,6 @@ export interface ILogMetadata extends Object {
 
 /** Abstract log class. */
 export abstract class Log {
-
   /** System is unusable. */
   public emergency(message: ILogMessage, metadata: ILogMetadata = {}, ...args: any[]): void {
     return this.log(ELogLevel.Emergency, message, metadata, ...args);
@@ -65,5 +64,4 @@ export abstract class Log {
 
   /** Log method provided by implementor. */
   protected abstract log(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, ...args: any[]): void;
-
 }

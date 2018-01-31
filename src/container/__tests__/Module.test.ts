@@ -26,7 +26,7 @@ class Test2 extends Module {
 
 class Test3 extends Module {
   public static readonly moduleName: string = "Test3";
-  public readonly test1: Test1;
+  public readonly test1!: Test1;
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test1: Test1 });
   }
@@ -37,7 +37,7 @@ class Test3 extends Module {
 
 class Test4 extends Test3 {
   public static readonly moduleName: string = "Test4";
-  public readonly test2: Test2;
+  public readonly test2!: Test2;
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test2: Test2 });
   }
@@ -46,7 +46,6 @@ class Test4 extends Test3 {
 }
 
 describe("Module", () => {
-
   const CONTAINER = new Container("Test1")
     .registerModules([Test1, Test2, Test3, Test4]);
 
@@ -80,5 +79,4 @@ describe("Module", () => {
     expect(t4.test1 instanceof Test1).toEqual(true);
     expect(t4.test2 instanceof Test2).toEqual(true);
   });
-
 });

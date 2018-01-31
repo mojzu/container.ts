@@ -235,7 +235,7 @@ export class Scripts extends Module {
   protected readonly scriptsWorkers: { [name: string]: IScriptsWorker } = {};
 
   /** Process module dependency. */
-  protected readonly process: Process;
+  protected readonly process!: Process;
 
   public constructor(options: IModuleOptions) {
     super(options);
