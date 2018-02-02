@@ -12,9 +12,9 @@ import {
   IModuleDependencies,
   IModuleOptions,
   Module,
-} from "../../container";
-import { ErrorChain } from "../error";
-import { isDirectory, isDuration, isFile } from "../node-validate";
+} from "../../../container";
+import { ErrorChain } from "../../error/ErrorChain";
+import { isDirectory, isDuration, isFile } from "../validate";
 import { ChildProcess } from "./ChildProcess";
 import { IProcessStatus, Process } from "./Process";
 import { BehaviorSubject, Observable, Subject } from "./RxJS";

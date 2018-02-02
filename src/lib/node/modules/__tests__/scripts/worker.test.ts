@@ -1,4 +1,4 @@
-import { Container, Environment, IModuleDependencies, IModuleOptions, Module } from "../../../../container";
+import { Container, Environment, IModuleDependencies, IModuleOptions, Module } from "../../../../../container";
 import { ChildProcess } from "../../ChildProcess";
 import { Observable } from "../../RxJS";
 

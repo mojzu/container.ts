@@ -1,5 +1,5 @@
 import * as path from "path";
-import { Container, Environment } from "../../../container";
+import { Container, Environment } from "../../../../container";
 import { Assets, AssetsError } from "../Assets";
 
 describe("Assets", () => {

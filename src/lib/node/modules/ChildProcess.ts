@@ -1,8 +1,8 @@
 import * as Debug from "debug";
 import { assign } from "lodash";
 import * as ipc from "node-ipc";
-import { IModuleOptions, Module } from "../../container";
-import { ErrorChain, IErrorChainSerialised } from "../error";
+import { IModuleOptions, Module } from "../../../container";
+import { ErrorChain, IErrorChainSerialised } from "../../error";
 import { isString } from "../validate";
 import { IProcessStatus, Process, ProcessError } from "./Process";
 import { Observable, Subject } from "./RxJS";

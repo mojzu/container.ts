@@ -2,9 +2,9 @@ import { readdir, readFile } from "fs";
 import { assign } from "lodash";
 import { resolve } from "path";
 import { promisify } from "util";
-import { IModuleOptions, Module } from "../../container";
-import { ErrorChain } from "../error";
-import { isDirectory, isFile } from "../node-validate";
+import { IModuleOptions, Module } from "../../../container";
+import { ErrorChain } from "../../error";
+import { isDirectory, isFile } from "../validate";
 
 /** Assets files may be cached when read. */
 export interface IAssetsCache {

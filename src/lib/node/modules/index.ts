@@ -1,4 +1,4 @@
-export * from "../modules";
+export * from "../../modules";
 export * from "./Assets";
 export * from "./ChildProcess";
 export * from "./Process";

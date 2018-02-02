@@ -1,7 +1,7 @@
 import * as os from "os";
 import * as process from "process";
-import { IModuleOptions, Module } from "../../container";
-import { ErrorChain } from "../error";
+import { IModuleOptions, Module } from "../../../container";
+import { ErrorChain } from "../../error";
 import { isString } from "../validate";
 import { Observable } from "./RxJS";
 

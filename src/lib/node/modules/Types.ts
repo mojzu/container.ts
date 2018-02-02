@@ -1,5 +1,5 @@
-import { IContainerLogMessage, IContainerMetricMessage } from "../../container";
-import { IErrorChainSerialised } from "../error";
+import { IContainerLogMessage, IContainerMetricMessage } from "../../../container";
+import { IErrorChainSerialised } from "../../error";
 import { Observable } from "./RxJS";
 
 /** Process message types. */

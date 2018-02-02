@@ -1,4 +1,4 @@
-import { Field } from "../validate";
+import { Field } from "../../validate";
 import * as NodeValidate from "./NodeValidate";
 
 export class BufferField extends Field<Buffer> {

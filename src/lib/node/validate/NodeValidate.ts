@@ -1,7 +1,7 @@
-import * as fs from "fs";
-import * as path from "path";
-import { ErrorChain } from "../error";
-import { Validate } from "../validate";
+import { lstatSync } from "fs";
+import { resolve } from "path";
+import { ErrorChain } from "../../error";
+import { Validate } from "../../validate";
 
 /** NodeValidate error codes. */
 export enum ENodeValidateError {
@@ -44,8 +44,8 @@ export function isFile(value = ""): string {
   let isValid = false;
 
   try {
-    value = path.resolve(value);
-    isValid = fs.lstatSync(value).isFile();
+    value = resolve(value);
+    isValid = lstatSync(value).isFile();
   } catch (error) {
     throw new NodeValidateError(ENodeValidateError.InvalidFile, value, error);
   }
@@ -61,8 +61,8 @@ export function isDirectory(value = ""): string {
   let isValid = false;
 
   try {
-    value = path.resolve(value);
-    isValid = fs.lstatSync(value).isDirectory();
+    value = resolve(value);
+    isValid = lstatSync(value).isDirectory();
   } catch (error) {
     throw new NodeValidateError(ENodeValidateError.InvalidDirectory, value, error);
   }
