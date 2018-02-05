@@ -73,7 +73,7 @@ export abstract class Schema {
 
   /** Construct new schema using this as a base. */
   public static extend(schema: ISchemaTypes = {}): ISchemaConstructor {
-    return buildSchema(assign(this.SCHEMA, schema));
+    return buildSchema(assign({}, this.SCHEMA, schema));
   }
 
   /**
