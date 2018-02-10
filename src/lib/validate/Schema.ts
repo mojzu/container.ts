@@ -39,7 +39,7 @@ export interface ISchemaConstructor {
   SCHEMA: ISchemaTypes;
   new(): Schema;
   isSchema(value: any): boolean;
-  extend(schema: ISchemaTypes): ISchemaConstructor;
+  extend(...schemas: ISchemaTypes[]): ISchemaConstructor;
   map(
     inp: any, out: any,
     schema: ISchemaTypes,
