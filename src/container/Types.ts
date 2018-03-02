@@ -21,8 +21,8 @@ export interface IModuleConstructor {
 export interface IModule {
   moduleName: string;
   moduleDependencies(...previous: IModuleDependencies[]): IModuleDependencies;
-  moduleUp(): void | Observable<void>;
-  moduleDown(): void | Observable<void>;
+  moduleUp(): void | Promise<void> | Observable<void>;
+  moduleDown(): void | Promise<void> | Observable<void>;
   moduleDestroy(): void;
 }
 

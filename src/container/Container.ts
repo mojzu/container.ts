@@ -193,16 +193,19 @@ export class Container {
             if (up$ == null) {
               // Module up returned void, set state now.
               return this.containerModuleState(mod.moduleName, true);
+            } else if (up$ instanceof Observable) {
+              // Observable returned, update state on next.
+              return up$
+                .switchMap(() => this.containerModuleState(mod.moduleName, true));
+            } else {
+              // Promise returned, update state on then.
+              return Observable.fromPromise(up$)
+                .switchMap(() => this.containerModuleState(mod.moduleName, true));
             }
-            // Observable returned, update state on next.
-            return up$
-              .switchMap(() => this.containerModuleState(mod.moduleName, true));
           });
       });
     return this.containerState(observables$, true, timeout);
   }
-
-  // TODO: Promise support for up/down methods.
 
   /**
    * Signal modules to leave operational state.
@@ -218,10 +221,15 @@ export class Container {
             if (down$ == null) {
               // Module down returned void, set state now.
               return this.containerModuleState(mod.moduleName, false);
+            } else if (down$ instanceof Observable) {
+              // Observable returned, update state on next.
+              return down$
+                .switchMap(() => this.containerModuleState(mod.moduleName, false));
+            } else {
+              // Promise returned, update state on then.
+              return Observable.fromPromise(down$)
+                .switchMap(() => this.containerModuleState(mod.moduleName, false));
             }
-            // Observable returned, update state on next.
-            return down$
-              .switchMap(() => this.containerModuleState(mod.moduleName, false));
           });
       });
     return this.containerState(observables$, false, timeout);
