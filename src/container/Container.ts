@@ -1,4 +1,5 @@
 import { asFunction, asValue, AwilixContainer, createContainer, InjectionMode } from "awilix";
+import * as Debug from "debug";
 import { keys } from "lodash";
 import { ErrorChain } from "../lib/error";
 import { Environment } from "./Environment";
@@ -108,6 +109,9 @@ export class Container {
   /** Container module metrics. */
   public readonly metrics$ = new Subject<ContainerMetricMessage>();
 
+  /** Module debug interface. */
+  public readonly debug: Debug.IDebugger;
+
   /** Creates a new container in proxy resolution mode. */
   public constructor(
     /** Required container name, used to namespace modules. */
@@ -117,7 +121,7 @@ export class Container {
     /** Optional command line arguments. */
     public readonly argv: IContainerArguments = { _: [], $0: "" },
   ) {
-    this.environment = environment;
+    this.debug = Debug(this.name);
     this.container = createContainer({ injectionMode: InjectionMode.PROXY });
     this.registerValue<Container>(Container.SCOPE.CONTAINER, this);
   }

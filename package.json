@@ -68,7 +68,6 @@
       "script.test.ts",
       "worker.test.ts"
     ],
-    "mapCoverage": true,
     "moduleFileExtensions": [
       "ts",
       "tsx",
