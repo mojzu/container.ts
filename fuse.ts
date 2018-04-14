@@ -41,13 +41,13 @@ fuseBox.Sparky.task("lint", () => {
 fuseBox.Sparky.task("test-worker", () => {
   const fuse = fuseBox.FuseBox.init({
     homeDir: "src",
-    output: "src/lib/node-modules/__tests__/scripts/$name.js",
+    output: "src/lib/node/modules/__tests__/scripts/$name.js",
     target: "server",
   });
   fuse.bundle("script.test")
-    .instructions(" > [lib/node-modules/__tests__/scripts/script.test.ts]");
+    .instructions(" > [lib/node/modules/__tests__/scripts/script.test.ts]");
   fuse.bundle("worker.test")
-    .instructions(" > [lib/node-modules/__tests__/scripts/worker.test.ts]");
+    .instructions(" > [lib/node/modules/__tests__/scripts/worker.test.ts]");
   return fuse.run();
 });
 
