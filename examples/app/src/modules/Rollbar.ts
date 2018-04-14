@@ -1,5 +1,5 @@
 import { ContainerLogMessage, ELogLevel, IModuleDependencies, IModuleOptions } from "container.ts";
-import { Logs, Process } from "container.ts/lib/node-modules";
+import { Logs, Process } from "container.ts/lib/node/modules";
 import { Validate } from "container.ts/lib/validate";
 import * as rollbar from "rollbar";
 
@@ -15,8 +15,8 @@ export class Rollbar extends Logs {
     REPORT_LEVEL: "ROLLBAR_REPORT_LEVEL",
   });
 
-  private readonly process: Process;
-  private readonly rollbar: rollbar;
+  protected readonly process!: Process;
+  protected readonly rollbar: rollbar;
 
   public constructor(options: IModuleOptions) {
     super(options);

@@ -1,5 +1,5 @@
 import { ContainerMetricMessage, EMetricType, IModuleOptions } from "container.ts";
-import { Metrics } from "container.ts/lib/node-modules";
+import { Metrics } from "container.ts/lib/node/modules";
 import { Validate } from "container.ts/lib/validate";
 import * as StatsdClient from "statsd-client";
 

@@ -1,15 +1,15 @@
 import { IModuleDependencies, Module } from "container.ts";
-import { Scripts, ScriptsProcess } from "container.ts/lib/node-modules";
+import { Scripts, ScriptsProcess } from "container.ts/lib/node/modules";
 import { Observable } from "rxjs/Observable";
 
 export class Main extends Module {
 
   public static readonly moduleName: string = "Main";
 
-  public readonly scripts: Scripts;
+  public readonly scripts!: Scripts;
 
   public readonly workerName = "Worker";
-  public worker$: Observable<ScriptsProcess>;
+  public worker$?: Observable<ScriptsProcess>;
 
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { scripts: Scripts });

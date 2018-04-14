@@ -1,6 +1,6 @@
 import { ContainerLogMessage, ELogLevel, IModuleOptions } from "container.ts";
 import { ErrorChain } from "container.ts/lib/error";
-import { Logs } from "container.ts/lib/node-modules";
+import { Logs } from "container.ts/lib/node/modules";
 import * as winston from "winston";
 
 export class Winston extends Logs {

@@ -19,29 +19,29 @@
     "assets": "assets/**/*"
   },
   "dependencies": {
-    "container.ts": "^1.0.0-beta.7",
-    "rollbar": "^2.3.3",
-    "rxjs": "^5.5.6",
-    "statsd-client": "^0.4.0",
-    "winston": "^2.4.0",
-    "yargs": "^10.0.3"
+    "container.ts": "^1.0.0-rc.16",
+    "rollbar": "^2.3.9",
+    "rxjs": "^5.5.10",
+    "statsd-client": "^0.4.2",
+    "winston": "^2.4.1",
+    "yargs": "^11.0.0"
   },
   "devDependencies": {
-    "@types/del": "^3.0.0",
-    "@types/jest": "^22.0.0",
-    "@types/node": "^8.5.2",
+    "@types/del": "^3.0.1",
+    "@types/jest": "^22.2.3",
+    "@types/node": "^9.6.5",
     "@types/statsd-client": "^0.4.0",
-    "@types/winston": "^2.3.7",
-    "@types/yargs": "^10.0.0",
+    "@types/winston": "^2.3.9",
+    "@types/yargs": "^11.0.0",
     "del": "^3.0.0",
-    "fuse-box": "^2.4.0",
-    "jest": "^22.0.4",
-    "pkg": "^4.2.6",
-    "ts-jest": "^22.0.0",
-    "ts-node": "^4.1.0",
-    "tslint": "^5.8.0",
-    "typescript": "^2.6.2",
-    "uglify-js": "^3.3.3"
+    "fuse-box": "^3.2.1",
+    "jest": "^22.4.3",
+    "pkg": "^4.3.1",
+    "ts-jest": "^22.4.2",
+    "ts-node": "^5.0.1",
+    "tslint": "^5.9.1",
+    "typescript": "^2.8.1",
+    "uglify-js": "^3.3.21"
   },
   "jest": {
     "transform": {

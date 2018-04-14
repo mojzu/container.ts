@@ -1,5 +1,5 @@
 import { Container, Environment } from "container.ts";
-import { ChildProcess } from "container.ts/lib/node-modules";
+import { ChildProcess } from "container.ts/lib/node/modules";
 
 // Create environment instance using process environment.
 const ENVIRONMENT = new Environment(process.env);
