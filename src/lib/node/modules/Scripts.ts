@@ -38,7 +38,9 @@ export interface IScriptsOptions {
 /** Scripts worker options. */
 export interface IScriptsWorkerOptions extends IScriptsOptions {
   /** Disable IPC for this worker if not required. */
-  disableIpc?: boolean;
+  ipcDisabled?: boolean;
+  /** IPC connection timeout. */
+  ipcTimeout?: number;
   /** Worker process should restart after exit. */
   restart?: boolean;
   /** Worker process restarts maximum number of times. */
@@ -76,7 +78,6 @@ export class ScriptsProcessError extends ErrorChain {
 
 /** Spawned scripts process. */
 export class ScriptsProcess implements IProcessSend {
-
   /** IPC socket set if acquired. */
   public ipcSocket?: Socket;
 
@@ -84,7 +85,9 @@ export class ScriptsProcess implements IProcessSend {
   public readonly messages$ = new Subject<IProcessMessage<any>>();
   public readonly events$ = new Subject<IProcessEvent<any>>();
 
-  public get isConnected(): boolean { return this.process.connected; }
+  public get isConnected(): boolean {
+    return this.process.connected;
+  }
 
   public constructor(
     public readonly scripts: Scripts,
@@ -99,8 +102,8 @@ export class ScriptsProcess implements IProcessSend {
       .take(1)
       .map((args) => {
         const [code, signal] = args;
-        const value = (typeof code === "number") ? code : signal;
-        return (value != null) ? value : 1;
+        const value = typeof code === "number" ? code : signal;
+        return value != null ? value : 1;
       });
 
     // Log error if script exits with error code.
@@ -126,9 +129,7 @@ export class ScriptsProcess implements IProcessSend {
       .subscribe((message) => {
         this.messages$.next(message.data);
       });
-    this.messages$
-      .takeUntil(this.exit$)
-      .subscribe((message) => this.scriptsProcessOnMessage(message));
+    this.messages$.takeUntil(this.exit$).subscribe((message) => this.scriptsProcessOnMessage(message));
   }
 
   /** End child process with signal. */
@@ -139,7 +140,7 @@ export class ScriptsProcess implements IProcessSend {
 
   /** Send message via IPC. */
   public send<T>(type: EProcessMessageType, data: IProcessMessageData<T>): void {
-    if ((this.ipcSocket != null) && this.ipcSocket.writable) {
+    if (this.ipcSocket != null && this.ipcSocket.writable) {
       const message: IProcessMessage<T> = { type, data };
       ipc.server.emit(this.ipcSocket, "message", message);
     }
@@ -187,12 +188,10 @@ export class ScriptsProcess implements IProcessSend {
       }
     }
   }
-
 }
 
 /** Node.js scripts module. */
 export class Scripts extends Module {
-
   /** Default module name. */
   public static readonly moduleName: string = "Scripts";
 
@@ -320,32 +319,31 @@ export class Scripts extends Module {
     const worker = this.scriptsWorkers[name];
 
     // Handle worker restarts.
-    process.exit$
-      .takeUntil(worker.unsubscribe$)
-      .subscribe((code) => {
-        // Log worker exit.
-        const metadata = this.scriptsWorkerLogMetadata({ name, worker, code });
-        this.log.info(Scripts.LOG.WORKER_EXIT, metadata);
+    process.exit$.takeUntil(worker.unsubscribe$).subscribe((code) => {
+      // Log worker exit.
+      const metadata = this.scriptsWorkerLogMetadata({ name, worker, code });
+      this.log.info(Scripts.LOG.WORKER_EXIT, metadata);
 
-        // Restart worker process by default.
-        if ((options.restart == null) || !!options.restart) {
-          // Do not restart process if limit reached.
-          if ((options.restartLimit == null) || (worker.restarts < options.restartLimit)) {
-            this.log.info(Scripts.LOG.WORKER_RESTART, metadata);
-            this.startWorker(name, fileName, options);
-          } else {
-            this.log.error(Scripts.LOG.WORKER_RESTART_LIMIT, metadata);
-            this.stopWorker(name);
-          }
+      // Restart worker process by default.
+      if (options.restart == null || !!options.restart) {
+        // Do not restart process if limit reached.
+        if (options.restartLimit == null || worker.restarts < options.restartLimit) {
+          this.log.info(Scripts.LOG.WORKER_RESTART, metadata);
+          this.startWorker(name, fileName, options);
+        } else {
+          this.log.error(Scripts.LOG.WORKER_RESTART_LIMIT, metadata);
+          this.stopWorker(name);
         }
-      });
+      }
+    });
 
     // Track worker process uptime.
-    process.listen<IProcessStatus>(ChildProcess.EVENT.STATUS)
+    process
+      .listen<IProcessStatus>(ChildProcess.EVENT.STATUS)
       .takeUntil(worker.unsubscribe$)
       .subscribe((status) => {
         // Kill worker process if uptime limit exceeded.
-        if ((uptimeLimit != null) && (status.uptime > uptimeLimit)) {
+        if (uptimeLimit != null && status.uptime > uptimeLimit) {
           const metadata = this.scriptsWorkerLogMetadata({ name, worker });
           this.log.info(Scripts.LOG.WORKER_UPTIME_LIMIT, metadata);
           process.kill();
@@ -357,17 +355,14 @@ export class Scripts extends Module {
         let connection$: Observable<Socket | undefined> = Observable.of(undefined);
 
         // Wait for IPC socket connection unless disabled.
-        if (!options.disableIpc) {
+        if (!options.ipcDisabled) {
           connection$ = this.ipcConnections$
-            .timeout(1000)
+            .timeout(options.ipcTimeout || 1000)
             .catch((error) => Observable.throw(new ScriptsError(error)))
             .take(1);
         }
 
-        return Observable.forkJoin(
-          Observable.of(proc),
-          connection$,
-        );
+        return Observable.forkJoin(Observable.of(proc), connection$);
       })
       .map(([proc, socket]) => {
         proc.ipcSocket = socket;
@@ -421,7 +416,9 @@ export class Scripts extends Module {
   protected scriptsWorkerUptimeLimit(limit?: string): number | null {
     if (limit != null) {
       try {
-        const duration = isDuration(limit).shiftTo("seconds").toObject();
+        const duration = isDuration(limit)
+          .shiftTo("seconds")
+          .toObject();
         return duration.seconds || null;
       } catch (error) {
         throw new ScriptsError(error);
@@ -450,5 +447,4 @@ export class Scripts extends Module {
     }
     return metadata;
   }
-
 }

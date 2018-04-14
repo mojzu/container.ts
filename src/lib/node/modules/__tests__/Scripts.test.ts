@@ -59,7 +59,7 @@ describe("Scripts", () => {
 
   it("#startWorker#restartLimit", (done) => {
     let restarts = 0;
-    SCRIPTS.startWorker(WN, "script.test.js", { disableIpc: true, restartLimit: 3 })
+    SCRIPTS.startWorker(WN, "script.test.js", { ipcDisabled: true, restartLimit: 3 })
       .subscribe({
         next: (worker) => {
           restarts += 1;
