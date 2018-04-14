@@ -1,7 +1,7 @@
 import * as Debug from "debug";
 import { assign } from "lodash";
 import * as ipc from "node-ipc";
-import { IModuleOptions, Module } from "../../../container";
+import { Container, IModuleOptions, Module } from "../../../container";
 import { ErrorChain, IErrorChainSerialised } from "../../error";
 import { isString } from "../validate";
 import { IProcessStatus, Process, ProcessError } from "./Process";
@@ -20,7 +20,6 @@ import {
 } from "./Types";
 
 export class ChildProcess extends Process implements IProcessSend {
-
   /** Default module name. */
   public static readonly moduleName: string = "ChildProcess";
 
@@ -34,8 +33,18 @@ export class ChildProcess extends Process implements IProcessSend {
     STATUS: "ChildProcess.Status",
   };
 
+  /** Determine if container has ChildProcess module. */
+  public static isChildProcess(container: Container): boolean {
+    try {
+      container.resolve<ChildProcess>(ChildProcess.name);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   public static ipcGenerateUid(): number {
-    return Math.floor(Math.random() * (0xFFFF - 1) + 1);
+    return Math.floor(Math.random() * (0xffff - 1) + 1);
   }
 
   /** Extract serialisable error properties to object. */
@@ -60,13 +69,8 @@ export class ChildProcess extends Process implements IProcessSend {
   }
 
   /** Listen for events from process. */
-  public static ipcListenForEvent<T>(
-    events$: Observable<IProcessEvent<any>>,
-    name: string,
-  ): Observable<T> {
-    return events$
-      .filter((event) => (name === event.name))
-      .map((event) => event.data as T);
+  public static ipcListenForEvent<T>(events$: Observable<IProcessEvent<any>>, name: string): Observable<T> {
+    return events$.filter((event) => name === event.name).map((event) => event.data as T);
   }
 
   /** Send call request to process. */
@@ -122,11 +126,7 @@ export class ChildProcess extends Process implements IProcessSend {
   }
 
   /** Handle method call requests. */
-  public static ipcOnCallRequest(
-    emitter: IProcessSend,
-    mod: Module,
-    data: IProcessCallRequest,
-  ): void {
+  public static ipcOnCallRequest(emitter: IProcessSend, mod: Module, data: IProcessCallRequest): void {
     const type = EProcessMessageType.CallResponse;
     const responseData: IProcessCallResponse<any> = { uid: data.uid };
 
@@ -135,23 +135,21 @@ export class ChildProcess extends Process implements IProcessSend {
       const targetMod = mod.container.resolve<any>(data.target);
       const method: IProcessCall<any> = targetMod[data.method].bind(targetMod);
 
-      method(...data.args)
-        .subscribe({
-          next: (next) => {
-            const nextData = Object.assign({ next }, responseData);
-            emitter.send(type, nextData);
-          },
-          error: (error) => {
-            error = ChildProcess.ipcSerialiseError(error);
-            const errorData = Object.assign({ error }, responseData);
-            emitter.send(type, errorData);
-          },
-          complete: () => {
-            const completeData = Object.assign({ complete: true }, responseData);
-            emitter.send(type, completeData);
-          },
-        });
-
+      method(...data.args).subscribe({
+        next: (next) => {
+          const nextData = Object.assign({ next }, responseData);
+          emitter.send(type, nextData);
+        },
+        error: (error) => {
+          error = ChildProcess.ipcSerialiseError(error);
+          const errorData = Object.assign({ error }, responseData);
+          emitter.send(type, errorData);
+        },
+        complete: () => {
+          const completeData = Object.assign({ complete: true }, responseData);
+          emitter.send(type, completeData);
+        },
+      });
     } catch (error) {
       error = ChildProcess.ipcSerialiseError(error);
       const errorData = Object.assign({ error }, responseData);
@@ -178,18 +176,16 @@ export class ChildProcess extends Process implements IProcessSend {
       const emitter = ipc.of[this.childProcessIpcId];
       emitter.on("message", (data: any) => this.messages$.next(data));
     });
-    this.messages$
-      .subscribe((message) => this.childProcessIpcOnMessage(message));
+    this.messages$.subscribe((message) => this.childProcessIpcOnMessage(message));
 
     // Send status event on interval.
-    Observable.interval(this.metricInterval)
-      .subscribe(() => this.event<IProcessStatus>(ChildProcess.EVENT.STATUS, { data: this.status }));
+    Observable.interval(this.metricInterval).subscribe(() =>
+      this.event<IProcessStatus>(ChildProcess.EVENT.STATUS, { data: this.status }),
+    );
 
     // Forward log and metric messages to parent process.
-    this.container.logs$
-      .subscribe((log) => this.send(EProcessMessageType.Log, log));
-    this.container.metrics$
-      .subscribe((metric) => this.send(EProcessMessageType.Metric, metric));
+    this.container.logs$.subscribe((log) => this.send(EProcessMessageType.Log, log));
+    this.container.metrics$.subscribe((metric) => this.send(EProcessMessageType.Metric, metric));
   }
 
   public moduleDestroy(): void {
@@ -235,5 +231,4 @@ export class ChildProcess extends Process implements IProcessSend {
       }
     }
   }
-
 }

@@ -1,6 +1,6 @@
 import * as os from "os";
 import * as process from "process";
-import { IModuleOptions, Module } from "../../../container";
+import { Container, IModuleOptions, Module } from "../../../container";
 import { ErrorChain } from "../../error";
 import { isString } from "../validate";
 import { Observable } from "./RxJS";
@@ -37,7 +37,6 @@ export class ProcessError extends ErrorChain {
 
 /** Node.js process interface. */
 export class Process extends Module {
-
   /** Default module name. */
   public static readonly moduleName: string = "Process";
 
@@ -63,8 +62,20 @@ export class Process extends Module {
     HEAP_USED_MEMORY_USAGE: "Process.HeapUsedMemoryUsage",
   };
 
+  /** Determine if container has Process module. */
+  public static isProcess(container: Container): boolean {
+    try {
+      container.resolve<Process>(Process.name);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   /** Get Node.js process title. */
-  public static get title(): string { return process.title; }
+  public static get title(): string {
+    return process.title;
+  }
 
   /** Set Node.js process title. */
   public static setTitle(name?: string): string {
@@ -75,12 +86,16 @@ export class Process extends Module {
     return process.title;
   }
 
-  public get title(): string { return Process.title; }
+  public get title(): string {
+    return Process.title;
+  }
   public readonly version = isString(this.environment.get(Process.ENV.VERSION, "1.0.0"));
   public readonly nodeEnv = isString(this.environment.get(Process.ENV.NODE_ENV, "production"));
 
   /** Override in subclass to change metric interval. */
-  public get metricInterval(): number { return 60000; }
+  public get metricInterval(): number {
+    return 60000;
+  }
 
   /** Get Node.js process information. */
   public get information(): IProcessInformation {
@@ -121,8 +136,7 @@ export class Process extends Module {
     this.debug(`${Process.ENV.NODE_ENV}="${this.nodeEnv}"`);
 
     // Process metrics on interval.
-    Observable.interval(this.metricInterval)
-      .subscribe(() => this.processMetrics(this.status));
+    Observable.interval(this.metricInterval).subscribe(() => this.processMetrics(this.status));
   }
 
   /** Try to read process information asset file, handle process events. */
@@ -138,20 +152,19 @@ export class Process extends Module {
   /** Container down when process termination signal received. */
   protected processOnSignal(signal: string): void {
     this.log.info(Process.LOG.SIGNAL, { signal });
-    this.container.down()
-      .subscribe({
-        next: () => {
-          this.container.destroy();
-          process.exit(0);
-        },
-        error: (error) => {
-          // Write error to stderr and exit with error code.
-          error = new ProcessError(error);
-          process.stderr.write(`${error}\n`);
-          this.container.destroy();
-          process.exit(1);
-        },
-      });
+    this.container.down().subscribe({
+      next: () => {
+        this.container.destroy();
+        process.exit(0);
+      },
+      error: (error) => {
+        // Write error to stderr and exit with error code.
+        error = new ProcessError(error);
+        process.stderr.write(`${error}\n`);
+        this.container.destroy();
+        process.exit(1);
+      },
+    });
   }
 
   protected processMetrics(status: IProcessStatus): void {
@@ -161,5 +174,4 @@ export class Process extends Module {
     this.metric.gauge(Process.METRIC.HEAP_TOTAL_MEMORY_USAGE, status.memoryUsage.heapTotal);
     this.metric.gauge(Process.METRIC.HEAP_USED_MEMORY_USAGE, status.memoryUsage.heapUsed);
   }
-
 }
