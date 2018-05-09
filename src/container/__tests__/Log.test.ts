@@ -11,7 +11,6 @@ class TestLog extends Log {
 }
 
 describe("Log", () => {
-
   const LOG = new TestLog();
 
   it("#Log#emergency", (done) => {
@@ -109,5 +108,4 @@ describe("Log", () => {
       done();
     });
   });
-
 });

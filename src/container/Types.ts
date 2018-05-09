@@ -1,4 +1,4 @@
-import { Observable } from "./RxJS";
+import { Observable } from "rxjs";
 
 /** Container options injected by awilix library. */
 export interface IModuleOptions {
@@ -14,7 +14,7 @@ export interface IModuleDependencies {
 /** Module constructor interface. */
 export interface IModuleConstructor {
   moduleName: string;
-  new(options: IModuleOptions): IModule;
+  new (options: IModuleOptions): IModule;
 }
 
 /** Container module. */

@@ -4,6 +4,8 @@ import { keys } from "lodash";
 import { Socket } from "net";
 import * as ipc from "node-ipc";
 import { resolve } from "path";
+import { BehaviorSubject, forkJoin, fromEvent, Observable, of, Subject, throwError } from "rxjs";
+import { catchError, filter, map, switchMap, take, takeUntil, timeout } from "rxjs/operators";
 import {
   IContainerLogMessage,
   IContainerMetricMessage,
@@ -11,13 +13,12 @@ import {
   ILogMetadata,
   IModuleDependencies,
   IModuleOptions,
-  Module,
+  Module
 } from "../../../container";
 import { ErrorChain } from "../../error/ErrorChain";
 import { isDirectory, isDuration, isFile } from "../validate";
 import { ChildProcess } from "./ChildProcess";
 import { IProcessStatus, Process } from "./Process";
-import { BehaviorSubject, Observable, Subject } from "./RxJS";
 import {
   EProcessMessageType,
   IProcessCallOptions,
@@ -26,7 +27,7 @@ import {
   IProcessExit,
   IProcessMessage,
   IProcessMessageData,
-  IProcessSend,
+  IProcessSend
 } from "./Types";
 
 /** Scripts process options. */
@@ -92,19 +93,20 @@ export class ScriptsProcess implements IProcessSend {
   public constructor(
     public readonly scripts: Scripts,
     public readonly fileName: string,
-    public readonly process: NodeChildProcess,
+    public readonly process: NodeChildProcess
   ) {
     // Accumulate multiple callback arguments into array.
     const accumulator: () => IProcessExit = (...args: any[]) => args as any;
 
     // Listen for process exit, reduce code/signal for next argument.
-    this.exit$ = Observable.fromEvent<IProcessExit>(process as any, "exit", accumulator)
-      .take(1)
-      .map((args) => {
+    this.exit$ = fromEvent<IProcessExit>(process as any, "exit", accumulator).pipe(
+      take(1),
+      map((args) => {
         const [code, signal] = args;
         const value = typeof code === "number" ? code : signal;
         return value != null ? value : 1;
-      });
+      })
+    );
 
     // Log error if script exits with error code.
     this.exit$.subscribe((code) => {
@@ -115,8 +117,8 @@ export class ScriptsProcess implements IProcessSend {
     });
 
     // Listen for process error, forward to scripts logger.
-    Observable.fromEvent<Error>(process as any, "error")
-      .takeUntil(this.exit$)
+    fromEvent<Error>(process as any, "error")
+      .pipe(takeUntil(this.exit$))
       .subscribe((error) => {
         const chained = new ScriptsProcessError(this.fileName, error);
         this.scripts.log.error(chained);
@@ -124,12 +126,11 @@ export class ScriptsProcess implements IProcessSend {
 
     // Handle IPC messages from scripts module.
     this.scripts.ipcMessages$
-      .takeUntil(this.exit$)
-      .filter((message) => message.socket === this.ipcSocket)
+      .pipe(takeUntil(this.exit$), filter((message) => message.socket === this.ipcSocket))
       .subscribe((message) => {
         this.messages$.next(message.data);
       });
-    this.messages$.takeUntil(this.exit$).subscribe((message) => this.scriptsProcessOnMessage(message));
+    this.messages$.pipe(takeUntil(this.exit$)).subscribe((message) => this.scriptsProcessOnMessage(message));
   }
 
   /** End child process with signal. */
@@ -198,7 +199,7 @@ export class Scripts extends Module {
   /** Environment variable names. */
   public static readonly ENV = {
     /** Scripts directory path (required). */
-    PATH: "SCRIPTS_PATH",
+    PATH: "SCRIPTS_PATH"
   };
 
   /** Log names. */
@@ -208,14 +209,14 @@ export class Scripts extends Module {
     WORKER_EXIT: "Scripts.WorkerExit",
     WORKER_RESTART: "Scripts.WorkerRestart",
     WORKER_RESTART_LIMIT: "Scripts.WorkerRestartLimit",
-    WORKER_UPTIME_LIMIT: "Scripts.WorkerUptimeLimit",
+    WORKER_UPTIME_LIMIT: "Scripts.WorkerUptimeLimit"
   };
 
   /** Metric names. */
   public static readonly METRIC = {
     IPC_CONNECT: "Scripts.IpcConnect",
     IPC_ERROR: "Scripts.IpcError",
-    IPC_MESSAGE: "Scripts.IpcMessage",
+    IPC_MESSAGE: "Scripts.IpcMessage"
   };
 
   /** Observable stream of sockets connected via IPC. */
@@ -263,7 +264,7 @@ export class Scripts extends Module {
   /** Scripts module depends on Process. */
   public moduleDependencies(...previous: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...previous, {
-      process: Process,
+      process: Process
     });
   }
 
@@ -273,7 +274,7 @@ export class Scripts extends Module {
       return this.stopWorker(name);
     });
     if (observables$.length > 0) {
-      return Observable.forkJoin(...observables$).map(() => undefined);
+      return forkJoin(...observables$).pipe(map(() => undefined));
     }
   }
 
@@ -297,7 +298,7 @@ export class Scripts extends Module {
     options.env = {
       ...options.env,
       // Set IPC id for ChildProcess module.
-      [ChildProcess.ENV.IPC_ID]: this.namespace,
+      [ChildProcess.ENV.IPC_ID]: this.namespace
     };
     const process = this.fork(fileName, options);
 
@@ -319,7 +320,7 @@ export class Scripts extends Module {
     const worker = this.scriptsWorkers[name];
 
     // Handle worker restarts.
-    process.exit$.takeUntil(worker.unsubscribe$).subscribe((code) => {
+    process.exit$.pipe(takeUntil(worker.unsubscribe$)).subscribe((code) => {
       // Log worker exit.
       const metadata = this.scriptsWorkerLogMetadata({ name, worker, code });
       this.log.info(Scripts.LOG.WORKER_EXIT, metadata);
@@ -340,7 +341,7 @@ export class Scripts extends Module {
     // Track worker process uptime.
     process
       .listen<IProcessStatus>(ChildProcess.EVENT.STATUS)
-      .takeUntil(worker.unsubscribe$)
+      .pipe(takeUntil(worker.unsubscribe$))
       .subscribe((status) => {
         // Kill worker process if uptime limit exceeded.
         if (uptimeLimit != null && status.uptime > uptimeLimit) {
@@ -350,29 +351,31 @@ export class Scripts extends Module {
         }
       });
 
-    return worker.next$
-      .switchMap<ScriptsProcess, [ScriptsProcess, Socket]>((proc) => {
-        let connection$: Observable<Socket | undefined> = Observable.of(undefined);
+    return worker.next$.pipe(
+      switchMap<ScriptsProcess, [ScriptsProcess, Socket]>((proc) => {
+        let connection$: Observable<Socket | undefined> = of(undefined);
 
         // Wait for IPC socket connection unless disabled.
         if (!options.ipcDisabled) {
-          connection$ = this.ipcConnections$
-            .timeout(options.ipcTimeout || 1000)
-            .catch((error) => Observable.throw(new ScriptsError(error)))
-            .take(1);
+          connection$ = this.ipcConnections$.pipe(
+            timeout(options.ipcTimeout || 1000),
+            catchError((error) => throwError(new ScriptsError(error))),
+            take(1)
+          );
         }
 
-        return Observable.forkJoin(Observable.of(proc), connection$);
-      })
-      .map(([proc, socket]) => {
+        return forkJoin(of(proc), connection$);
+      }),
+      map(([proc, socket]) => {
         proc.ipcSocket = socket;
         return proc;
-      });
+      })
+    );
   }
 
   public stopWorker(name: string): Observable<string | number> {
     const worker = this.scriptsWorkers[name];
-    let observable$: Observable<string | number> = Observable.of(0);
+    let observable$: Observable<string | number> = of(0);
 
     if (worker != null) {
       const process = worker.next$.value;
@@ -435,7 +438,7 @@ export class Scripts extends Module {
   }): ILogMetadata {
     const metadata: ILogMetadata = {
       name: data.name,
-      restarts: data.worker.restarts,
+      restarts: data.worker.restarts
     };
     if (data.options != null) {
       metadata.restart = data.options.restart;

@@ -1,6 +1,6 @@
+import { Observable } from "rxjs";
 import { IContainerLogMessage, IContainerMetricMessage } from "../../../container";
 import { IErrorChainSerialised } from "../../error";
-import { Observable } from "./RxJS";
 
 /** Process message types. */
 export enum EProcessMessageType {
@@ -8,7 +8,7 @@ export enum EProcessMessageType {
   Metric,
   Event,
   CallRequest,
-  CallResponse,
+  CallResponse
 }
 
 /** Process event method options. */
@@ -48,7 +48,8 @@ export interface IProcessCallResponse<T> {
 }
 
 /** Process message data types union. */
-export type IProcessMessageData<T> = IContainerLogMessage
+export type IProcessMessageData<T> =
+  | IContainerLogMessage
   | IContainerMetricMessage
   | IProcessEvent<T>
   | IProcessCallRequest

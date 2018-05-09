@@ -25,10 +25,10 @@ const groupSchema = validate.buildSchema({
   name: nameField,
   information: {
     theme: optionalThemeField,
-    customer: optionalCustomerField,
+    customer: optionalCustomerField
   },
   map: { "*": customerField },
-  array: ["*", customerField],
+  array: ["*", customerField]
 });
 
 // Validate input data.
@@ -36,18 +36,17 @@ const input1 = {
   name: "GroupName",
   information: {
     theme: "customer",
-    customer: "CustomerName",
-  },
+    customer: "CustomerName"
+  }
 };
 const validated1 = groupSchema.validate<IGroup>(input1);
 process.stdout.write(`${JSON.stringify(validated1, null, 2)}\n`);
 
 const input2 = {
   name: "GroupName",
-  information: {
-  },
+  information: {},
   map: {},
-  array: [],
+  array: []
 };
 const validated2 = groupSchema.validate<IGroup>(input2);
 process.stdout.write(`${JSON.stringify(validated2, null, 2)}\n`);

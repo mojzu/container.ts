@@ -37,16 +37,17 @@ export interface ISchemaMapHandlers {
 /** Schema static interface. */
 export interface ISchemaConstructor {
   SCHEMA: ISchemaTypes;
-  new(): Schema;
+  new (): Schema;
   isSchema(value: any): boolean;
   extend(...schemas: ISchemaTypes[]): ISchemaConstructor;
   map(
-    inp: any, out: any,
+    inp: any,
+    out: any,
     schema: ISchemaTypes,
     mask?: ISchemaMask,
     dataKeys?: Array<number | string>,
     keyRoot?: string,
-    handlers?: ISchemaMapHandlers,
+    handlers?: ISchemaMapHandlers
   ): void;
   validate<T>(data: any, mask?: ISchemaMask, keyRoot?: string): T;
   format<T>(data: T, mask?: ISchemaMask, keyRoot?: string): any;
@@ -66,9 +67,9 @@ export abstract class Schema {
 
   /** Returns true if value is a Schema class object. */
   public static isSchema(value: any): boolean {
-    const isFunction = (typeof value === "function");
-    const hasSchemaProperty = (value.SCHEMA != null);
-    return (isFunction && hasSchemaProperty);
+    const isFunction = typeof value === "function";
+    const hasSchemaProperty = value.SCHEMA != null;
+    return isFunction && hasSchemaProperty;
   }
 
   /** Construct new schema using this as a base. */
@@ -80,15 +81,15 @@ export abstract class Schema {
    * Helper for iterating over schema fields.
    */
   public static map(
-    inp: any, out: any,
+    inp: any,
+    out: any,
     schema: ISchemaTypes,
     mask: ISchemaMask | null = null,
     dataKeys: Array<number | string> = [],
     keyRoot = "",
-    handlers: ISchemaMapHandlers = {},
+    handlers: ISchemaMapHandlers = {}
   ): void {
     if (Array.isArray(schema)) {
-
       const schemaArray: ISchemaFields[] = schema as any;
       if (schemaArray[0] === "*") {
         // Wildcard asterisk, map all data indexes to field.
@@ -101,9 +102,7 @@ export abstract class Schema {
           Schema.mapHandler(inp, out, mask, keyRoot, handlers, value, index);
         });
       }
-
     } else {
-
       const schemaMap: ISchemaMap = schema as any;
       if (schemaMap["*"] != null) {
         // If wildcard asterisk is present, map all data keys to field.
@@ -116,7 +115,6 @@ export abstract class Schema {
           Schema.mapHandler(inp, out, mask, keyRoot, handlers, schemaMap[key], key);
         });
       }
-
     }
   }
 
@@ -159,7 +157,7 @@ export abstract class Schema {
       if (output != null) {
         out[key] = output;
       }
-    },
+    }
   };
 
   protected static readonly formatMapHandlers: ISchemaMapHandlers = {
@@ -177,17 +175,18 @@ export abstract class Schema {
       if (output != null) {
         out[key] = output;
       }
-    },
+    }
   };
 
   /** Internal schema map handler. */
   protected static mapHandler(
-    inp: any, out: any,
+    inp: any,
+    out: any,
     mask: ISchemaMask | null,
     keyRoot: string,
     handlers: ISchemaMapHandlers,
     value: any,
-    key: number | string,
+    key: number | string
   ) {
     // Expand key root.
     const subkeyRoot = `${keyRoot}.${key}`;
@@ -205,44 +204,32 @@ export abstract class Schema {
     }
 
     try {
-      if ((value instanceof Field) && (!!handlers.isField)) {
-
+      if (value instanceof Field && !!handlers.isField) {
         // Value is field class instance.
         const field: Field<any> = value as any;
         handlers.isField(inp, out, field, key);
-
-      } else if (Array.isArray(value) && (!!handlers.isSchemaArray)) {
-
+      } else if (Array.isArray(value) && !!handlers.isSchemaArray) {
         // Value is a schema array object.
         const schemaArray: ISchemaArray = value as any;
         handlers.isSchemaArray(inp, out, schemaArray, key, submask, subkeyRoot);
-
-      } else if ((typeof value === "object") && (!!handlers.isSchemaMap)) {
-
+      } else if (typeof value === "object" && !!handlers.isSchemaMap) {
         // Value is schema map object.
         const schemaMap: ISchemaMap = value as any;
         handlers.isSchemaMap(inp, out, schemaMap, key, submask, subkeyRoot);
-
-      } else if ((typeof value === "string") && (value === "*")) {
-
+      } else if (typeof value === "string" && value === "*") {
         // Wildcard asterisk, accept all data.
         out[key] = inp[key];
-
       } else {
-
         // Unknown schema field value.
         throw new SchemaError(subkeyRoot, value);
-
       }
     } catch (error) {
-
       // Schema error wrapper.
       if (error instanceof SchemaError) {
         throw error;
       } else {
         throw new SchemaError(subkeyRoot, error);
       }
-
     }
   }
 }

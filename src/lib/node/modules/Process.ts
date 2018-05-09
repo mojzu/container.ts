@@ -1,9 +1,9 @@
 import * as os from "os";
 import * as process from "process";
+import { interval } from "rxjs";
 import { Container, IModuleOptions, Module } from "../../../container";
 import { ErrorChain } from "../../error";
 import { isString } from "../validate";
-import { Observable } from "./RxJS";
 
 /** Process runtime information interface. */
 export interface IProcessInformation {
@@ -44,13 +44,13 @@ export class Process extends Module {
   public static readonly ENV = {
     NAME: "PROCESS_NAME",
     VERSION: "PROCESS_VERSION",
-    NODE_ENV: "NODE_ENV",
+    NODE_ENV: "NODE_ENV"
   };
 
   /** Log names. */
   public static readonly LOG = {
     INFORMATION: "Process.Information",
-    SIGNAL: "Process.Signal",
+    SIGNAL: "Process.Signal"
   };
 
   /** Metric names. */
@@ -59,7 +59,7 @@ export class Process extends Module {
     SYSTEM_CPU_USAGE: "Process.SystemCpuUsage",
     RSS_MEMORY_USAGE: "Process.RssMemoryUsage",
     HEAP_TOTAL_MEMORY_USAGE: "Process.HeapTotalMemoryUsage",
-    HEAP_USED_MEMORY_USAGE: "Process.HeapUsedMemoryUsage",
+    HEAP_USED_MEMORY_USAGE: "Process.HeapUsedMemoryUsage"
   };
 
   /** Determine if container has Process module. */
@@ -111,7 +111,7 @@ export class Process extends Module {
       type: os.type(),
       release: os.release(),
       endianness: os.endianness(),
-      hostname: os.hostname(),
+      hostname: os.hostname()
     };
   }
 
@@ -120,7 +120,7 @@ export class Process extends Module {
     return {
       uptime: process.uptime(),
       cpuUsage: process.cpuUsage(),
-      memoryUsage: process.memoryUsage(),
+      memoryUsage: process.memoryUsage()
     };
   }
 
@@ -136,7 +136,7 @@ export class Process extends Module {
     this.debug(`${Process.ENV.NODE_ENV}="${this.nodeEnv}"`);
 
     // Process metrics on interval.
-    Observable.interval(this.metricInterval).subscribe(() => this.processMetrics(this.status));
+    interval(this.metricInterval).subscribe(() => this.processMetrics(this.status));
   }
 
   /** Try to read process information asset file, handle process events. */
@@ -163,7 +163,7 @@ export class Process extends Module {
         process.stderr.write(`${error}\n`);
         this.container.destroy();
         process.exit(1);
-      },
+      }
     });
   }
 

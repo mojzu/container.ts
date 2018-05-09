@@ -3,10 +3,8 @@ import { Container, Environment } from "../../../../container";
 import { Assets, AssetsError } from "../Assets";
 
 describe("Assets", () => {
-  const ENVIRONMENT = new Environment()
-    .set(Assets.ENV.PATH, path.resolve(__dirname, "assets"));
-  const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModule(Assets);
+  const ENVIRONMENT = new Environment().set(Assets.ENV.PATH, path.resolve(__dirname, "assets"));
+  const CONTAINER = new Container("Test", ENVIRONMENT).registerModule(Assets);
   const ASSETS = CONTAINER.resolve<Assets>(Assets.moduleName);
 
   beforeAll(async () => {

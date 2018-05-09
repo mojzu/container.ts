@@ -22,7 +22,6 @@ class TestMetric extends Metric {
 }
 
 describe("Metric", () => {
-
   const METRIC = new TestMetric();
 
   it("#Metric#increment", (done) => {
@@ -79,5 +78,4 @@ describe("Metric", () => {
     });
     METRIC.histogram("histogram", 100);
   });
-
 });

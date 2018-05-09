@@ -7,7 +7,7 @@ import { Validate } from "../../validate";
 export enum ENodeValidateError {
   InvalidBuffer,
   InvalidFile,
-  InvalidDirectory,
+  InvalidDirectory
 }
 
 /** NodeValidate error chain class. */

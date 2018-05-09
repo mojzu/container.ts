@@ -10,7 +10,7 @@ interface IData {
     mapInner: {
       booleanMapInnerField: boolean;
       stringMapInnerField: string;
-    },
+    };
   };
   mapOptional?: {
     booleanOptionalField?: boolean;
@@ -20,14 +20,7 @@ interface IData {
     booleanField: boolean;
     stringField: string;
   };
-  arrayOuter: [
-    boolean,
-    string,
-    [
-      boolean,
-      string
-    ]
-  ];
+  arrayOuter: [boolean, string, [boolean, string]];
   wildcardMap?: {
     [key: string]: boolean;
   };
@@ -50,36 +43,31 @@ const dataSchema = validate.buildSchema({
     stringMapOuterField: stringField,
     mapInner: {
       booleanMapInnerField: booleanField,
-      stringMapInnerField: stringField,
-    },
+      stringMapInnerField: stringField
+    }
   },
   // Optional mapped fields.
   mapOptional: {
     booleanOptionalField: optionalBooleanField,
-    stringOptionalField: optionalStringField,
+    stringOptionalField: optionalStringField
   },
   // Schema fields.
-  schemaField: new validate.SchemaField(validate.buildSchema({
-    booleanField,
-    stringField,
-  })),
-  // Array of fields.
-  arrayOuter: [
-    booleanField,
-    stringField,
-    [
+  schemaField: new validate.SchemaField(
+    validate.buildSchema({
       booleanField,
-      stringField,
-    ],
-  ],
+      stringField
+    })
+  ),
+  // Array of fields.
+  arrayOuter: [booleanField, stringField, [booleanField, stringField]],
   // Wildcard mapped fields.
   wildcardMap: {
-    "*": booleanField,
+    "*": booleanField
   },
   // Wildcard any field.
   any: "*",
   // Wildcard array fields.
-  wildcardArray: ["*", stringField],
+  wildcardArray: ["*", stringField]
 });
 
 const inputData = {
@@ -90,33 +78,26 @@ const inputData = {
     stringMapOuterField: "bar",
     mapInner: {
       booleanMapInnerField: "1",
-      stringMapInnerField: "baz",
-    },
+      stringMapInnerField: "baz"
+    }
   },
   mapOptional: {
-    booleanOptionalField: "10",
+    booleanOptionalField: "10"
   },
   schemaField: {
     booleanField: "1",
-    stringField: "foo",
+    stringField: "foo"
   },
-  arrayOuter: [
-    "true",
-    "bar",
-    [
-      "false",
-      "baz",
-    ],
-  ],
+  arrayOuter: ["true", "bar", ["false", "baz"]],
   wildcardMap: {
     one: "0",
-    two: "1",
+    two: "1"
   },
   any: {
     one: 2,
-    two: true,
+    two: true
   },
-  wildcardArray: ["foo", "bar", "baz"],
+  wildcardArray: ["foo", "bar", "baz"]
 };
 
 for (let i = 0; i < 5; i++) {

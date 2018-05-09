@@ -1,11 +1,10 @@
-
 /** Metric types supported by StatsD. */
 export enum EMetricType {
   Increment,
   Decrement,
   Gauge,
   Timing,
-  Histogram,
+  Histogram
 }
 
 /** Metric tags. */

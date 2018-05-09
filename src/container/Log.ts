@@ -9,7 +9,7 @@ export enum ELogLevel {
   Warning,
   Notice,
   Informational,
-  Debug,
+  Debug
 }
 
 /** Log message types. */

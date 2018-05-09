@@ -1,18 +1,17 @@
 import * as process from "process";
+import { Observable } from "rxjs";
 import { argv } from "yargs";
 import { Container, Environment, IModuleDependencies, IModuleOptions, Module } from "../src/container";
-import { Observable } from "../src/container/RxJS";
-import { Process } from "../src/lib/node-modules";
+import { Process } from "../src/lib/node/modules";
 
 // Define a new module by extending the 'Module' class.
 class AppModule extends Module {
-
   // Modules must have a name used to register them within a container.
   // This name is used to resolve module dependencies from a container.
   public static readonly moduleName: string = "AppModule";
 
   // Injected module dependency.
-  protected readonly proc: Process;
+  protected readonly proc!: Process;
 
   // Optionally override the class constructor.
   // Module dependencies are available after 'super' has been called.
@@ -45,7 +44,6 @@ class AppModule extends Module {
   public moduleDown(): Observable<void> | void {
     // ...
   }
-
 }
 
 // Create environment from process environment.
@@ -56,22 +54,18 @@ const ENVIRONMENT = new Environment(process.env);
 const VALUE = ENVIRONMENT.get("KEY") || "DEFAULT";
 
 // Set value(s) in environment.
-ENVIRONMENT
-  .set("KEY", VALUE)
-  .set("KEY2", "VALUE2");
+ENVIRONMENT.set("KEY", VALUE).set("KEY2", "VALUE2");
 
 // Create container using environment and register modules.
 // Optionally pass in command line arguments provided by 'yargs' package.
-const CONTAINER = new Container("Main", ENVIRONMENT, argv)
-  .registerModules([Process, AppModule]);
+const CONTAINER = new Container("Main", ENVIRONMENT, argv).registerModules([Process, AppModule]);
 
 // Signal operational.
 // The 'Process' module automatically calls container.down when
 // process is terminated by a signal.
-CONTAINER.up()
-  .subscribe({
-    error: (error) => {
-      process.stderr.write(`${error}\n`);
-      process.exit(1);
-    },
-  });
+CONTAINER.up().subscribe({
+  error: (error) => {
+    process.stderr.write(`${error}\n`);
+    process.exit(1);
+  }
+});

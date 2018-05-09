@@ -1,8 +1,9 @@
 import * as path from "path";
+import { Observable, of } from "rxjs";
+import { take } from "rxjs/operators";
 import { Container, Environment, Module } from "../../../../container";
 import { ErrorChain } from "../../../error";
 import { Process } from "../Process";
-import { Observable } from "../RxJS";
 import { Scripts } from "../Scripts";
 
 const WN = "Worker";
@@ -12,20 +13,16 @@ class TestModule extends Module {
   public static readonly moduleName: string = "Test";
   // Test method called from child process.
   public testCall2(data: string): Observable<number> {
-    return Observable.of(data.length);
+    return of(data.length);
   }
   public testCall5(data: number): Observable<number> {
-    return Observable.of(data);
+    return of(data);
   }
 }
 
 describe("Scripts", () => {
-  const ENVIRONMENT = new Environment()
-    .set(Scripts.ENV.PATH, path.resolve(__dirname, "scripts"));
-
-  const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModules([Process, Scripts, TestModule]);
-
+  const ENVIRONMENT = new Environment().set(Scripts.ENV.PATH, path.resolve(__dirname, "scripts"));
+  const CONTAINER = new Container("Test", ENVIRONMENT).registerModules([Process, Scripts, TestModule]);
   const SCRIPTS = CONTAINER.resolve<Scripts>(Scripts.moduleName);
 
   beforeAll(async () => {
@@ -44,12 +41,14 @@ describe("Scripts", () => {
 
   it("#fork", async () => {
     const proc = SCRIPTS.fork("script.test.js");
-    const code = await proc.exit$.take(1).toPromise();
+    const code = await proc.exit$.pipe(take(1)).toPromise();
     expect(code).toEqual(0);
   });
 
   it("#startWorker", async () => {
-    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false })
+      .pipe(take(1))
+      .toPromise();
     expect(worker.isConnected).toEqual(true);
     await timeout(500); // Otherwise 'SIGTERM' exit code is returned.
 
@@ -59,32 +58,35 @@ describe("Scripts", () => {
 
   it("#startWorker#restartLimit", (done) => {
     let restarts = 0;
-    SCRIPTS.startWorker(WN, "script.test.js", { ipcDisabled: true, restartLimit: 3 })
-      .subscribe({
-        next: (worker) => {
-          restarts += 1;
-        },
-        error: (error) => done(error),
-        complete: () => {
-          expect(restarts).toEqual(4);
-          done();
-        },
-      });
+    SCRIPTS.startWorker(WN, "script.test.js", { ipcDisabled: true, restartLimit: 3 }).subscribe({
+      next: (worker) => {
+        restarts += 1;
+      },
+      error: (error) => done(error),
+      complete: () => {
+        expect(restarts).toEqual(4);
+        done();
+      }
+    });
   });
 
   it("#startWorker ipc timeout", async (done) => {
     try {
-      await SCRIPTS.startWorker(WN, "script.test.js", { restart: false }).take(1).toPromise();
+      await SCRIPTS.startWorker(WN, "script.test.js", { restart: false })
+        .pipe(take(1))
+        .toPromise();
       done.fail();
     } catch (error) {
       expect(error instanceof ErrorChain).toEqual(true);
-      expect(error.joinNames()).toEqual("ScriptsError.TimeoutError");
+      expect(error.joinNames()).toEqual("ScriptsError.Error");
       done();
     }
   });
 
   it("#ScriptsProcess#call function does not exist", async (done) => {
-    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false })
+      .pipe(take(1))
+      .toPromise();
     expect(worker.isConnected).toEqual(true);
 
     try {
@@ -101,7 +103,9 @@ describe("Scripts", () => {
   });
 
   it("#ScriptsProcess#call", async () => {
-    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false })
+      .pipe(take(1))
+      .toPromise();
     expect(worker.isConnected).toEqual(true);
 
     const result = await worker.call<number>("Test", "testCall1", { args: [4] }).toPromise();
@@ -112,9 +116,13 @@ describe("Scripts", () => {
   });
 
   it("#ScriptsProcess#call multiple workers", async () => {
-    const worker1 = await SCRIPTS.startWorker(`${WN}1`, "worker.test.js").take(1).toPromise();
+    const worker1 = await SCRIPTS.startWorker(`${WN}1`, "worker.test.js")
+      .pipe(take(1))
+      .toPromise();
     expect(worker1.isConnected).toEqual(true);
-    const worker2 = await SCRIPTS.startWorker(`${WN}2`, "worker.test.js").take(1).toPromise();
+    const worker2 = await SCRIPTS.startWorker(`${WN}2`, "worker.test.js")
+      .pipe(take(1))
+      .toPromise();
     expect(worker2.isConnected).toEqual(true);
 
     const result1 = await worker1.call<number>("Test", "testCall4", { args: [1] }).toPromise();
@@ -129,7 +137,9 @@ describe("Scripts", () => {
   });
 
   it("#ScriptsProcess#ChildProcess#call", async () => {
-    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false })
+      .pipe(take(1))
+      .toPromise();
     expect(worker.isConnected).toEqual(true);
 
     const result = await worker.call<number>("Test", "testCall2", { args: ["hello"] }).toPromise();
@@ -140,9 +150,13 @@ describe("Scripts", () => {
   });
 
   it("#ScriptsProcess#ChildProcess#call multiple workers", async () => {
-    const worker1 = await SCRIPTS.startWorker(`${WN}1`, "worker.test.js").take(1).toPromise();
+    const worker1 = await SCRIPTS.startWorker(`${WN}1`, "worker.test.js")
+      .pipe(take(1))
+      .toPromise();
     expect(worker1.isConnected).toEqual(true);
-    const worker2 = await SCRIPTS.startWorker(`${WN}2`, "worker.test.js").take(1).toPromise();
+    const worker2 = await SCRIPTS.startWorker(`${WN}2`, "worker.test.js")
+      .pipe(take(1))
+      .toPromise();
     expect(worker2.isConnected).toEqual(true);
 
     const result1 = await worker1.call<number>("Test", "testCall5", { args: [100] }).toPromise();
@@ -157,7 +171,9 @@ describe("Scripts", () => {
   });
 
   it("#call", async () => {
-    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false })
+      .pipe(take(1))
+      .toPromise();
     expect(worker.isConnected).toEqual(true);
 
     const result = await worker.call<number>("Test", "testCall3", { args: [4] }).toPromise();
@@ -168,10 +184,12 @@ describe("Scripts", () => {
   });
 
   it("#ScriptsProcess#event", async () => {
-    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false })
+      .pipe(take(1))
+      .toPromise();
     expect(worker.isConnected).toEqual(true);
 
-    const pong$ = worker.listen("pong").take(1);
+    const pong$ = worker.listen("pong").pipe(take(1));
     worker.event<number>("ping", { data: 8 });
     const result = await pong$.toPromise();
     expect(result).toEqual(16);
@@ -181,7 +199,9 @@ describe("Scripts", () => {
   });
 
   it("#ScriptsProcess#ChildProcess#call data size testing", async () => {
-    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false }).take(1).toPromise();
+    const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false })
+      .pipe(take(1))
+      .toPromise();
     expect(worker.isConnected).toEqual(true);
     const size = 1024;
 

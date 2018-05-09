@@ -11,7 +11,7 @@ export enum EFieldError {
   InvalidAnd,
   InvalidOr,
   InvalidNot,
-  InvalidOptional,
+  InvalidOptional
 }
 
 /** Field error chain class. */
@@ -28,7 +28,6 @@ export class FieldError extends ErrorChain {
  * Optional context available for additional validation/formatting information.
  */
 export abstract class Field<T, K = object> {
-
   public abstract validate(value?: string | object, context?: K): T | null;
 
   public format(value: T, context?: K): string | object | null {
@@ -46,7 +45,6 @@ export abstract class Field<T, K = object> {
   public not(...fields: Array<Field<T, K>>): Field<T, K> {
     return this.and(this, new NotField<T, K>(...fields));
   }
-
 }
 
 /** Operator field helper. */
@@ -60,13 +58,10 @@ export abstract class OperatorField<T, K> extends Field<T, K> {
 
 /** And field wrapper, all input fields used to validate/format values. */
 export class AndField<T, K> extends OperatorField<T, K> {
-
   public validate(value: string, context?: K): T {
     let validated: T | null;
     try {
-      validated = this.fields
-        .map((f) => f.validate(value, context))
-        .reduce((p, c) => ((p != null) ? p : c), null);
+      validated = this.fields.map((f) => f.validate(value, context)).reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
       throw new FieldError(EFieldError.InvalidAnd, value, error);
     }
@@ -79,9 +74,7 @@ export class AndField<T, K> extends OperatorField<T, K> {
   public format(value: T, context?: K): string | object {
     let formatted: string | object | null;
     try {
-      formatted = this.fields
-        .map((f) => f.format(value, context))
-        .reduce((p, c) => ((p != null) ? p : c), null);
+      formatted = this.fields.map((f) => f.format(value, context)).reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
       throw new FieldError(EFieldError.InvalidAnd, value, error);
     }
@@ -90,12 +83,10 @@ export class AndField<T, K> extends OperatorField<T, K> {
     }
     return formatted;
   }
-
 }
 
 /** Or field wrapper, at least one input field used to validate/format values. */
 export class OrField<T, K> extends OperatorField<T, K> {
-
   public validate(value: string, context?: any): T {
     let validated: T | null;
     try {
@@ -107,7 +98,7 @@ export class OrField<T, K> extends OperatorField<T, K> {
             return null;
           }
         })
-        .reduce((p, c) => ((p != null) ? p : c), null);
+        .reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
       throw new FieldError(EFieldError.InvalidOr, value, error);
     }
@@ -128,7 +119,7 @@ export class OrField<T, K> extends OperatorField<T, K> {
             return null;
           }
         })
-        .reduce((p, c) => ((p != null) ? p : c), null);
+        .reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
       throw new FieldError(EFieldError.InvalidOr, value, error);
     }
@@ -137,12 +128,10 @@ export class OrField<T, K> extends OperatorField<T, K> {
     }
     return formatted;
   }
-
 }
 
 /** Not field wrapper, all input fields expected to throw error/fail to format values. */
 export class NotField<T, K> extends OperatorField<T, K> {
-
   public validate(value: string, context?: any): null {
     let validated: T | null;
     try {
@@ -154,7 +143,7 @@ export class NotField<T, K> extends OperatorField<T, K> {
             return null;
           }
         })
-        .reduce((p, c) => ((p != null) ? p : c), null);
+        .reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
       throw new FieldError(EFieldError.InvalidNot, value, error);
     }
@@ -175,7 +164,7 @@ export class NotField<T, K> extends OperatorField<T, K> {
             return null;
           }
         })
-        .reduce((p, c) => ((p != null) ? p : c), null);
+        .reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
       throw new FieldError(EFieldError.InvalidNot, value, error);
     }
@@ -184,7 +173,6 @@ export class NotField<T, K> extends OperatorField<T, K> {
     }
     return formatted;
   }
-
 }
 
 /**
@@ -192,14 +180,9 @@ export class NotField<T, K> extends OperatorField<T, K> {
  * If value is undefined default or null value is returned.
  */
 export class OptionalField<T, K> extends Field<T, K> {
-
   protected readonly formatDefault: string | object | null;
 
-  public constructor(
-    protected readonly field: Field<T, K>,
-    protected readonly defaultValue?: T,
-    context?: any,
-  ) {
+  public constructor(protected readonly field: Field<T, K>, protected readonly defaultValue?: T, context?: any) {
     super();
     this.formatDefault = this.format(defaultValue, context);
   }
@@ -231,7 +214,6 @@ export class OptionalField<T, K> extends Field<T, K> {
       throw new FieldError(EFieldError.InvalidOptional, value, error);
     }
   }
-
 }
 
 export interface ISchemaFieldContext {

@@ -1,11 +1,10 @@
+import { Subject } from "rxjs";
 import { ErrorChain } from "../../lib/error";
 import { Container, ContainerError } from "../Container";
 import { Environment } from "../Environment";
 import { Module, ModuleLog, ModuleMetric } from "../Module";
-import { Subject } from "../RxJS";
 
 describe("Container", () => {
-
   it("#ContainerError", () => {
     const error = new ContainerError("unknown");
     expect(error instanceof ErrorChain).toEqual(true);
@@ -36,5 +35,4 @@ describe("Container", () => {
     expect(testModule.metric instanceof ModuleMetric).toEqual(true);
     expect(testModule.debug).toBeDefined();
   });
-
 });

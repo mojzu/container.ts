@@ -1,7 +1,6 @@
 import { ErrorChain } from "../ErrorChain";
 
 describe("ErrorChain", () => {
-
   const rootError = new Error("UnknownError");
   const wrapError = new ErrorChain({ name: "ErrorOne", value: 1 }, rootError);
   const chainError = new ErrorChain({ name: "ErrorTwo", value: 2 }, wrapError);
@@ -23,5 +22,4 @@ describe("ErrorChain", () => {
   it("#deserialise", () => {
     expect(deserialised).toBeDefined();
   });
-
 });

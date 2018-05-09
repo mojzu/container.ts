@@ -1,11 +1,12 @@
 import { asFunction, asValue, AwilixContainer, createContainer, InjectionMode } from "awilix";
 import * as Debug from "debug";
 import { keys } from "lodash";
+import { BehaviorSubject, forkJoin, from, Observable, of, Subject, throwError } from "rxjs";
+import { catchError, filter, map, switchMap, take, timeout as rxjsTimeout } from "rxjs/operators";
 import { ErrorChain } from "../lib/error";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata } from "./Log";
 import { EMetricType, IMetricTags } from "./Metric";
-import { BehaviorSubject, Observable, Subject } from "./RxJS";
 import { IModule, IModuleConstructor, IModuleState } from "./Types";
 
 /** Command line arguments interface matching `yargs` package. */
@@ -39,8 +40,8 @@ export class ContainerLogMessage implements IContainerLogMessage {
     public readonly level: ELogLevel,
     public readonly message: ILogMessage,
     public readonly metadata: ILogMetadata,
-    public readonly args: any[],
-  ) { }
+    public readonly args: any[]
+  ) {}
 }
 
 /** Container metric message interface. */
@@ -59,8 +60,8 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
     public readonly name: string,
     public readonly value: any,
     public readonly tags: IMetricTags,
-    public readonly args: any[],
-  ) { }
+    public readonly args: any[]
+  ) {}
 }
 
 /**
@@ -72,19 +73,19 @@ export class Container {
   public static readonly ERROR = {
     UP: "Container.UpError",
     DOWN: "Container.DownError",
-    MODULE_REGISTERED: "Container.ModuleRegisteredError",
+    MODULE_REGISTERED: "Container.ModuleRegisteredError"
   };
 
   /** Log names. */
   public static readonly LOG = {
     UP: "Container.Up",
-    DOWN: "Container.Down",
+    DOWN: "Container.Down"
   };
 
   /** Scope key names. */
   public static readonly SCOPE = {
     /** Container reference name resolved internally by modules. */
-    CONTAINER: "Container",
+    CONTAINER: "Container"
   };
 
   /** Root container. */
@@ -119,7 +120,7 @@ export class Container {
     /** Optional container environment. */
     public readonly environment = new Environment(),
     /** Optional command line arguments. */
-    public readonly argv: IContainerArguments = { _: [], $0: "" },
+    public readonly argv: IContainerArguments = { _: [], $0: "" }
   ) {
     this.debug = Debug(this.name);
     this.container = createContainer({ injectionMode: InjectionMode.PROXY });
@@ -175,12 +176,12 @@ export class Container {
 
   /** Observable stream of module logs filtered by level. */
   public filterLogs(level: ELogLevel): Observable<ContainerLogMessage> {
-    return this.logs$.filter((m) => m.level <= level);
+    return this.logs$.pipe(filter((m) => m.level <= level));
   }
 
   /** Observable stream of module metrics filtered by type. */
   public filterMetrics(type: EMetricType): Observable<ContainerMetricMessage> {
-    return this.metrics$.filter((m) => m.type === type);
+    return this.metrics$.pipe(filter((m) => m.type === type));
   }
 
   /**
@@ -188,27 +189,25 @@ export class Container {
    * Module hook method `moduleUp` called in order of dependencies.
    */
   public up(timeout?: number): Observable<void> {
-    const observables$ = this.modules
-      .map((mod) => {
-        return this.containerWhenModulesUp(...this.containerModuleDependencies(mod))
-          .switchMap(() => {
-            const up$ = mod.moduleUp();
+    const observables$ = this.modules.map((mod) => {
+      return this.containerWhenModulesUp(...this.containerModuleDependencies(mod)).pipe(
+        switchMap(() => {
+          const up$ = mod.moduleUp();
 
-            if (up$ == null) {
-              // Module up returned void, set state now.
-              return this.containerModuleState(mod.moduleName, true);
-            } else if (up$ instanceof Observable) {
-              // Observable returned, update state on next.
-              return up$
-                .switchMap(() => this.containerModuleState(mod.moduleName, true));
-            } else {
-              // Promise returned, update state on then.
-              return Observable.fromPromise(up$)
-                .switchMap(() => this.containerModuleState(mod.moduleName, true));
-            }
-          });
-      });
-    return this.containerState(observables$, true, timeout);
+          if (up$ == null) {
+            // Module up returned void, set state now.
+            return this.containerModuleState(mod.moduleName, true, timeout);
+          } else if (up$ instanceof Observable) {
+            // Observable returned, update state on next.
+            return up$.pipe(switchMap(() => this.containerModuleState(mod.moduleName, true, timeout)));
+          } else {
+            // Promise returned, update state on then.
+            return from(up$).pipe(switchMap(() => this.containerModuleState(mod.moduleName, true, timeout)));
+          }
+        })
+      );
+    });
+    return this.containerState(observables$, true);
   }
 
   /**
@@ -216,27 +215,25 @@ export class Container {
    * Module hook method `moduleDown` called in order of dependents.
    */
   public down(timeout?: number): Observable<void> {
-    const observables$ = this.modules
-      .map((mod) => {
-        return this.containerWhenModulesDown(...this.containerModuleDependents(mod))
-          .switchMap(() => {
-            const down$ = mod.moduleDown();
+    const observables$ = this.modules.map((mod) => {
+      return this.containerWhenModulesDown(...this.containerModuleDependents(mod)).pipe(
+        switchMap(() => {
+          const down$ = mod.moduleDown();
 
-            if (down$ == null) {
-              // Module down returned void, set state now.
-              return this.containerModuleState(mod.moduleName, false);
-            } else if (down$ instanceof Observable) {
-              // Observable returned, update state on next.
-              return down$
-                .switchMap(() => this.containerModuleState(mod.moduleName, false));
-            } else {
-              // Promise returned, update state on then.
-              return Observable.fromPromise(down$)
-                .switchMap(() => this.containerModuleState(mod.moduleName, false));
-            }
-          });
-      });
-    return this.containerState(observables$, false, timeout);
+          if (down$ == null) {
+            // Module down returned void, set state now.
+            return this.containerModuleState(mod.moduleName, false, timeout);
+          } else if (down$ instanceof Observable) {
+            // Observable returned, update state on next.
+            return down$.pipe(switchMap(() => this.containerModuleState(mod.moduleName, false, timeout)));
+          } else {
+            // Promise returned, update state on then.
+            return from(down$).pipe(switchMap(() => this.containerModuleState(mod.moduleName, false, timeout)));
+          }
+        })
+      );
+    });
+    return this.containerState(observables$, false);
   }
 
   /** Call modules destroy hooks before process exit. */
@@ -246,26 +243,28 @@ export class Container {
 
   /** Wait for modules to enter operational state before calling next. */
   protected containerWhenModulesUp(...modules: string[]): Observable<void> {
-    return this.modules$
-      .filter((states) => {
+    return this.modules$.pipe(
+      filter((states) => {
         return modules.reduce((previous, current) => {
           return previous && states[current];
         }, true);
-      })
-      .map(() => undefined)
-      .take(1);
+      }),
+      map(() => undefined),
+      take(1)
+    );
   }
 
   /** Wait for modules to leave operational state before calling next. */
   protected containerWhenModulesDown(...modules: string[]): Observable<void> {
-    return this.modules$
-      .filter((states) => {
+    return this.modules$.pipe(
+      filter((states) => {
         return !modules.reduce((previous, current) => {
           return previous || states[current];
         }, false);
-      })
-      .map(() => undefined)
-      .take(1);
+      }),
+      map(() => undefined),
+      take(1)
+    );
   }
 
   /** Create a new instance of module class. */
@@ -285,7 +284,7 @@ export class Container {
     this.modules.map((m) => {
       const dependencies = m.moduleDependencies();
       const dependent = keys(dependencies).reduce((previous, key) => {
-        return previous || (dependencies[key].moduleName === mod.moduleName);
+        return previous || dependencies[key].moduleName === mod.moduleName;
       }, false);
 
       if (dependent) {
@@ -297,27 +296,29 @@ export class Container {
 
   /** Returns true if module is already registered in container. */
   protected containerModuleRegistered(name: string): boolean {
-    return (this.modules$.value[name] != null);
+    return this.modules$.value[name] != null;
   }
 
   /** Update observable modules state for target module. */
-  protected containerModuleState(name: string, state: boolean): Observable<void> {
+  protected containerModuleState(name: string, state: boolean, timeout = 10000): Observable<void> {
     const next = { ...this.modules$.value, [name]: state };
     this.modules$.next(next);
-    return Observable.of(undefined);
+    return of(undefined).pipe(
+      rxjsTimeout(timeout),
+      catchError((error) => {
+        const errorName = state ? Container.ERROR.UP : Container.ERROR.DOWN;
+        return throwError(new ContainerError(`${name}:${errorName}`, error));
+      })
+    );
   }
 
   /** Internal handler for `up` and `down` methods of class. */
-  protected containerState(observables$: Array<Observable<void>>, state: boolean, timeout = 10000): Observable<void> {
-    return Observable.forkJoin(...observables$)
-      .timeout(timeout)
-      .catch((error) => {
-        const name = state ? Container.ERROR.UP : Container.ERROR.DOWN;
-        return Observable.throw(new ContainerError(name, error));
-      })
-      .map(() => {
+  protected containerState(observables$: Array<Observable<void>>, state: boolean): Observable<void> {
+    return forkJoin(...observables$).pipe(
+      map(() => {
         const message = state ? Container.LOG.UP : Container.LOG.DOWN;
         this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
-      });
+      })
+    );
   }
 }

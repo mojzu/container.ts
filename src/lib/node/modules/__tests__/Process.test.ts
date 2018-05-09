@@ -2,14 +2,12 @@ import { Container, Environment } from "../../../../container";
 import { Process } from "../Process";
 
 describe("Process", () => {
-
   const ENVIRONMENT = new Environment()
     .set(Process.ENV.NAME, "test-process")
     .set(Process.ENV.VERSION, "1.2.3")
     .set(Process.ENV.NODE_ENV, "development");
 
-  const CONTAINER = new Container("Test", ENVIRONMENT)
-    .registerModule(Process);
+  const CONTAINER = new Container("Test", ENVIRONMENT).registerModule(Process);
 
   const PROCESS = CONTAINER.resolve<Process>(Process.moduleName);
 
@@ -28,5 +26,4 @@ describe("Process", () => {
     expect(PROCESS.version).toEqual("1.2.3");
     expect(PROCESS.nodeEnv).toEqual("development");
   });
-
 });

@@ -14,10 +14,8 @@ class TestMetrics extends Metrics {
 }
 
 describe("Metric", () => {
-
   const NAME = "Test";
-  const CONTAINER = new Container(NAME)
-    .registerModule(TestMetrics);
+  const CONTAINER = new Container(NAME).registerModule(TestMetrics);
 
   const METRICS = CONTAINER.resolve<TestMetrics>(TestMetrics.name);
 
@@ -48,5 +46,4 @@ describe("Metric", () => {
       done();
     });
   });
-
 });

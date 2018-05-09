@@ -34,7 +34,7 @@ export enum EValidateError {
   InvalidTimeZone,
   InvalidDateTime,
   InvalidDuration,
-  InvalidInterval,
+  InvalidInterval
 }
 
 /** Validate error chain class. */
@@ -61,7 +61,7 @@ export function isBoolean(value = "", options: IValidateBoolean = {}): boolean {
 }
 
 /** Validate.isInteger options. */
-export interface IValidateInteger extends ValidatorJS.IsIntOptions { }
+export interface IValidateInteger extends ValidatorJS.IsIntOptions {}
 
 /** Wrapper for validator.isInt. */
 export function isInteger(value = "", options: IValidateInteger = {}): number {
@@ -80,7 +80,7 @@ export function isInteger(value = "", options: IValidateInteger = {}): number {
 }
 
 /** Validate.isFloat options. */
-export interface IValidateFloat extends ValidatorJS.IsFloatOptions { }
+export interface IValidateFloat extends ValidatorJS.IsFloatOptions {}
 
 /** Wrapper for validator.isFloat. */
 export function isFloat(value = "", options: IValidateFloat = {}): number {
@@ -260,7 +260,7 @@ export function isCreditCard(value = ""): string {
 }
 
 /** Validate.isEmail options. */
-export interface IValidateEmail extends ValidatorJS.IsEmailOptions { }
+export interface IValidateEmail extends ValidatorJS.IsEmailOptions {}
 
 /** Wrapper for validator.isEmail. */
 export function isEmail(value = "", options: IValidateEmail = {}): string {
@@ -279,7 +279,7 @@ export function isEmail(value = "", options: IValidateEmail = {}): string {
 }
 
 /** Validate.isDomain options. */
-export interface IValidateDomain extends ValidatorJS.IsFQDNOptions { }
+export interface IValidateDomain extends ValidatorJS.IsFQDNOptions {}
 
 /** Wrapper for validator.isFQDN. */
 export function isDomain(value = "", options: IValidateDomain = {}): string {
@@ -447,7 +447,7 @@ export function isPostalCode(value = "", options: IValidatePostalCode = {}): str
 }
 
 /** Validate.isUrl options. */
-export interface IValidateUrl extends ValidatorJS.IsURLOptions { }
+export interface IValidateUrl extends ValidatorJS.IsURLOptions {}
 
 /** Wrapper for validator.isURL. */
 export function isUrl(value = "", options: IValidateUrl = { require_host: true }): string {
@@ -491,7 +491,7 @@ export function isUuid(value = "", options: IValidateUuid = {}): string {
 /** Validate that value is a valid port number (1 - 65535). */
 export function isPort(value = ""): number {
   try {
-    return isInteger(value, { min: 0x1, max: 0xFFFF });
+    return isInteger(value, { min: 0x1, max: 0xffff });
   } catch (error) {
     throw new ValidateError(EValidateError.InvalidPort, value, error);
   }
@@ -551,7 +551,7 @@ export function isTimeZone(value = ""): string {
 }
 
 /** Validate.isDateTime options. */
-export interface IValidateDateTime extends DateTimeOptions { }
+export interface IValidateDateTime extends DateTimeOptions {}
 
 /** Validate that value is a valid date and time parsed by 'luxon' library. */
 export function isDateTime(value = "", options: IValidateDateTime = {}): DateTime {
@@ -571,7 +571,7 @@ export function isDateTime(value = "", options: IValidateDateTime = {}): DateTim
 }
 
 /** Validate.isDuration options. */
-export interface IValidateDuration extends DurationOptions { }
+export interface IValidateDuration extends DurationOptions {}
 
 /** Validate that value is a valid duration parsed by 'luxon' library. */
 export function isDuration(value = "", options: IValidateDuration = {}): Duration {
@@ -590,7 +590,7 @@ export function isDuration(value = "", options: IValidateDuration = {}): Duratio
 }
 
 /** Validate.isInterval options. */
-export interface IValidateInterval extends DateTimeOptions { }
+export interface IValidateInterval extends DateTimeOptions {}
 
 /** Validate that value is a valid date time interval parsed by 'luxon' library. */
 export function isInterval(value = "", options: IValidateInterval = {}): Interval {

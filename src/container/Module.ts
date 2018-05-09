@@ -1,11 +1,11 @@
 import * as Debug from "debug";
 import { assign, keys } from "lodash";
+import { Observable } from "rxjs";
 import { ErrorChain } from "../lib/error";
 import { Container } from "./Container";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./Log";
 import { EMetricType, IMetricTags, Metric } from "./Metric";
-import { Observable } from "./RxJS";
 import { IModule, IModuleDependencies, IModuleOptions } from "./Types";
 
 /** Module error class. */
@@ -17,10 +17,9 @@ export class ModuleError extends ErrorChain {
 
 /** Container module log class. */
 export class ModuleLog extends Log {
-  public constructor(
-    protected readonly container: Container,
-    protected readonly name: string,
-  ) { super(); }
+  public constructor(protected readonly container: Container, protected readonly name: string) {
+    super();
+  }
 
   /**
    * Sends log message to container bus for consumption by modules.
@@ -34,10 +33,9 @@ export class ModuleLog extends Log {
 
 /** Container module metric class. */
 export class ModuleMetric extends Metric {
-  public constructor(
-    protected readonly container: Container,
-    protected readonly name: string,
-  ) { super(); }
+  public constructor(protected readonly container: Container, protected readonly name: string) {
+    super();
+  }
 
   /**
    * Sends metric message to container bus for consumption by modules.
@@ -56,7 +54,7 @@ export class Module implements IModule {
 
   /** Error names. */
   public static readonly ERROR = {
-    DEPENDENCY: "Module.DependencyError",
+    DEPENDENCY: "Module.DependencyError"
   };
 
   /** Module name. */
@@ -75,10 +73,14 @@ export class Module implements IModule {
   public readonly debug: Debug.IDebugger;
 
   /** Module container environment reference. */
-  public get environment(): Environment { return this.container.environment; }
+  public get environment(): Environment {
+    return this.container.environment;
+  }
 
   /** Module container and module names. */
-  public get namespace(): string { return `${this.container.name}.${this.moduleName}`; }
+  public get namespace(): string {
+    return `${this.container.name}.${this.moduleName}`;
+  }
 
   public constructor(options: IModuleOptions) {
     // Resolve container instance and construct instance properties.
@@ -107,11 +109,11 @@ export class Module implements IModule {
   }
 
   /** Module operational state hook. */
-  public moduleUp(): void | Observable<void> { }
+  public moduleUp(): void | Observable<void> {}
 
   /** Module non-operational state hook. */
-  public moduleDown(): void | Observable<void> { }
+  public moduleDown(): void | Observable<void> {}
 
   /** Module destruction hook. */
-  public moduleDestroy(): void { }
+  public moduleDestroy(): void {}
 }

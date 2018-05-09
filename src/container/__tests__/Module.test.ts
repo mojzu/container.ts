@@ -9,9 +9,15 @@ let moduleDestroy = 0;
 
 class Test1 extends Module {
   public static readonly moduleName: string = "Test1";
-  public moduleUp(): void { moduleUpOrder.push(1); }
-  public moduleDown(): void { moduleDownOrder.push(1); }
-  public moduleDestroy(): void { moduleDestroy++; }
+  public moduleUp(): void {
+    moduleUpOrder.push(1);
+  }
+  public moduleDown(): void {
+    moduleDownOrder.push(1);
+  }
+  public moduleDestroy(): void {
+    moduleDestroy++;
+  }
 }
 
 class Test2 extends Module {
@@ -19,9 +25,15 @@ class Test2 extends Module {
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test1: Test1, test3: Test3 });
   }
-  public moduleUp(): void { moduleUpOrder.push(2); }
-  public moduleDown(): void { moduleDownOrder.push(2); }
-  public moduleDestroy(): void { moduleDestroy++; }
+  public moduleUp(): void {
+    moduleUpOrder.push(2);
+  }
+  public moduleDown(): void {
+    moduleDownOrder.push(2);
+  }
+  public moduleDestroy(): void {
+    moduleDestroy++;
+  }
 }
 
 class Test3 extends Module {
@@ -30,9 +42,15 @@ class Test3 extends Module {
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test1: Test1 });
   }
-  public moduleUp(): void { moduleUpOrder.push(3); }
-  public moduleDown(): void { moduleDownOrder.push(3); }
-  public moduleDestroy(): void { moduleDestroy++; }
+  public moduleUp(): void {
+    moduleUpOrder.push(3);
+  }
+  public moduleDown(): void {
+    moduleDownOrder.push(3);
+  }
+  public moduleDestroy(): void {
+    moduleDestroy++;
+  }
 }
 
 class Test4 extends Test3 {
@@ -41,13 +59,16 @@ class Test4 extends Test3 {
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test2: Test2 });
   }
-  public moduleUp(): void { moduleUpOrder.push(4); }
-  public moduleDown(): void { moduleDownOrder.push(4); }
+  public moduleUp(): void {
+    moduleUpOrder.push(4);
+  }
+  public moduleDown(): void {
+    moduleDownOrder.push(4);
+  }
 }
 
 describe("Module", () => {
-  const CONTAINER = new Container("Test1")
-    .registerModules([Test1, Test2, Test3, Test4]);
+  const CONTAINER = new Container("Test1").registerModules([Test1, Test2, Test3, Test4]);
 
   it("#up", async () => {
     await CONTAINER.up().toPromise();

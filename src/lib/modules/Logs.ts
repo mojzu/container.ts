@@ -3,22 +3,20 @@ import { isString } from "../validate";
 
 /** Abstract container logs handler module. */
 export abstract class Logs extends Module {
-
   /** Default module name. */
   public static readonly moduleName: string = "Logs";
 
   /** Environment variable names. */
   public static readonly ENV = {
     /** Application logs level (default warning). */
-    LEVEL: "LOGS_LEVEL",
+    LEVEL: "LOGS_LEVEL"
   };
 
   /**
    * Parsed application logs level.
    * Get log level from environment, defaults to warning.
    */
-  protected readonly logsLevel = this.logsParseLevel(
-    isString(this.environment.get(Logs.ENV.LEVEL, "warning")));
+  protected readonly logsLevel = this.logsParseLevel(isString(this.environment.get(Logs.ENV.LEVEL, "warning")));
 
   public constructor(options: IModuleOptions) {
     super(options);
@@ -27,8 +25,7 @@ export abstract class Logs extends Module {
     this.debug(`${Logs.ENV.LEVEL}="${ELogLevel[this.logsLevel]}"`);
 
     // Subscribe to container log messages filtered by level.
-    this.container.filterLogs(this.logsLevel)
-      .subscribe((log) => this.logsOnMessage(log));
+    this.container.filterLogs(this.logsLevel).subscribe((log) => this.logsOnMessage(log));
   }
 
   /** Abstract handler for incoming log messages. */
@@ -72,5 +69,4 @@ export abstract class Logs extends Module {
       }
     }
   }
-
 }

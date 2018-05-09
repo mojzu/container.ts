@@ -32,14 +32,14 @@ export class Assets extends Module {
   /** Environment variable names. */
   public static readonly ENV = {
     /** Assets directory path (required). */
-    PATH: "ASSETS_PATH",
+    PATH: "ASSETS_PATH"
   };
 
   /** Error names. */
   public static readonly ERROR = assign({}, Module.ERROR, {
     READ_FILE: "Assets.ReadFileError",
     JSON_PARSE: "Assets.JsonParseError",
-    READ_DIRECTORY: "Assets.ReadDirectoryError",
+    READ_DIRECTORY: "Assets.ReadDirectoryError"
   });
 
   /** Absolute path to assets files directory. */
@@ -58,7 +58,7 @@ export class Assets extends Module {
   /** Returns true if target file is cached. */
   public isCached(target: string, encoding?: string): boolean {
     const cacheKey = `${target}:${encoding}`;
-    return (this.assetsCache[cacheKey] != null);
+    return this.assetsCache[cacheKey] != null;
   }
 
   // Overload signature for correct return types.
@@ -76,9 +76,9 @@ export class Assets extends Module {
   /** Read asset file contents and parse JSON object. */
   public async readJson<T>(
     target: string,
-    options: IAssetsReadOptions = { encoding: "utf8", cache: true },
+    options: IAssetsReadOptions = { encoding: "utf8", cache: true }
   ): Promise<T> {
-    const data = await this.assetsRead(target, options) as string;
+    const data = (await this.assetsRead(target, options)) as string;
     try {
       return JSON.parse(data);
     } catch (error) {

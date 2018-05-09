@@ -1,7 +1,6 @@
 import { Environment } from "../Environment";
 
 describe("Environment", () => {
-
   it("#Environment", () => {
     const variables = { value: "1" };
     const environment = new Environment(variables);
@@ -34,5 +33,4 @@ describe("Environment", () => {
     expect(environment.set("value", value) instanceof Environment).toEqual(true);
     expect(environment.get("value")).toEqual(value);
   });
-
 });
