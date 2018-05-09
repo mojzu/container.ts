@@ -65,3 +65,5 @@ fuseBox.Sparky.task("example", () => {
 fuseBox.Sparky.task("dist", ["lint", "test", "tsc"], () => {
   return tools.shell("npm pack", CWD);
 });
+
+// TODO(M): Docs fuse tasks.
