@@ -1,7 +1,7 @@
 import { DateTime, Duration, Interval } from "luxon";
 import * as validator from "validator";
 import { ErrorChain } from "../error";
-import { ISchemaConstructor, ISchemaMask } from "./Schema";
+import { ISchemaMask, Schema } from "./Schema";
 import * as Validate from "./Validate";
 
 // TODO(H): Improve operator field documentation/testing.
@@ -222,7 +222,7 @@ export interface ISchemaFieldContext {
 }
 
 export class SchemaField<T = object> extends Field<T> {
-  public constructor(protected readonly schema: ISchemaConstructor) {
+  public constructor(protected readonly schema: typeof Schema) {
     super();
   }
   public validate(value: object, context: ISchemaFieldContext = {}): T {

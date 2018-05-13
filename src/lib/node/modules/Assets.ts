@@ -1,5 +1,4 @@
 import { readdir, readFile } from "fs";
-import { assign } from "lodash";
 import { resolve } from "path";
 import { promisify } from "util";
 import { IModuleOptions, Module } from "../../../container";
@@ -24,26 +23,26 @@ export interface IAssetsReadOptions {
   cache?: boolean;
 }
 
+/** Assets environment variable names. */
+export enum EAssetsEnv {
+  /** Assets directory path (required). */
+  Path = "ASSETS_PATH"
+}
+
+/** Assets error names. */
+export enum EAssetsError {
+  ReadFile = "AssetsError.ReadFile",
+  JsonParse = "AssetsError.JsonParse",
+  ReadDirectory = "AssetsError.ReadDirectory"
+}
+
 /** Assets read only files module. */
 export class Assets extends Module {
   /** Default module name. */
   public static readonly moduleName: string = "Assets";
 
-  /** Environment variable names. */
-  public static readonly ENV = {
-    /** Assets directory path (required). */
-    PATH: "ASSETS_PATH"
-  };
-
-  /** Error names. */
-  public static readonly ERROR = assign({}, Module.ERROR, {
-    READ_FILE: "Assets.ReadFileError",
-    JSON_PARSE: "Assets.JsonParseError",
-    READ_DIRECTORY: "Assets.ReadDirectoryError"
-  });
-
   /** Absolute path to assets files directory. */
-  public readonly path = isDirectory(this.environment.get(Assets.ENV.PATH));
+  public readonly path = isDirectory(this.environment.get(EAssetsEnv.Path));
 
   /** Internal assets cache. */
   protected readonly assetsCache: IAssetsCache = {};
@@ -52,7 +51,7 @@ export class Assets extends Module {
     super(options);
 
     // Debug environment variables.
-    this.debug(`${Assets.ENV.PATH}="${this.path}"`);
+    this.debug(`${EAssetsEnv.Path}="${this.path}"`);
   }
 
   /** Returns true if target file is cached. */
@@ -82,7 +81,7 @@ export class Assets extends Module {
     try {
       return JSON.parse(data);
     } catch (error) {
-      throw new AssetsError(Assets.ERROR.JSON_PARSE, target, error);
+      throw new AssetsError(EAssetsError.JsonParse, target, error);
     }
   }
 
@@ -93,7 +92,7 @@ export class Assets extends Module {
       const fsReaddir = promisify(readdir);
       return await fsReaddir(directoryPath);
     } catch (error) {
-      throw new AssetsError(Assets.ERROR.READ_DIRECTORY, target, error);
+      throw new AssetsError(EAssetsError.ReadDirectory, target, error);
     }
   }
 
@@ -118,7 +117,7 @@ export class Assets extends Module {
       }
       return data;
     } catch (error) {
-      throw new AssetsError(Assets.ERROR.READ_FILE, target, error);
+      throw new AssetsError(EAssetsError.ReadFile, target, error);
     }
   }
 }

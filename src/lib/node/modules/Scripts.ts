@@ -17,7 +17,7 @@ import {
 } from "../../../container";
 import { ErrorChain } from "../../error/ErrorChain";
 import { isDirectory, isDuration, isFile } from "../validate";
-import { ChildProcess } from "./ChildProcess";
+import { ChildProcess, EChildProcessEnv, EChildProcessEvent } from "./ChildProcess";
 import { IProcessStatus, Process } from "./Process";
 import {
   EProcessMessageType,
@@ -191,33 +191,33 @@ export class ScriptsProcess implements IProcessSend {
   }
 }
 
+/** Scripts environment variable names. */
+export enum EScriptsEnv {
+  /** Scripts directory path (required). */
+  Path = "SCRIPTS_PATH"
+}
+
+/** Scripts log names. */
+export enum EScriptsLog {
+  WorkerStart = "Scripts.WorkerStart",
+  WorkerStop = "Scripts.WorkerStop",
+  WorkerExit = "Scripts.WorkerExit",
+  WorkerRestart = "Scripts.WorkerRestart",
+  WorkerRestartLimit = "Scripts.WorkerRestartLimit",
+  WorkerUptimeLimit = "Scripts.WorkerUptimeLimit"
+}
+
+/** Scripts metric names. */
+export enum EScriptsMetric {
+  IpcConnect = "Scripts.IpcConnect",
+  IpcError = "Scripts.IpcError",
+  IpcMessage = "Scripts.IpcMessage"
+}
+
 /** Node.js scripts module. */
 export class Scripts extends Module {
   /** Default module name. */
   public static readonly moduleName: string = "Scripts";
-
-  /** Environment variable names. */
-  public static readonly ENV = {
-    /** Scripts directory path (required). */
-    PATH: "SCRIPTS_PATH"
-  };
-
-  /** Log names. */
-  public static readonly LOG = {
-    WORKER_START: "Scripts.WorkerStart",
-    WORKER_STOP: "Scripts.WorkerStop",
-    WORKER_EXIT: "Scripts.WorkerExit",
-    WORKER_RESTART: "Scripts.WorkerRestart",
-    WORKER_RESTART_LIMIT: "Scripts.WorkerRestartLimit",
-    WORKER_UPTIME_LIMIT: "Scripts.WorkerUptimeLimit"
-  };
-
-  /** Metric names. */
-  public static readonly METRIC = {
-    IPC_CONNECT: "Scripts.IpcConnect",
-    IPC_ERROR: "Scripts.IpcError",
-    IPC_MESSAGE: "Scripts.IpcMessage"
-  };
 
   /** Observable stream of sockets connected via IPC. */
   public readonly ipcConnections$ = new Subject<Socket>();
@@ -229,7 +229,7 @@ export class Scripts extends Module {
   public readonly ipcMessages$ = new Subject<IScriptsIpcMessage>();
 
   /** Absolute path to script files directory. */
-  public readonly path = isDirectory(this.environment.get(Scripts.ENV.PATH));
+  public readonly path = isDirectory(this.environment.get(EScriptsEnv.Path));
 
   /** Workers state. */
   protected readonly scriptsWorkers: { [name: string]: IScriptsWorker } = {};
@@ -241,7 +241,7 @@ export class Scripts extends Module {
     super(options);
 
     // Debug environment variables.
-    this.debug(`${Scripts.ENV.PATH}="${this.path}"`);
+    this.debug(`${EScriptsEnv.Path}="${this.path}"`);
 
     // Configure IPC for worker scripts.
     ipc.config.appspace = `${this.process.title}.`;
@@ -298,7 +298,7 @@ export class Scripts extends Module {
     options.env = {
       ...options.env,
       // Set IPC id for ChildProcess module.
-      [ChildProcess.ENV.IPC_ID]: this.namespace
+      [EChildProcessEnv.IpcId]: this.namespace
     };
     const process = this.fork(fileName, options);
 
@@ -310,7 +310,7 @@ export class Scripts extends Module {
 
       // Log worker start.
       const metadata = this.scriptsWorkerLogMetadata({ name, worker: this.scriptsWorkers[name], options });
-      this.log.info(Scripts.LOG.WORKER_START, metadata);
+      this.log.info(EScriptsLog.WorkerStart, metadata);
     } else {
       // Restarted worker, update process in state.
       this.scriptsWorkers[name].unsubscribe$.next();
@@ -323,16 +323,16 @@ export class Scripts extends Module {
     process.exit$.pipe(takeUntil(worker.unsubscribe$)).subscribe((code) => {
       // Log worker exit.
       const metadata = this.scriptsWorkerLogMetadata({ name, worker, code });
-      this.log.info(Scripts.LOG.WORKER_EXIT, metadata);
+      this.log.info(EScriptsLog.WorkerExit, metadata);
 
       // Restart worker process by default.
       if (options.restart == null || !!options.restart) {
         // Do not restart process if limit reached.
         if (options.restartLimit == null || worker.restarts < options.restartLimit) {
-          this.log.info(Scripts.LOG.WORKER_RESTART, metadata);
+          this.log.info(EScriptsLog.WorkerRestart, metadata);
           this.startWorker(name, fileName, options);
         } else {
-          this.log.error(Scripts.LOG.WORKER_RESTART_LIMIT, metadata);
+          this.log.error(EScriptsLog.WorkerRestartLimit, metadata);
           this.stopWorker(name);
         }
       }
@@ -340,13 +340,13 @@ export class Scripts extends Module {
 
     // Track worker process uptime.
     process
-      .listen<IProcessStatus>(ChildProcess.EVENT.STATUS)
+      .listen<IProcessStatus>(EChildProcessEvent.Status)
       .pipe(takeUntil(worker.unsubscribe$))
       .subscribe((status) => {
         // Kill worker process if uptime limit exceeded.
         if (uptimeLimit != null && status.uptime > uptimeLimit) {
           const metadata = this.scriptsWorkerLogMetadata({ name, worker });
-          this.log.info(Scripts.LOG.WORKER_UPTIME_LIMIT, metadata);
+          this.log.info(EScriptsLog.WorkerUptimeLimit, metadata);
           process.kill();
         }
       });
@@ -392,7 +392,7 @@ export class Scripts extends Module {
 
       // Log worker stop and delete in state.
       const metadata = this.scriptsWorkerLogMetadata({ name, worker });
-      this.log.info(Scripts.LOG.WORKER_STOP, metadata);
+      this.log.info(EScriptsLog.WorkerStop, metadata);
       delete this.scriptsWorkers[name];
     }
 
@@ -400,19 +400,19 @@ export class Scripts extends Module {
   }
 
   protected scriptsIpcOnConnect(socket: Socket): Socket {
-    this.metric.increment(Scripts.METRIC.IPC_CONNECT);
+    this.metric.increment(EScriptsMetric.IpcConnect);
     return socket;
   }
 
   protected scriptsIpcOnError(error: any): ScriptsError {
-    this.metric.increment(Scripts.METRIC.IPC_ERROR, 1, { error: ErrorChain.errorName(error) });
+    this.metric.increment(EScriptsMetric.IpcError, 1, { error: ErrorChain.errorName(error) });
     const chained = new ScriptsError(error);
     this.log.error(chained);
     return chained;
   }
 
   protected scriptsIpcOnMessage(data: any, socket: Socket): IScriptsIpcMessage {
-    this.metric.increment(Scripts.METRIC.IPC_MESSAGE);
+    this.metric.increment(EScriptsMetric.IpcMessage);
     return { socket, data };
   }
 

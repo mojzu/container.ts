@@ -4,7 +4,7 @@ import { take } from "rxjs/operators";
 import { Container, Environment, Module } from "../../../../container";
 import { ErrorChain } from "../../../error";
 import { Process } from "../Process";
-import { Scripts } from "../Scripts";
+import { EScriptsEnv, Scripts } from "../Scripts";
 
 const WN = "Worker";
 const timeout = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -21,7 +21,7 @@ class TestModule extends Module {
 }
 
 describe("Scripts", () => {
-  const ENVIRONMENT = new Environment().set(Scripts.ENV.PATH, path.resolve(__dirname, "scripts"));
+  const ENVIRONMENT = new Environment().set(EScriptsEnv.Path, path.resolve(__dirname, "scripts"));
   const CONTAINER = new Container("Test", ENVIRONMENT).registerModules([Process, Scripts, TestModule]);
   const SCRIPTS = CONTAINER.resolve<Scripts>(Scripts.moduleName);
 

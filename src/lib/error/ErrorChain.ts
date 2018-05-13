@@ -19,17 +19,17 @@ export interface IErrorChainSerialised {
   ErrorChain: IErrorChainItem[];
 }
 
+/** Error chain error names. */
+export enum EErrorChainError {
+  Serialise = "ErrorChainError.Serialise",
+  Deserialise = "ErrorChainError.Deserialise"
+}
+
 /**
  * ErrorChain class.
  * Serialisable, chained errors utility.
  */
 export class ErrorChain {
-  /** Error names. */
-  public static readonly ERROR = {
-    SERIALISE: "ErrorChain.SerialiseError",
-    DESERIALISE: "ErrorChain.DeserialiseError"
-  };
-
   /** Returns true if error instance of ErrorChain. */
   public static isErrorChain(error: any): error is ErrorChain {
     return error instanceof ErrorChain;
@@ -101,7 +101,7 @@ export class ErrorChain {
 
       return chained;
     } catch (error) {
-      throw new ErrorChain({ name: ErrorChain.ERROR.DESERIALISE, value: serialised }, error);
+      throw new ErrorChain({ name: EErrorChainError.Deserialise, value: serialised }, error);
     }
   }
 
@@ -167,7 +167,7 @@ export class ErrorChain {
 
       return { ErrorChain: chained };
     } catch (error) {
-      throw new ErrorChain({ name: ErrorChain.ERROR.SERIALISE }, error);
+      throw new ErrorChain({ name: EErrorChainError.Serialise }, error);
     }
   }
 }

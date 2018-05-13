@@ -2,7 +2,7 @@ import * as Debug from "debug";
 import { assign, keys } from "lodash";
 import { Observable } from "rxjs";
 import { ErrorChain } from "../lib/error";
-import { Container } from "./Container";
+import { Container, EContainerScope } from "./Container";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./Log";
 import { EMetricType, IMetricTags, Metric } from "./Metric";
@@ -47,15 +47,15 @@ export class ModuleMetric extends Metric {
   }
 }
 
+/** Module error names. */
+export enum EModuleError {
+  Dependency = "ModuleError.Dependency"
+}
+
 /** Base class for container class modules with dependency injection. */
 export class Module implements IModule {
   /** Default module name. */
   public static readonly moduleName: string = "Module";
-
-  /** Error names. */
-  public static readonly ERROR = {
-    DEPENDENCY: "Module.DependencyError"
-  };
 
   /** Module name. */
   public readonly moduleName: string;
@@ -85,7 +85,7 @@ export class Module implements IModule {
   public constructor(options: IModuleOptions) {
     // Resolve container instance and construct instance properties.
     this.moduleName = options.moduleName;
-    this.container = options.opts[Container.SCOPE.CONTAINER];
+    this.container = options.opts[EContainerScope.Container];
     this.log = new ModuleLog(this.container, this.namespace);
     this.metric = new ModuleMetric(this.container, this.namespace);
     this.debug = Debug(this.namespace);
@@ -99,7 +99,7 @@ export class Module implements IModule {
         this[key] = options.opts[target.moduleName];
       });
     } catch (error) {
-      throw new ModuleError(Module.ERROR.DEPENDENCY, error);
+      throw new ModuleError(EModuleError.Dependency, error);
     }
   }
 

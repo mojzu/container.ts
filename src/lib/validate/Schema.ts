@@ -34,27 +34,8 @@ export interface ISchemaMapHandlers {
   isField?: (i: any, o: any, field: Field<any>, k: number | string, m?: ISchemaMask, kr?: string) => void;
 }
 
-/** Schema static interface. */
-export interface ISchemaConstructor {
-  SCHEMA: ISchemaTypes;
-  new (): Schema;
-  isSchema(value: any): boolean;
-  extend(...schemas: ISchemaTypes[]): ISchemaConstructor;
-  map(
-    inp: any,
-    out: any,
-    schema: ISchemaTypes,
-    mask?: ISchemaMask,
-    dataKeys?: Array<number | string>,
-    keyRoot?: string,
-    handlers?: ISchemaMapHandlers
-  ): void;
-  validate<T>(data: any, mask?: ISchemaMask, keyRoot?: string): T;
-  format<T>(data: T, mask?: ISchemaMask, keyRoot?: string): any;
-}
-
 /** Build schema class from input map. */
-export function buildSchema(schema: ISchemaTypes = {}): ISchemaConstructor {
+export function buildSchema(schema: ISchemaTypes = {}): typeof Schema {
   class NewSchema extends Schema {
     public static readonly SCHEMA = schema;
   }
@@ -73,7 +54,7 @@ export abstract class Schema {
   }
 
   /** Construct new schema using this as a base. */
-  public static extend(...schemas: ISchemaTypes[]): ISchemaConstructor {
+  public static extend(...schemas: ISchemaTypes[]): typeof Schema {
     return buildSchema(assign({}, this.SCHEMA, ...schemas));
   }
 

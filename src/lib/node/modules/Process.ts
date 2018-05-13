@@ -35,32 +35,32 @@ export class ProcessError extends ErrorChain {
   }
 }
 
+/** Process environment variable names. */
+export enum EProcessEnv {
+  Name = "PROCESS_NAME",
+  Version = "PROCESS_VERSION",
+  NodeEnv = "NODE_ENV"
+}
+
+/** Process log names. */
+export enum EProcessLog {
+  Information = "Process.Information",
+  Signal = "Process.Signal"
+}
+
+/** Process metric names. */
+export enum EProcessMetric {
+  UserCpuUsage = "Process.UserCpuUsage",
+  SystemCpuUsage = "Process.SystemCpuUsage",
+  RssMemoryUsage = "Process.RssMemoryUsage",
+  HeapTotalMemoryUsage = "Process.HeapTotalMemoryUsage",
+  HeapUsedMemoryUsage = "Process.HeapUsedMemoryUsage"
+}
+
 /** Node.js process interface. */
 export class Process extends Module {
   /** Default module name. */
   public static readonly moduleName: string = "Process";
-
-  /** Environment variable names. */
-  public static readonly ENV = {
-    NAME: "PROCESS_NAME",
-    VERSION: "PROCESS_VERSION",
-    NODE_ENV: "NODE_ENV"
-  };
-
-  /** Log names. */
-  public static readonly LOG = {
-    INFORMATION: "Process.Information",
-    SIGNAL: "Process.Signal"
-  };
-
-  /** Metric names. */
-  public static readonly METRIC = {
-    USER_CPU_USAGE: "Process.UserCpuUsage",
-    SYSTEM_CPU_USAGE: "Process.SystemCpuUsage",
-    RSS_MEMORY_USAGE: "Process.RssMemoryUsage",
-    HEAP_TOTAL_MEMORY_USAGE: "Process.HeapTotalMemoryUsage",
-    HEAP_USED_MEMORY_USAGE: "Process.HeapUsedMemoryUsage"
-  };
 
   /** Determine if container has Process module. */
   public static isProcess(container: Container): boolean {
@@ -89,8 +89,8 @@ export class Process extends Module {
   public get title(): string {
     return Process.title;
   }
-  public readonly version = isString(this.environment.get(Process.ENV.VERSION, "1.0.0"));
-  public readonly nodeEnv = isString(this.environment.get(Process.ENV.NODE_ENV, "production"));
+  public readonly version = isString(this.environment.get(EProcessEnv.Version, "1.0.0"));
+  public readonly nodeEnv = isString(this.environment.get(EProcessEnv.NodeEnv, "production"));
 
   /** Override in subclass to change metric interval. */
   public get metricInterval(): number {
@@ -128,12 +128,12 @@ export class Process extends Module {
     super(options);
 
     // Set process title.
-    Process.setTitle(isString(this.environment.get(Process.ENV.NAME, "node")));
+    Process.setTitle(isString(this.environment.get(EProcessEnv.Name, "node")));
 
     // Debug environment variables.
-    this.debug(`${Process.ENV.NAME}="${this.title}"`);
-    this.debug(`${Process.ENV.VERSION}="${this.version}"`);
-    this.debug(`${Process.ENV.NODE_ENV}="${this.nodeEnv}"`);
+    this.debug(`${EProcessEnv.Name}="${this.title}"`);
+    this.debug(`${EProcessEnv.Version}="${this.version}"`);
+    this.debug(`${EProcessEnv.NodeEnv}="${this.nodeEnv}"`);
 
     // Process metrics on interval.
     interval(this.metricInterval).subscribe(() => this.processMetrics(this.status));
@@ -142,7 +142,7 @@ export class Process extends Module {
   /** Try to read process information asset file, handle process events. */
   public moduleUp(): void {
     // Log process information.
-    this.log.info(Process.LOG.INFORMATION, this.information);
+    this.log.info(EProcessLog.Information, this.information);
 
     // Process end signal handlers.
     process.on("SIGTERM", () => this.processOnSignal("SIGTERM"));
@@ -151,7 +151,7 @@ export class Process extends Module {
 
   /** Container down when process termination signal received. */
   protected processOnSignal(signal: string): void {
-    this.log.info(Process.LOG.SIGNAL, { signal });
+    this.log.info(EProcessLog.Signal, { signal });
     this.container.down().subscribe({
       next: () => {
         this.container.destroy();
@@ -168,10 +168,10 @@ export class Process extends Module {
   }
 
   protected processMetrics(status: IProcessStatus): void {
-    this.metric.gauge(Process.METRIC.USER_CPU_USAGE, status.cpuUsage.user);
-    this.metric.gauge(Process.METRIC.SYSTEM_CPU_USAGE, status.cpuUsage.system);
-    this.metric.gauge(Process.METRIC.RSS_MEMORY_USAGE, status.memoryUsage.rss);
-    this.metric.gauge(Process.METRIC.HEAP_TOTAL_MEMORY_USAGE, status.memoryUsage.heapTotal);
-    this.metric.gauge(Process.METRIC.HEAP_USED_MEMORY_USAGE, status.memoryUsage.heapUsed);
+    this.metric.gauge(EProcessMetric.UserCpuUsage, status.cpuUsage.user);
+    this.metric.gauge(EProcessMetric.SystemCpuUsage, status.cpuUsage.system);
+    this.metric.gauge(EProcessMetric.RssMemoryUsage, status.memoryUsage.rss);
+    this.metric.gauge(EProcessMetric.HeapTotalMemoryUsage, status.memoryUsage.heapTotal);
+    this.metric.gauge(EProcessMetric.HeapUsedMemoryUsage, status.memoryUsage.heapUsed);
   }
 }

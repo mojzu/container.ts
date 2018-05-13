@@ -1,9 +1,9 @@
 import * as path from "path";
 import { Container, Environment } from "../../../../container";
-import { Assets, AssetsError } from "../Assets";
+import { Assets, AssetsError, EAssetsEnv, EAssetsError } from "../Assets";
 
 describe("Assets", () => {
-  const ENVIRONMENT = new Environment().set(Assets.ENV.PATH, path.resolve(__dirname, "assets"));
+  const ENVIRONMENT = new Environment().set(EAssetsEnv.Path, path.resolve(__dirname, "assets"));
   const CONTAINER = new Container("Test", ENVIRONMENT).registerModule(Assets);
   const ASSETS = CONTAINER.resolve<Assets>(Assets.moduleName);
 
@@ -45,7 +45,7 @@ describe("Assets", () => {
       done.fail();
     } catch (error) {
       expect(error instanceof AssetsError).toEqual(true);
-      expect(error.name).toEqual(Assets.ERROR.JSON_PARSE);
+      expect(error.name).toEqual(EAssetsError.JsonParse);
       done();
     }
   });
@@ -56,7 +56,7 @@ describe("Assets", () => {
       done.fail();
     } catch (error) {
       expect(error instanceof AssetsError).toEqual(true);
-      expect(error.name).toEqual(Assets.ERROR.READ_FILE);
+      expect(error.name).toEqual(EAssetsError.ReadFile);
       done();
     }
   });

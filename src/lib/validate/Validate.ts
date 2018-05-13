@@ -607,37 +607,3 @@ export function isInterval(value = "", options: IValidateInterval = {}): Interva
   }
   return interval;
 }
-
-/** Static validate methods container. */
-export class Validate {
-  public static isBoolean = isBoolean;
-  public static isInteger = isInteger;
-  public static isFloat = isFloat;
-  public static isHexadecimal = isHexadecimal;
-  public static isString = isString;
-  public static isAscii = isAscii;
-  public static isBase64 = isBase64;
-  public static isAlpha = isAlpha;
-  public static isAlphanumeric = isAlphanumeric;
-  public static isCreditCard = isCreditCard;
-  public static isEmail = isEmail;
-  public static isDomain = isDomain;
-  public static isHexColour = isHexColour;
-  public static isIp = isIp;
-  public static isJson = isJson;
-  public static isMacAddress = isMacAddress;
-  public static isMd5 = isMd5;
-  public static isMobilePhone = isMobilePhone;
-  public static isMongoId = isMongoId;
-  public static isPostalCode = isPostalCode;
-  public static isUrl = isUrl;
-  public static isUuid = isUuid;
-  public static isPort = isPort;
-  public static isLanguage = isLanguage;
-  public static isCountry = isCountry;
-  public static isLocale = isLocale;
-  public static isTimeZone = isTimeZone;
-  public static isDateTime = isDateTime;
-  public static isDuration = isDuration;
-  public static isInterval = isInterval;
-}

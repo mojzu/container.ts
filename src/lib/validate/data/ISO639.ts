@@ -140,5 +140,5 @@ export const ISO639 = [
   "xh", // Xhosa
   "yi", // Yiddish
   "yo", // Yoruba
-  "zu"  // Zulu
+  "zu" // Zulu
 ];

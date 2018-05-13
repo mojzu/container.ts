@@ -1,28 +1,28 @@
 import { ContainerLogMessage, ELogLevel, IModuleOptions, Module } from "../../container";
 import { isString } from "../validate";
 
+/** Logs environment variable names. */
+export enum ELogsEnv {
+  /** Application logs level (default warning). */
+  Level = "LOGS_LEVEL"
+}
+
 /** Abstract container logs handler module. */
 export abstract class Logs extends Module {
   /** Default module name. */
   public static readonly moduleName: string = "Logs";
 
-  /** Environment variable names. */
-  public static readonly ENV = {
-    /** Application logs level (default warning). */
-    LEVEL: "LOGS_LEVEL"
-  };
-
   /**
    * Parsed application logs level.
    * Get log level from environment, defaults to warning.
    */
-  protected readonly logsLevel = this.logsParseLevel(isString(this.environment.get(Logs.ENV.LEVEL, "warning")));
+  protected readonly logsLevel = this.logsParseLevel(isString(this.environment.get(ELogsEnv.Level, "warning")));
 
   public constructor(options: IModuleOptions) {
     super(options);
 
     // Debug environment variables.
-    this.debug(`${Logs.ENV.LEVEL}="${ELogLevel[this.logsLevel]}"`);
+    this.debug(`${ELogsEnv.Level}="${ELogLevel[this.logsLevel]}"`);
 
     // Subscribe to container log messages filtered by level.
     this.container.filterLogs(this.logsLevel).subscribe((log) => this.logsOnMessage(log));

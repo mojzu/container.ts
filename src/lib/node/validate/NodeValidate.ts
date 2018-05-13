@@ -1,7 +1,6 @@
 import { lstatSync } from "fs";
 import { resolve } from "path";
 import { ErrorChain } from "../../error";
-import { Validate } from "../../validate";
 
 /** NodeValidate error codes. */
 export enum ENodeValidateError {
@@ -71,11 +70,4 @@ export function isDirectory(value = ""): string {
     throw new NodeValidateError(ENodeValidateError.InvalidDirectory, value);
   }
   return value;
-}
-
-/** Static validate methods container. */
-export class NodeValidate extends Validate {
-  public static isBuffer = isBuffer;
-  public static isFile = isFile;
-  public static isDirectory = isDirectory;
 }

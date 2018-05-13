@@ -248,5 +248,5 @@ export const ISO3166 = [
   "YT", // Mayotte
   "ZA", // South Africa
   "ZM", // Zambia
-  "ZW"  // Zimbabwe
+  "ZW" // Zimbabwe
 ];

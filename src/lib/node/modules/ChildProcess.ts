@@ -1,5 +1,4 @@
 import * as Debug from "debug";
-import { assign } from "lodash";
 import * as ipc from "node-ipc";
 import { interval, Observable, of, Subject, throwError } from "rxjs";
 import { filter, map, mergeMap, takeWhile, timeout as rxjsTimeout } from "rxjs/operators";
@@ -20,19 +19,20 @@ import {
   IProcessSend
 } from "./Types";
 
+/** Child process environment variable names. */
+export enum EChildProcessEnv {
+  /** Child process directory path (required). */
+  IpcId = "CHILD_PROCESS_IPC_ID"
+}
+
+/** Child process event names. */
+export enum EChildProcessEvent {
+  Status = "ChildProcessEvent.Status"
+}
+
 export class ChildProcess extends Process implements IProcessSend {
   /** Default module name. */
   public static readonly moduleName: string = "ChildProcess";
-
-  /** Environment variable names. */
-  public static readonly ENV = assign({}, Process.ENV, {
-    IPC_ID: "CHILD_PROCESS_IPC_ID"
-  });
-
-  /** Event names. */
-  public static readonly EVENT = {
-    STATUS: "ChildProcess.Status"
-  };
 
   /** Determine if container has ChildProcess module. */
   public static isChildProcess(container: Container): boolean {
@@ -165,7 +165,7 @@ export class ChildProcess extends Process implements IProcessSend {
   /** Observable stream of events received via IPC. */
   public readonly events$ = new Subject<IProcessEvent<any>>();
 
-  protected readonly childProcessIpcId = isString(this.environment.get(ChildProcess.ENV.IPC_ID));
+  protected readonly childProcessIpcId = isString(this.environment.get(EChildProcessEnv.IpcId));
 
   public constructor(options: IModuleOptions) {
     super(options);
@@ -182,7 +182,7 @@ export class ChildProcess extends Process implements IProcessSend {
 
     // Send status event on interval.
     interval(this.metricInterval).subscribe(() =>
-      this.event<IProcessStatus>(ChildProcess.EVENT.STATUS, { data: this.status })
+      this.event<IProcessStatus>(EChildProcessEvent.Status, { data: this.status })
     );
 
     // Forward log and metric messages to parent process.

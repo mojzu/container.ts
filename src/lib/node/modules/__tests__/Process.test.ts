@@ -1,11 +1,11 @@
 import { Container, Environment } from "../../../../container";
-import { Process } from "../Process";
+import { EProcessEnv, Process } from "../Process";
 
 describe("Process", () => {
   const ENVIRONMENT = new Environment()
-    .set(Process.ENV.NAME, "test-process")
-    .set(Process.ENV.VERSION, "1.2.3")
-    .set(Process.ENV.NODE_ENV, "development");
+    .set(EProcessEnv.Name, "test-process")
+    .set(EProcessEnv.Version, "1.2.3")
+    .set(EProcessEnv.NodeEnv, "development");
 
   const CONTAINER = new Container("Test", ENVIRONMENT).registerModule(Process);
 

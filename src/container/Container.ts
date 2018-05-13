@@ -64,30 +64,30 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
   ) {}
 }
 
+/** Container error names. */
+export enum EContainerError {
+  Up = "ContainerError.Up",
+  Down = "ContainerError.Down",
+  ModuleRegistered = "ContainerError.ModuleRegistered"
+}
+
+/** Container log names. */
+export enum EContainerLog {
+  Up = "Container.Up",
+  Down = "Container.Down"
+}
+
+/** Container scope keys. */
+export enum EContainerScope {
+  /** Container reference name resolved internally by modules. */
+  Container = "Container"
+}
+
 /**
  * Container class.
  * Wrapper around awilix library.
  */
 export class Container {
-  /** Error names. */
-  public static readonly ERROR = {
-    UP: "Container.UpError",
-    DOWN: "Container.DownError",
-    MODULE_REGISTERED: "Container.ModuleRegisteredError"
-  };
-
-  /** Log names. */
-  public static readonly LOG = {
-    UP: "Container.Up",
-    DOWN: "Container.Down"
-  };
-
-  /** Scope key names. */
-  public static readonly SCOPE = {
-    /** Container reference name resolved internally by modules. */
-    CONTAINER: "Container"
-  };
-
   /** Root container. */
   public readonly container: AwilixContainer;
 
@@ -124,7 +124,7 @@ export class Container {
   ) {
     this.debug = Debug(this.name);
     this.container = createContainer({ injectionMode: InjectionMode.PROXY });
-    this.registerValue<Container>(Container.SCOPE.CONTAINER, this);
+    this.registerValue<Container>(EContainerScope.Container, this);
   }
 
   /** Create scoped container from root container. */
@@ -138,7 +138,7 @@ export class Container {
    */
   public registerModule(moduleClass: IModuleConstructor): Container {
     if (this.containerModuleRegistered(moduleClass.moduleName)) {
-      throw new ContainerError(Container.ERROR.MODULE_REGISTERED);
+      throw new ContainerError(EContainerError.ModuleRegistered);
     }
 
     const factoryFunction = (opts: any) => this.containerModuleFactory(moduleClass, opts);
@@ -306,7 +306,7 @@ export class Container {
     return of(undefined).pipe(
       rxjsTimeout(timeout),
       catchError((error) => {
-        const errorName = state ? Container.ERROR.UP : Container.ERROR.DOWN;
+        const errorName = state ? EContainerError.Up : EContainerError.Down;
         return throwError(new ContainerError(`${name}:${errorName}`, error));
       })
     );
@@ -316,7 +316,7 @@ export class Container {
   protected containerState(observables$: Array<Observable<void>>, state: boolean): Observable<void> {
     return forkJoin(...observables$).pipe(
       map(() => {
-        const message = state ? Container.LOG.UP : Container.LOG.DOWN;
+        const message = state ? EContainerLog.Up : EContainerLog.Down;
         this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
       })
     );
