@@ -18,7 +18,7 @@ fuseBox.Sparky.task("clean", () => {
     "index.js.map",
     "index.js",
     "container",
-    "lib",
+    "lib"
   ]);
 });
 
@@ -42,12 +42,10 @@ fuseBox.Sparky.task("test-worker", () => {
   const fuse = fuseBox.FuseBox.init({
     homeDir: "src",
     output: "src/lib/node/modules/__tests__/scripts/$name.js",
-    target: "server",
+    target: "server"
   });
-  fuse.bundle("script.test")
-    .instructions(" > [lib/node/modules/__tests__/scripts/script.test.ts]");
-  fuse.bundle("worker.test")
-    .instructions(" > [lib/node/modules/__tests__/scripts/worker.test.ts]");
+  fuse.bundle("script.test").instructions(" > [lib/node/modules/__tests__/scripts/script.test.ts]");
+  fuse.bundle("worker.test").instructions(" > [lib/node/modules/__tests__/scripts/worker.test.ts]");
   return fuse.run();
 });
 

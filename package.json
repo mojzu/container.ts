@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "1.0.0-rc.17",
+  "version": "1.0.0-rc.18",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -42,17 +42,17 @@
     "@types/validator": "^9.4.1",
     "luxon": "^1.2.0",
     "node-ipc": "^9.1.1",
-    "validator": "^10.1.0"
+    "validator": "^10.2.0"
   },
   "devDependencies": {
     "@types/del": "^3.0.1",
     "@types/jest": "^22.2.3",
-    "@types/node": "^10.0.6",
+    "@types/node": "^10.0.8",
     "@types/yargs": "^11.0.0",
     "del": "^3.0.0",
     "fuse-box": "^3.2.2",
     "jest": "^22.4.3",
-    "ts-jest": "^22.4.5",
+    "ts-jest": "^22.4.6",
     "ts-node": "^6.0.3",
     "tslint": "^5.10.0",
     "typescript": "^2.8.3",

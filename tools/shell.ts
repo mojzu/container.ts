@@ -9,6 +9,6 @@ export async function shell(command: string, cwd: string): Promise<void> {
   childProcess.execSync(command, {
     stdio: [null, process.stdout, process.stderr],
     env: { PATH: `${process.env.PATH}:${path.resolve("./node_modules/.bin")}` },
-    cwd,
+    cwd
   });
 }
