@@ -239,6 +239,11 @@ export class Container {
   /** Call modules destroy hooks before process exit. */
   public destroy(): void {
     this.modules.map((mod) => mod.moduleDestroy());
+
+    // Observables clean up.
+    this.modules$.complete();
+    this.logs$.complete();
+    this.metrics$.complete();
   }
 
   /** Wait for modules to enter operational state before calling next. */

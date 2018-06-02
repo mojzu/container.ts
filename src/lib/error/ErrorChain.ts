@@ -160,9 +160,10 @@ export class ErrorChain {
         if (ErrorChain.isErrorChain(this.cause)) {
           const serialised = this.cause.serialise();
           chained = chained.concat(serialised.ErrorChain);
-        } else if (this.cause instanceof Error) {
+        } else if (ErrorChain.isError(this.cause)) {
           chained.push(ErrorChain.serialiseError(this.cause));
         }
+        // TODO(L): Serialise other objects if not ErrorChain/Error?
       }
 
       return { ErrorChain: chained };
@@ -170,4 +171,6 @@ export class ErrorChain {
       throw new ErrorChain({ name: EErrorChainError.Serialise }, error);
     }
   }
+
+  // TODO(L): Pretty print function for readability.
 }
