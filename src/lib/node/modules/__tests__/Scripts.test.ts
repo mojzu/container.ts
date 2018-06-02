@@ -78,7 +78,7 @@ describe("Scripts", () => {
       done.fail();
     } catch (error) {
       expect(error instanceof ErrorChain).toEqual(true);
-      expect(error.joinNames()).toEqual("ScriptsError.Error");
+      expect(error.joinNames()).toEqual("ScriptsError.TimeoutError");
       done();
     }
   });

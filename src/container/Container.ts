@@ -307,6 +307,7 @@ export class Container {
       rxjsTimeout(timeout),
       catchError((error) => {
         const errorName = state ? EContainerError.Up : EContainerError.Down;
+        // TODO(L): Improve error name.
         return throwError(new ContainerError(`${name}:${errorName}`, error));
       })
     );

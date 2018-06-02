@@ -30,6 +30,8 @@ import {
   IProcessSend
 } from "./Types";
 
+// TODO(HH): Refactor ChildProcess/Scripts to remove IPC support.
+
 /** Scripts process options. */
 export interface IScriptsOptions {
   args?: string[];
