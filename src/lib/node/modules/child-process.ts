@@ -5,7 +5,7 @@ import { filter, map, mergeMap, takeWhile, timeout as rxjsTimeout } from "rxjs/o
 import { Container, IModuleOptions, Module } from "../../../container";
 import { ErrorChain, IErrorChainSerialised } from "../../error";
 import { isString } from "../validate";
-import { IProcessStatus, Process, ProcessError } from "./Process";
+import { IProcessStatus, Process, ProcessError } from "./process";
 import {
   EProcessMessageType,
   IProcessCall,
@@ -17,7 +17,7 @@ import {
   IProcessMessage,
   IProcessMessageData,
   IProcessSend
-} from "./Types";
+} from "./types";
 
 /** Child process environment variable names. */
 export enum EChildProcessEnv {

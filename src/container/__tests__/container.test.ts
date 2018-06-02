@@ -1,17 +1,20 @@
 import { Subject } from "rxjs";
 import { ErrorChain } from "../../lib/error";
-import { Container, ContainerError } from "../Container";
-import { Environment } from "../Environment";
-import { Module, ModuleLog, ModuleMetric } from "../Module";
+import { Container, ContainerError } from "../container";
+import { Environment } from "../environment";
+import { Module, ModuleLog, ModuleMetric } from "../module";
 
 describe("Container", () => {
-  it("#ContainerError", () => {
+  it("ContainerError is instance of expected classes", () => {
     const error = new ContainerError("unknown");
+    expect(error instanceof Error).toEqual(false);
+    expect(ErrorChain.isError(error)).toEqual(true);
     expect(error instanceof ErrorChain).toEqual(true);
+    expect(ErrorChain.isErrorChain(error)).toEqual(true);
     expect(error instanceof ContainerError).toEqual(true);
   });
 
-  it("#Container", () => {
+  it("class has expected properties", () => {
     const name = "test";
     const container = new Container(name);
     expect(container.name).toEqual(name);
@@ -21,7 +24,7 @@ describe("Container", () => {
     expect(container.metrics$ instanceof Subject).toEqual(true);
   });
 
-  it("#Container#registerModule", () => {
+  it("module is registered/resolved and has expected properties", () => {
     const name = "test";
     const container = new Container(name);
     expect(container.registerModule(Module) instanceof Container).toEqual(true);

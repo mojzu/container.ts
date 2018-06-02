@@ -1,1 +1,1 @@
-export * from "./ErrorChain";
+export * from "./error-chain";

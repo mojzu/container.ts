@@ -4,10 +4,10 @@ import { keys } from "lodash";
 import { BehaviorSubject, forkJoin, from, Observable, of, Subject, throwError } from "rxjs";
 import { catchError, filter, map, switchMap, take, timeout as rxjsTimeout } from "rxjs/operators";
 import { ErrorChain } from "../lib/error";
-import { Environment } from "./Environment";
-import { ELogLevel, ILogMessage, ILogMetadata } from "./Log";
-import { EMetricType, IMetricTags } from "./Metric";
-import { Module } from "./Module";
+import { Environment } from "./environment";
+import { ELogLevel, ILogMessage, ILogMetadata } from "./log";
+import { EMetricType, IMetricTags } from "./metric";
+import { Module } from "./module";
 
 /** Command line arguments interface matching `yargs` package. */
 export interface IContainerArguments {

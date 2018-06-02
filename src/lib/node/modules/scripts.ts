@@ -15,10 +15,10 @@ import {
   IModuleOptions,
   Module
 } from "../../../container";
-import { ErrorChain } from "../../error/ErrorChain";
+import { ErrorChain } from "../../error/error-chain";
 import { isDirectory, isDuration, isFile } from "../validate";
-import { ChildProcess, EChildProcessEnv, EChildProcessEvent } from "./ChildProcess";
-import { IProcessStatus, Process } from "./Process";
+import { ChildProcess, EChildProcessEnv, EChildProcessEvent } from "./child-process";
+import { IProcessStatus, Process } from "./process";
 import {
   EProcessMessageType,
   IProcessCallOptions,
@@ -28,9 +28,9 @@ import {
   IProcessMessage,
   IProcessMessageData,
   IProcessSend
-} from "./Types";
+} from "./types";
 
-// TODO(HH): Refactor ChildProcess/Scripts to remove IPC support.
+// TODO(H): Refactor ChildProcess/Scripts to remove IPC support.
 
 /** Scripts process options. */
 export interface IScriptsOptions {

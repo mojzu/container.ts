@@ -1,6 +1,6 @@
 import * as path from "path";
 import { Container, Environment } from "../../../../container";
-import { Assets, AssetsError, EAssetsEnv, EAssetsError } from "../Assets";
+import { Assets, AssetsError, EAssetsEnv, EAssetsError } from "../assets";
 
 describe("Assets", () => {
   const ENVIRONMENT = new Environment().set(EAssetsEnv.Path, path.resolve(__dirname, "assets"));

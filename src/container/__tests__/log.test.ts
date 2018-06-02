@@ -1,4 +1,4 @@
-import { ELogLevel, ILogMessage, ILogMetadata, Log } from "../Log";
+import { ELogLevel, ILogMessage, ILogMetadata, Log } from "../log";
 
 type ITestLogCallback = (level: ELogLevel, message: ILogMessage, metadata: ILogMetadata) => void;
 
@@ -13,7 +13,7 @@ class TestLog extends Log {
 describe("Log", () => {
   const LOG = new TestLog();
 
-  it("#Log#emergency", (done) => {
+  it("emergency level message", (done) => {
     const error = new Error("Emergency");
     const metadata = { value: 1 };
     LOG.emergency(error, metadata, (level: ELogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
@@ -25,7 +25,7 @@ describe("Log", () => {
     });
   });
 
-  it("#Log#alert", (done) => {
+  it("alert level message", (done) => {
     const error = new Error("Alert");
     const metadata = { value: 1 };
     LOG.alert(error, metadata, (level: ELogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
@@ -37,7 +37,7 @@ describe("Log", () => {
     });
   });
 
-  it("#Log#critical", (done) => {
+  it("critical level message", (done) => {
     const error = new Error("Critical");
     const metadata = { value: 1 };
     LOG.critical(error, metadata, (level: ELogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
@@ -49,7 +49,7 @@ describe("Log", () => {
     });
   });
 
-  it("#Log#error", (done) => {
+  it("error level message", (done) => {
     const error = new Error("Error");
     const metadata = { value: 1 };
     LOG.error(error, metadata, (level: ELogLevel, logError: ILogMessage, logMetadata: ILogMetadata) => {
@@ -61,7 +61,7 @@ describe("Log", () => {
     });
   });
 
-  it("#Log#warn", (done) => {
+  it("warn level message", (done) => {
     const message = "Warning";
     const metadata = { value: 1 };
     LOG.warn(message, metadata, (level: ELogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
@@ -73,7 +73,7 @@ describe("Log", () => {
     });
   });
 
-  it("#Log#notice", (done) => {
+  it("notice level message", (done) => {
     const message = "Notice";
     const metadata = { value: 1 };
     LOG.notice(message, metadata, (level: ELogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
@@ -85,7 +85,7 @@ describe("Log", () => {
     });
   });
 
-  it("#Log#info", (done) => {
+  it("info level message", (done) => {
     const message = "Informational";
     const metadata = { value: 1 };
     LOG.info(message, metadata, (level: ELogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {
@@ -97,7 +97,7 @@ describe("Log", () => {
     });
   });
 
-  it("#Log#debug", (done) => {
+  it("debug level message", (done) => {
     const message = "Debug";
     const metadata = { value: 1 };
     LOG.debug(message, metadata, (level: ELogLevel, logMessage: ILogMessage, logMetadata: ILogMetadata) => {

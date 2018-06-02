@@ -1,4 +1,4 @@
-import { EMetricType, IMetricTags, Metric } from "../Metric";
+import { EMetricType, IMetricTags, Metric } from "../metric";
 
 let _CALLBACK: any = null;
 
@@ -24,7 +24,7 @@ class TestMetric extends Metric {
 describe("Metric", () => {
   const METRIC = new TestMetric();
 
-  it("#Metric#increment", (done) => {
+  it("increment type message", (done) => {
     setCallback((type: EMetricType, name: string, value: any, tags: IMetricTags) => {
       expect(type).toEqual(EMetricType.Increment);
       expect(name).toEqual("increment");
@@ -35,7 +35,7 @@ describe("Metric", () => {
     METRIC.increment("increment");
   });
 
-  it("#Metric#decrement", (done) => {
+  it("decrement type message", (done) => {
     setCallback((type: EMetricType, name: string, value: any, tags: IMetricTags) => {
       expect(type).toEqual(EMetricType.Decrement);
       expect(name).toEqual("decrement");
@@ -46,7 +46,7 @@ describe("Metric", () => {
     METRIC.decrement("decrement");
   });
 
-  it("#Metric#gauge", (done) => {
+  it("gauge type message", (done) => {
     setCallback((type: EMetricType, name: string, value: any, tags: IMetricTags) => {
       expect(type).toEqual(EMetricType.Gauge);
       expect(name).toEqual("gauge");
@@ -57,7 +57,7 @@ describe("Metric", () => {
     METRIC.gauge("gauge", 100);
   });
 
-  it("#Metric#timing", (done) => {
+  it("timing type message", (done) => {
     setCallback((type: EMetricType, name: string, value: any, tags: IMetricTags) => {
       expect(type).toEqual(EMetricType.Timing);
       expect(name).toEqual("timing");
@@ -68,7 +68,7 @@ describe("Metric", () => {
     METRIC.timing("timing", 1000);
   });
 
-  it("#Metric#histogram", (done) => {
+  it("histogram type message", (done) => {
     setCallback((type: EMetricType, name: string, value: any, tags: IMetricTags) => {
       expect(type).toEqual(EMetricType.Histogram);
       expect(name).toEqual("histogram");

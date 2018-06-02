@@ -1,5 +1,5 @@
 import { Field } from "../../validate";
-import * as NodeValidate from "./NodeValidate";
+import * as NodeValidate from "./node-validate";
 
 export class BufferField extends Field<Buffer> {
   public constructor(protected readonly options: NodeValidate.INodeValidateBuffer = {}) {

@@ -2,10 +2,10 @@ import * as Debug from "debug";
 import { assign, keys } from "lodash";
 import { Observable } from "rxjs";
 import { ErrorChain } from "../lib/error";
-import { Container, EContainerScope } from "./Container";
-import { Environment } from "./Environment";
-import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./Log";
-import { EMetricType, IMetricTags, Metric } from "./Metric";
+import { Container, EContainerScope } from "./container";
+import { Environment } from "./environment";
+import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./log";
+import { EMetricType, IMetricTags, Metric } from "./metric";
 
 /** Container options injected by awilix library. */
 export interface IModuleOptions {

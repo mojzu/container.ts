@@ -1,5 +1,5 @@
 import { Container, ContainerLogMessage, ELogLevel } from "../../../container";
-import { Logs } from "../Logs";
+import { Logs } from "../logs";
 
 type ITestLogsCallback = (log: ContainerLogMessage) => void;
 
@@ -28,12 +28,12 @@ describe("Logs", () => {
     CONTAINER.destroy();
   });
 
-  it("#TestLog", () => {
+  it("module has expected properties", () => {
     expect(LOGS).toBeDefined();
     expect(LOGS.moduleName).toEqual(TestLogs.moduleName);
   });
 
-  it("#TestLog#emergency", (done) => {
+  it("emergency level message handled by module", (done) => {
     const error = new Error("Emergency");
     const metadata = { value: 1 };
     LOGS.log.emergency(error, metadata, (log: ContainerLogMessage) => {
@@ -46,7 +46,7 @@ describe("Logs", () => {
     });
   });
 
-  it("#TestLog#critical", (done) => {
+  it("critical level message handled by module", (done) => {
     const error = new Error("Critical");
     const metadata = { value: 1 };
     LOGS.log.critical(error, metadata, (log: ContainerLogMessage) => {

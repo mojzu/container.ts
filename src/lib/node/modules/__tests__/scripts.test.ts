@@ -3,8 +3,8 @@ import { Observable, of } from "rxjs";
 import { take } from "rxjs/operators";
 import { Container, Environment, Module } from "../../../../container";
 import { ErrorChain } from "../../../error";
-import { Process } from "../Process";
-import { EScriptsEnv, Scripts } from "../Scripts";
+import { Process } from "../process";
+import { EScriptsEnv, Scripts } from "../scripts";
 
 const WN = "Worker";
 const timeout = (ms: number) => new Promise((res) => setTimeout(res, ms));

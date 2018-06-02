@@ -1,6 +1,6 @@
 import { Observable, of } from "rxjs";
 import { Container, Environment, IModuleDependencies, IModuleOptions, Module } from "../../../../../container";
-import { ChildProcess } from "../../ChildProcess";
+import { ChildProcess } from "../../child-process";
 
 class TestModule extends Module {
   public static readonly moduleName: string = "Test";

@@ -1,5 +1,5 @@
 import { Container, ContainerMetricMessage, EMetricType } from "../../../container";
-import { Metrics } from "../Metrics";
+import { Metrics } from "../metrics";
 
 type ITestMetricsCallback = (metric: ContainerMetricMessage) => void;
 
@@ -28,12 +28,12 @@ describe("Metric", () => {
     CONTAINER.destroy();
   });
 
-  it("#TestMetrics", () => {
+  it("module instance has expected properties", () => {
     expect(METRICS).toBeDefined();
     expect(METRICS.moduleName).toEqual(TestMetrics.moduleName);
   });
 
-  it("#TestMetric#increment", (done) => {
+  it("increment type message handled by module", (done) => {
     const name = "testCounter";
     const value = 5;
     const tags = { tag: "tag" };

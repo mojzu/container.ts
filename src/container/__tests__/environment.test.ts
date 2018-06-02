@@ -1,13 +1,13 @@
-import { Environment } from "../Environment";
+import { Environment } from "../environment";
 
 describe("Environment", () => {
-  it("#Environment", () => {
+  it("has expected properties", () => {
     const variables = { value: "1" };
     const environment = new Environment(variables);
     expect(environment.variables).toEqual(variables);
   });
 
-  it("#Environment#copy", () => {
+  it("is copied successfully, set method does not change original instance values", () => {
     const variables = { value: "1" };
     const environment = new Environment(variables);
     const environmentCopy = environment.copy({ test: "3" });
@@ -20,14 +20,14 @@ describe("Environment", () => {
     expect(testValue).toEqual("3");
   });
 
-  it("#Environment#get", () => {
+  it("get returns expected value", () => {
     const value = "1";
     const variables = { value };
     const environment = new Environment(variables);
     expect(environment.get("value")).toEqual(value);
   });
 
-  it("#Environment#set", () => {
+  it("set returns Container instance and get returns expected value", () => {
     const value = "1";
     const environment = new Environment();
     expect(environment.set("value", value) instanceof Environment).toEqual(true);

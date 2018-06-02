@@ -1,5 +1,5 @@
 import { Container, Environment } from "../../../../container";
-import { EProcessEnv, Process } from "../Process";
+import { EProcessEnv, Process } from "../process";
 
 describe("Process", () => {
   const ENVIRONMENT = new Environment()

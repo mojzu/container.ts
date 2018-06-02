@@ -1,5 +1,5 @@
-import { Container, ContainerError } from "../Container";
-import { IModuleDependencies, Module } from "../Module";
+import { Container, ContainerError } from "../container";
+import { IModuleDependencies, Module } from "../module";
 
 // Tests for Module up/down order.
 const moduleUpOrder: number[] = [];
@@ -69,22 +69,22 @@ class Test4 extends Test3 {
 describe("Module", () => {
   const CONTAINER = new Container("Test1").registerModules([Test1, Test2, Test3, Test4]);
 
-  it("#up", async () => {
+  it("up calls moduleUp methods in expected order", async () => {
     await CONTAINER.up().toPromise();
     expect(moduleUpOrder).toEqual([1, 3, 2, 4]);
   });
 
-  it("#down", async () => {
+  it("down calls moduleDown methods in expected order", async () => {
     await CONTAINER.down().toPromise();
     expect(moduleDownOrder).toEqual([4, 2, 3, 1]);
   });
 
-  it("#destroy", () => {
+  it("destroy calls moduleDestroy methods", () => {
     CONTAINER.destroy();
     expect(moduleDestroy).toEqual(4);
   });
 
-  it("#registerModules throws error for duplicates", (done) => {
+  it("registerModules throws error for duplicate module names", (done) => {
     try {
       new Container("Invalid").registerModules([Test1, Test1]);
       done.fail();
@@ -94,7 +94,7 @@ describe("Module", () => {
     }
   });
 
-  it("#moduleDependencies inherited dependencies work", () => {
+  it("moduleDependencies inherited dependencies are present in module instances", () => {
     const t4 = CONTAINER.resolve<Test4>(Test4.moduleName);
     expect(t4.test1 instanceof Test1).toEqual(true);
     expect(t4.test2 instanceof Test2).toEqual(true);
