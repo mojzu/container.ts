@@ -7,7 +7,7 @@ import { ErrorChain } from "../lib/error";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata } from "./Log";
 import { EMetricType, IMetricTags } from "./Metric";
-import { IModule, IModuleConstructor, IModuleState } from "./Types";
+import { Module } from "./Module";
 
 /** Command line arguments interface matching `yargs` package. */
 export interface IContainerArguments {
@@ -21,8 +21,8 @@ export interface IContainerArguments {
 
 /** Container error class. */
 export class ContainerError extends ErrorChain {
-  public constructor(name: string, cause?: Error) {
-    super({ name }, cause);
+  public constructor(name: string, cause?: Error, moduleName?: string) {
+    super({ name, value: moduleName }, cause);
   }
 }
 
@@ -92,7 +92,7 @@ export class Container {
   public readonly container: AwilixContainer;
 
   /** Observable module state. */
-  public readonly modules$ = new BehaviorSubject<IModuleState>({});
+  public readonly modules$ = new BehaviorSubject<{ [key: string]: boolean }>({});
 
   /** Array of registered module names. */
   public get moduleNames(): string[] {
@@ -100,8 +100,8 @@ export class Container {
   }
 
   /** Array of registered modules. */
-  public get modules(): IModule[] {
-    return this.moduleNames.map((n) => this.container.resolve<IModule>(n));
+  public get modules(): Module[] {
+    return this.moduleNames.map((n) => this.container.resolve<Module>(n));
   }
 
   /** Container module logs. */
@@ -136,7 +136,7 @@ export class Container {
    * Register a module in container.
    * Throws an error if module of name is already registered.
    */
-  public registerModule(moduleClass: IModuleConstructor): Container {
+  public registerModule<T extends typeof Module>(moduleClass: T): Container {
     if (this.containerModuleRegistered(moduleClass.moduleName)) {
       throw new ContainerError(EContainerError.ModuleRegistered);
     }
@@ -148,7 +148,7 @@ export class Container {
   }
 
   /** Register named modules in container. */
-  public registerModules(modules: IModuleConstructor[]): Container {
+  public registerModules<T extends typeof Module>(modules: T[]): Container {
     modules.map((mod) => this.registerModule(mod));
     return this;
   }
@@ -268,18 +268,18 @@ export class Container {
   }
 
   /** Create a new instance of module class. */
-  protected containerModuleFactory<T extends IModuleConstructor>(moduleClass: T, opts: any): IModule {
+  protected containerModuleFactory<T extends typeof Module>(moduleClass: T, opts: any): Module {
     return new moduleClass({ moduleName: moduleClass.moduleName, opts });
   }
 
   /** Returns list of module names which are dependencies of target module. */
-  protected containerModuleDependencies(mod: IModule): string[] {
+  protected containerModuleDependencies(mod: Module): string[] {
     const dependencies = mod.moduleDependencies();
     return keys(dependencies).map((k) => dependencies[k].moduleName);
   }
 
   /** Returns list of module names which are dependents of target module. */
-  protected containerModuleDependents(mod: IModule): string[] {
+  protected containerModuleDependents(mod: Module): string[] {
     const dependents: string[] = [];
     this.modules.map((m) => {
       const dependencies = m.moduleDependencies();
@@ -307,8 +307,7 @@ export class Container {
       rxjsTimeout(timeout),
       catchError((error) => {
         const errorName = state ? EContainerError.Up : EContainerError.Down;
-        // TODO(L): Improve error name.
-        return throwError(new ContainerError(`${name}:${errorName}`, error));
+        return throwError(new ContainerError(errorName, error, name));
       })
     );
   }

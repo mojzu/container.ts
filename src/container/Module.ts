@@ -6,7 +6,17 @@ import { Container, EContainerScope } from "./Container";
 import { Environment } from "./Environment";
 import { ELogLevel, ILogMessage, ILogMetadata, Log } from "./Log";
 import { EMetricType, IMetricTags, Metric } from "./Metric";
-import { IModule, IModuleDependencies, IModuleOptions } from "./Types";
+
+/** Container options injected by awilix library. */
+export interface IModuleOptions {
+  moduleName: string;
+  opts: any;
+}
+
+/** Module dependencies. */
+export interface IModuleDependencies {
+  [key: string]: typeof Module;
+}
 
 /** Module error class. */
 export class ModuleError extends ErrorChain {
@@ -53,7 +63,7 @@ export enum EModuleError {
 }
 
 /** Base class for container class modules with dependency injection. */
-export class Module implements IModule {
+export class Module {
   /** Default module name. */
   public static readonly moduleName: string = "Module";
 

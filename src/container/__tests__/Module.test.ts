@@ -1,6 +1,5 @@
 import { Container, ContainerError } from "../Container";
-import { Module } from "../Module";
-import { IModuleDependencies } from "../Types";
+import { IModuleDependencies, Module } from "../Module";
 
 // Tests for Module up/down order.
 const moduleUpOrder: number[] = [];
