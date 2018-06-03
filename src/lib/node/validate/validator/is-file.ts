@@ -11,11 +11,11 @@ export function isFile(value = ""): string {
     value = resolve(value);
     isValid = lstatSync(value).isFile();
   } catch (error) {
-    throw new NodeValidateError(ENodeValidateError.InvalidFile, value, error);
+    throw new NodeValidateError(ENodeValidateError.IsFileError, value, error);
   }
 
   if (!isValid) {
-    throw new NodeValidateError(ENodeValidateError.InvalidFile, value);
+    throw new NodeValidateError(ENodeValidateError.IsFileError, value);
   }
   return value;
 }

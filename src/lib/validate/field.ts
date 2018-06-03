@@ -5,10 +5,10 @@ import { ErrorChain } from "../error";
 
 /** Field error codes. */
 export enum EFieldError {
-  InvalidAnd,
-  InvalidOr,
-  InvalidNot,
-  InvalidOptional
+  AndFieldError,
+  OrFieldError,
+  NotFieldError,
+  OptionalFieldError
 }
 
 /** Field error chain class. */
@@ -82,7 +82,7 @@ export class OptionalField<T, C = object> extends Field<T, C> {
       }
       return this.field.validate(value, context);
     } catch (error) {
-      throw new FieldError(EFieldError.InvalidOptional, value, error);
+      throw new FieldError(EFieldError.OptionalFieldError, value, error);
     }
   }
 
@@ -96,7 +96,7 @@ export class OptionalField<T, C = object> extends Field<T, C> {
       }
       return this.field.format(value, context);
     } catch (error) {
-      throw new FieldError(EFieldError.InvalidOptional, value, error);
+      throw new FieldError(EFieldError.OptionalFieldError, value, error);
     }
   }
 }
@@ -108,10 +108,10 @@ export class AndField<T, C = object> extends OperatorField<T, C> {
     try {
       validated = this.fields.map((f) => f.validate(value, context)).reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
-      throw new FieldError(EFieldError.InvalidAnd, value, error);
+      throw new FieldError(EFieldError.AndFieldError, value, error);
     }
     if (validated == null) {
-      throw new FieldError(EFieldError.InvalidAnd, value);
+      throw new FieldError(EFieldError.AndFieldError, value);
     }
     return validated;
   }
@@ -121,10 +121,10 @@ export class AndField<T, C = object> extends OperatorField<T, C> {
     try {
       formatted = this.fields.map((f) => f.format(value, context)).reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
-      throw new FieldError(EFieldError.InvalidAnd, value, error);
+      throw new FieldError(EFieldError.AndFieldError, value, error);
     }
     if (formatted == null) {
-      throw new FieldError(EFieldError.InvalidAnd, value);
+      throw new FieldError(EFieldError.AndFieldError, value);
     }
     return formatted;
   }
@@ -145,10 +145,10 @@ export class OrField<T, C = object> extends OperatorField<T, C> {
         })
         .reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
-      throw new FieldError(EFieldError.InvalidOr, value, error);
+      throw new FieldError(EFieldError.OrFieldError, value, error);
     }
     if (validated == null) {
-      throw new FieldError(EFieldError.InvalidOr);
+      throw new FieldError(EFieldError.OrFieldError);
     }
     return validated;
   }
@@ -166,10 +166,10 @@ export class OrField<T, C = object> extends OperatorField<T, C> {
         })
         .reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
-      throw new FieldError(EFieldError.InvalidOr, value, error);
+      throw new FieldError(EFieldError.OrFieldError, value, error);
     }
     if (formatted == null) {
-      throw new FieldError(EFieldError.InvalidOr);
+      throw new FieldError(EFieldError.OrFieldError);
     }
     return formatted;
   }
@@ -190,10 +190,10 @@ export class NotField<T, C = object> extends OperatorField<T, C> {
         })
         .reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
-      throw new FieldError(EFieldError.InvalidNot, value, error);
+      throw new FieldError(EFieldError.NotFieldError, value, error);
     }
     if (validated != null) {
-      throw new FieldError(EFieldError.InvalidNot, validated);
+      throw new FieldError(EFieldError.NotFieldError, validated);
     }
     return validated;
   }
@@ -211,10 +211,10 @@ export class NotField<T, C = object> extends OperatorField<T, C> {
         })
         .reduce((p, c) => (p != null ? p : c), null);
     } catch (error) {
-      throw new FieldError(EFieldError.InvalidNot, value, error);
+      throw new FieldError(EFieldError.NotFieldError, value, error);
     }
     if (formatted != null) {
-      throw new FieldError(EFieldError.InvalidNot, formatted);
+      throw new FieldError(EFieldError.NotFieldError, formatted);
     }
     return formatted;
   }

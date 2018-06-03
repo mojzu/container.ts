@@ -8,7 +8,7 @@ export function isLanguage(value = ""): string {
   try {
     return isString(value.toLowerCase(), { min: 2, max: 2, values: ISO639 });
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidLanguage, value, error);
+    throw new ValidateError(EValidateError.IsLanguageError, value, error);
   }
 }
 

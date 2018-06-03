@@ -12,11 +12,11 @@ export function isEmail(value = "", options: IIsEmail = {}): string {
   try {
     isValid = validatorIsEmail(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidEmail, value, error);
+    throw new ValidateError(EValidateError.IsEmailError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidEmail, value);
+    throw new ValidateError(EValidateError.IsEmailError, value);
   }
   return value;
 }

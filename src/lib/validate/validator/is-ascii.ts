@@ -11,11 +11,11 @@ export function isAscii(value = "", options: IIsString = {}): string {
     isValid = validatorIsAscii(value);
     value = isString(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidAscii, value, error);
+    throw new ValidateError(EValidateError.IsAsciiError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidAscii, value);
+    throw new ValidateError(EValidateError.IsAsciiError, value);
   }
   return value;
 }

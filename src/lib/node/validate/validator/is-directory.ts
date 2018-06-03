@@ -11,11 +11,11 @@ export function isDirectory(value = ""): string {
     value = resolve(value);
     isValid = lstatSync(value).isDirectory();
   } catch (error) {
-    throw new NodeValidateError(ENodeValidateError.InvalidDirectory, value, error);
+    throw new NodeValidateError(ENodeValidateError.IsDirectoryError, value, error);
   }
 
   if (!isValid) {
-    throw new NodeValidateError(ENodeValidateError.InvalidDirectory, value);
+    throw new NodeValidateError(ENodeValidateError.IsDirectoryError, value);
   }
   return value;
 }

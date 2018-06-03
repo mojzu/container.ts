@@ -14,7 +14,7 @@ export function isBoolean(value = "", options: IIsBoolean = {}): boolean {
   try {
     return toBoolean(value, strict);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidBoolean, value, error);
+    throw new ValidateError(EValidateError.IsBooleanError, value, error);
   }
 }
 

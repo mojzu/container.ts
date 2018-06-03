@@ -9,11 +9,11 @@ export function isJson<T>(value = ""): T {
   try {
     isValid = isJSON(value);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidJson, value, error);
+    throw new ValidateError(EValidateError.IsJsonError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidJson, value);
+    throw new ValidateError(EValidateError.IsJsonError, value);
   }
   return JSON.parse(value);
 }

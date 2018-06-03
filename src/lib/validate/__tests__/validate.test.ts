@@ -16,27 +16,27 @@ import {
 } from "../validator";
 
 describe("Validate", () => {
-  const invalidBoolean = EValidateError[EValidateError.InvalidBoolean];
-  const invalidString = EValidateError[EValidateError.InvalidString];
+  const invalidBoolean = EValidateError[EValidateError.IsBooleanError];
+  const invalidString = EValidateError[EValidateError.IsStringError];
 
   // Error tests.
 
   it("ValidateError is instance of Error and ValidateError", () => {
-    const error = new ValidateError(EValidateError.InvalidString);
+    const error = new ValidateError(EValidateError.IsStringError);
     expect(error instanceof ErrorChain).toEqual(true);
     expect(error instanceof ValidateError).toEqual(true);
   });
 
   it("ValidateError has expected properties", () => {
-    const error = new ValidateError(EValidateError.InvalidBoolean);
-    expect(error.name).toEqual("InvalidBoolean");
+    const error = new ValidateError(EValidateError.IsBooleanError);
+    expect(error.name).toEqual("IsBooleanError");
     expect(error.stack).toBeDefined();
     expect(error.message).toEqual(invalidBoolean);
   });
 
   it("ValidateError passed thrown error has format", () => {
-    const error = new ValidateError(EValidateError.InvalidString, "", new Error("Unknown"));
-    expect(error.name).toEqual("InvalidString");
+    const error = new ValidateError(EValidateError.IsStringError, "", new Error("Unknown"));
+    expect(error.name).toEqual("IsStringError");
     expect(error.stack).toBeDefined();
     expect(error.message).toEqual(`${invalidString} "": Error: Unknown`);
   });

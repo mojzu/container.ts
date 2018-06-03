@@ -12,11 +12,11 @@ export function isUrl(value = "", options: IIsUrl = { require_host: true }): str
   try {
     isValid = isURL(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidUrl, value, error);
+    throw new ValidateError(EValidateError.IsUrlError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidUrl, value);
+    throw new ValidateError(EValidateError.IsUrlError, value);
   }
   return value;
 }

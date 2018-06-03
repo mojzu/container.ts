@@ -14,11 +14,11 @@ export function isBuffer(value = "", options: IIsBuffer = {}): Buffer {
   try {
     buf = Buffer.from(value, options.encoding);
   } catch (error) {
-    throw new NodeValidateError(ENodeValidateError.InvalidBuffer, value, error);
+    throw new NodeValidateError(ENodeValidateError.IsBufferError, value, error);
   }
 
   if (buf == null) {
-    throw new NodeValidateError(ENodeValidateError.InvalidBuffer, value);
+    throw new NodeValidateError(ENodeValidateError.IsBufferError, value);
   }
   return buf;
 }

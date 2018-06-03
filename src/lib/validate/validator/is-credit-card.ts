@@ -9,11 +9,11 @@ export function isCreditCard(value = ""): string {
   try {
     isValid = validatorIsCreditCard(value);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidCreditCard, value, error);
+    throw new ValidateError(EValidateError.IsCreditCardError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidCreditCard, value);
+    throw new ValidateError(EValidateError.IsCreditCardError, value);
   }
   return value;
 }

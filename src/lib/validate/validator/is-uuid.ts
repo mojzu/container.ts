@@ -16,11 +16,11 @@ export function isUuid(value = "", options: IIsUuid = {}): string {
   try {
     isValid = isUUID(value, version);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidUuid, value, error);
+    throw new ValidateError(EValidateError.IsUuidError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidUuid, value);
+    throw new ValidateError(EValidateError.IsUuidError, value);
   }
   return value;
 }

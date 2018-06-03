@@ -2,9 +2,9 @@ import { ErrorChain } from "../../error";
 
 /** NodeValidate error codes. */
 export enum ENodeValidateError {
-  InvalidBuffer,
-  InvalidFile,
-  InvalidDirectory
+  IsBufferError,
+  IsFileError,
+  IsDirectoryError
 }
 
 /** NodeValidate error chain class. */

@@ -11,11 +11,11 @@ export function isBase64(value = "", options: IIsString = {}): string {
     isValid = validatorIsBase64(value);
     value = isString(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidBase64, value, error);
+    throw new ValidateError(EValidateError.IsBase64Error, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidBase64, value);
+    throw new ValidateError(EValidateError.IsBase64Error, value);
   }
   return value;
 }

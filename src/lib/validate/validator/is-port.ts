@@ -7,7 +7,7 @@ export function isPort(value = ""): number {
   try {
     return isInteger(value, { min: 0x1, max: 0xffff });
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidPort, value, error);
+    throw new ValidateError(EValidateError.IsPortError, value, error);
   }
 }
 

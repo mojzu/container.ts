@@ -9,11 +9,11 @@ export function isMacAddress(value = ""): string {
   try {
     isValid = isMACAddress(value);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidMacAddress, value, error);
+    throw new ValidateError(EValidateError.IsMacAddressError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidMacAddress, value);
+    throw new ValidateError(EValidateError.IsMacAddressError, value);
   }
   return value;
 }

@@ -18,11 +18,11 @@ export function isAlphanumeric(value = "", options: IIsAlphanumeric = {}): strin
     isValid = validatorIsAlphanumeric(value, locale);
     value = isString(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidAlphanumeric, value);
+    throw new ValidateError(EValidateError.IsAlphanumericError, value);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidAlphanumeric, value);
+    throw new ValidateError(EValidateError.IsAlphanumericError, value);
   }
   return value;
 }

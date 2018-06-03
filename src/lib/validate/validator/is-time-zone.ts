@@ -9,11 +9,11 @@ export function isTimeZone(value = ""): string {
   try {
     datetime = DateTime.local().setZone(value);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidTimeZone, value, error);
+    throw new ValidateError(EValidateError.IsTimeZoneError, value, error);
   }
 
   if (!datetime.isValid) {
-    throw new ValidateError(EValidateError.InvalidTimeZone, value);
+    throw new ValidateError(EValidateError.IsTimeZoneError, value);
   }
   return datetime.zoneName;
 }

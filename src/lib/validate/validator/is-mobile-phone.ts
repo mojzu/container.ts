@@ -16,11 +16,11 @@ export function isMobilePhone(value = "", options: IIsMobilePhone = {}): string 
   try {
     isValid = validatorIsMobilePhone(value, locale);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidMobilePhone, value, error);
+    throw new ValidateError(EValidateError.IsMobilePhoneError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidMobilePhone, value);
+    throw new ValidateError(EValidateError.IsMobilePhoneError, value);
   }
   return value;
 }

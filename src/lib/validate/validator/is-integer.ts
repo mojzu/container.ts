@@ -12,11 +12,11 @@ export function isInteger(value = "", options: IIsInteger = {}): number {
   try {
     isValid = isInt(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidInteger, value, error);
+    throw new ValidateError(EValidateError.IsIntegerError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidInteger, value);
+    throw new ValidateError(EValidateError.IsIntegerError, value);
   }
   return toInt(value, 10);
 }

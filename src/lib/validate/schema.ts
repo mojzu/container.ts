@@ -4,8 +4,8 @@ import { Field } from "./field";
 
 /** Schema error codes. */
 export enum ESchemaError {
-  Unknown,
-  InvalidField
+  SchemaValueError,
+  SchemaFieldError
 }
 
 /** Schema error class. */
@@ -194,14 +194,14 @@ export class Schema<T = object> {
         output[key] = input[key];
       } else {
         // Invalid schema field value.
-        throw new SchemaError(ESchemaError.InvalidField, keyPath, value);
+        throw new SchemaError(ESchemaError.SchemaFieldError, keyPath, value);
       }
     } catch (error) {
       // Schema error wrapper.
       if (error instanceof SchemaError) {
         throw error;
       } else {
-        throw new SchemaError(ESchemaError.Unknown, keyPath, error);
+        throw new SchemaError(ESchemaError.SchemaValueError, keyPath, error);
       }
     }
   }

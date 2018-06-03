@@ -18,11 +18,11 @@ export function isAlpha(value = "", options: IIsAlpha = {}): string {
     isValid = validatorIsAlpha(value, locale);
     value = isString(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidAlpha, value, error);
+    throw new ValidateError(EValidateError.IsAlphaError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidAlpha, value);
+    throw new ValidateError(EValidateError.IsAlphaError, value);
   }
   return value;
 }

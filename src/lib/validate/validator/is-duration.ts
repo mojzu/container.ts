@@ -12,11 +12,11 @@ export function isDuration(value = "", options: IIsDuration = {}): Duration {
   try {
     duration = Duration.fromISO(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidDuration, value, error);
+    throw new ValidateError(EValidateError.IsDurationError, value, error);
   }
 
   if (!duration.isValid) {
-    throw new ValidateError(EValidateError.InvalidDuration, value);
+    throw new ValidateError(EValidateError.IsDurationError, value);
   }
   return duration;
 }

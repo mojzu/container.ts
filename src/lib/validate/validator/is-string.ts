@@ -40,11 +40,11 @@ export function isString(value = "", options: IIsString = {}): string {
       isValid = false;
     }
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidString, value, error);
+    throw new ValidateError(EValidateError.IsStringError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidString, value);
+    throw new ValidateError(EValidateError.IsStringError, value);
   }
   return value;
 }

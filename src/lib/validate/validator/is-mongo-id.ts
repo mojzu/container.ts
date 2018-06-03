@@ -9,11 +9,11 @@ export function isMongoId(value = ""): string {
   try {
     isValid = validatorIsMongoId(value);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidMongoId, value, error);
+    throw new ValidateError(EValidateError.IsMongoIdError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidMongoId, value);
+    throw new ValidateError(EValidateError.IsMongoIdError, value);
   }
   return value;
 }

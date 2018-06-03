@@ -13,11 +13,11 @@ export function isDateTime(value = "", options: IIsDateTime = {}): DateTime {
   try {
     datetime = DateTime.fromISO(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidDateTime, value, error);
+    throw new ValidateError(EValidateError.IsDateTimeError, value, error);
   }
 
   if (!datetime.isValid) {
-    throw new ValidateError(EValidateError.InvalidDateTime, value);
+    throw new ValidateError(EValidateError.IsDateTimeError, value);
   }
   return datetime;
 }

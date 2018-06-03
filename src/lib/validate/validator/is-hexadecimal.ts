@@ -9,11 +9,11 @@ export function isHexadecimal(value = ""): number {
   try {
     isValid = validatorIsHexadecimal(value);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidHexadecimal, value, error);
+    throw new ValidateError(EValidateError.IsHexadecimalError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidHexadecimal, value);
+    throw new ValidateError(EValidateError.IsHexadecimalError, value);
   }
   return toInt(value, 16);
 }

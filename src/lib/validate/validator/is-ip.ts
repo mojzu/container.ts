@@ -16,11 +16,11 @@ export function isIp(value = "", options: IIsIp = {}): string {
   try {
     isValid = isIP(value, version);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidIp, value, error);
+    throw new ValidateError(EValidateError.IsIpError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidIp, value);
+    throw new ValidateError(EValidateError.IsIpError, value);
   }
   return value;
 }

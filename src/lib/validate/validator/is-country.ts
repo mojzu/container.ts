@@ -8,7 +8,7 @@ export function isCountry(value = ""): string {
   try {
     return isString(value.toUpperCase(), { min: 2, max: 2, values: ISO3166 });
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidCountry, value, error);
+    throw new ValidateError(EValidateError.IsCountryError, value, error);
   }
 }
 

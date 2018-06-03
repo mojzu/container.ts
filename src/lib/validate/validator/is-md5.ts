@@ -9,11 +9,11 @@ export function isMd5(value = ""): string {
   try {
     isValid = isMD5(value);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidMd5, value, error);
+    throw new ValidateError(EValidateError.IsMd5Error, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidMd5, value);
+    throw new ValidateError(EValidateError.IsMd5Error, value);
   }
   return value;
 }

@@ -18,7 +18,7 @@ export function isLocale(value = "", options: IIsLocale = {}): string {
     const country = isCountry(parts[1]);
     return `${language}${separator}${country}`;
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidLocale, value, error);
+    throw new ValidateError(EValidateError.IsLocaleError, value, error);
   }
 }
 

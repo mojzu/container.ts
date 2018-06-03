@@ -12,11 +12,11 @@ export function isInterval(value = "", options: IIsInterval = {}): Interval {
   try {
     interval = Interval.fromISO(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidInterval, value, error);
+    throw new ValidateError(EValidateError.IsIntervalError, value, error);
   }
 
   if (!interval.isValid) {
-    throw new ValidateError(EValidateError.InvalidInterval, value);
+    throw new ValidateError(EValidateError.IsIntervalError, value);
   }
   return interval;
 }

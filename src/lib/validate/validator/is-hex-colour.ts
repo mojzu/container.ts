@@ -9,11 +9,11 @@ export function isHexColour(value = ""): string {
   try {
     isValid = validatorIsHexColor(value);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidHexColour, value, error);
+    throw new ValidateError(EValidateError.IsHexColourError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidHexColour, value);
+    throw new ValidateError(EValidateError.IsHexColourError, value);
   }
   return value;
 }

@@ -12,11 +12,11 @@ export function isDomain(value = "", options: IIsDomain = {}): string {
   try {
     isValid = isFQDN(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidDomain, value, error);
+    throw new ValidateError(EValidateError.IsDomainError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidDomain, value);
+    throw new ValidateError(EValidateError.IsDomainError, value);
   }
   return value;
 }

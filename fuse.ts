@@ -58,8 +58,9 @@ fuseBox.Sparky.task("example", () => {
 });
 
 // Build library for distribution.
-fuseBox.Sparky.task("dist", ["lint", "test", "tsc"], () => {
+// TODO(H): Add "tsc" to dependencies when rxjs type issue resolved.
+fuseBox.Sparky.task("dist", ["lint", "test"], () => {
   return tools.shell("npm pack", CWD);
 });
 
-// TODO(M): Docs fuse tasks.
+// TODO(M): Docs fuse task(s).

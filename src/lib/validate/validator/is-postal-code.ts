@@ -16,11 +16,11 @@ export function isPostalCode(value = "", options: IIsPostalCode = {}): string {
   try {
     isValid = validatorIsPostalCode(value, locale);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidPostalCode, value, error);
+    throw new ValidateError(EValidateError.IsPostalCodeError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidPostalCode, value);
+    throw new ValidateError(EValidateError.IsPostalCodeError, value);
   }
   return value;
 }

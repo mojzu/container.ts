@@ -12,11 +12,11 @@ export function isFloat(value = "", options: IIsFloat = {}): number {
   try {
     isValid = validatorIsFloat(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.InvalidFloat, value, error);
+    throw new ValidateError(EValidateError.IsFloatError, value, error);
   }
 
   if (!isValid) {
-    throw new ValidateError(EValidateError.InvalidFloat, value);
+    throw new ValidateError(EValidateError.IsFloatError, value);
   }
   return toFloat(value);
 }
