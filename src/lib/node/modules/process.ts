@@ -1,7 +1,7 @@
 import * as os from "os";
 import * as process from "process";
 import { interval } from "rxjs";
-import { Container, IModuleOptions, Module } from "../../../container";
+import { IModuleOptions, Module } from "../../../container";
 import { ErrorChain } from "../../error";
 import { isString } from "../validate";
 
@@ -62,19 +62,9 @@ export class Process extends Module {
   /** Default module name. */
   public static readonly moduleName: string = "Process";
 
-  /** Determine if container has Process module. */
-  public static isProcess(container: Container): boolean {
-    try {
-      container.resolve<Process>(Process.name);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
   /** Get Node.js process title. */
   public static get title(): string {
-    return process.title;
+    return process.title || "node";
   }
 
   /** Set Node.js process title. */
@@ -83,7 +73,7 @@ export class Process extends Module {
       const untypedProcess: any = process;
       untypedProcess.title = name;
     }
-    return process.title;
+    return Process.title;
   }
 
   public get title(): string {

@@ -33,7 +33,7 @@ const stringField = new validate.StringField();
 const optionalBooleanField = new validate.OptionalField(booleanField);
 const optionalStringField = new validate.OptionalField(stringField);
 
-const dataSchema = validate.buildSchema({
+const dataSchema = new validate.Schema<IData>({
   // Fields.
   booleanField,
   stringField,
@@ -52,12 +52,10 @@ const dataSchema = validate.buildSchema({
     stringOptionalField: optionalStringField
   },
   // Schema fields.
-  schemaField: new validate.SchemaField(
-    validate.buildSchema({
-      booleanField,
-      stringField
-    })
-  ),
+  schemaField: new validate.SchemaField({
+    booleanField,
+    stringField
+  }),
   // Array of fields.
   arrayOuter: [booleanField, stringField, [booleanField, stringField]],
   // Wildcard mapped fields.
@@ -103,7 +101,7 @@ const inputData = {
 for (let i = 0; i < 5; i++) {
   console.time("schemaTest");
   for (let j = 0; j < 10000; j++) {
-    dataSchema.validate<IData>(inputData);
+    dataSchema.validate(inputData);
   }
   console.timeEnd("schemaTest");
 }
