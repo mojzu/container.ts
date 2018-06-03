@@ -4,13 +4,13 @@ import { shell } from "./shell";
 const PLATFORMS = {
   linux: "linux",
   win32: "win",
-  darwin: "macos",
+  darwin: "macos"
 };
 
 const ARCHITECTURES = {
   x64: "x64",
   ia32: "x86",
-  arm: "armv6",
+  arm: "armv6"
 };
 
 function defaultTarget() {
@@ -24,7 +24,7 @@ function defaultTarget() {
  * Package application into binary for host platform(s).
  * Targets host platform by default.
  */
-export function pkg(cwd: string, output: string, targets: string[] = []) {
+export async function pkg(cwd: string, output: string, targets: string[] = []): Promise<void> {
   const command = ["pkg", ".", "--out-path", output];
 
   if (targets.length === 0) {
@@ -35,10 +35,12 @@ export function pkg(cwd: string, output: string, targets: string[] = []) {
     command.push(targets.join(","));
 
     // Copy native modules to output directory.
-    targets.map((target) => {
-      fuseBox.Sparky.src(`${__dirname}/native_modules/${target}/**/*.node`).dest(output).exec();
-    });
+    for (const target of targets) {
+      await fuseBox.Sparky.src(`${__dirname}/native_modules/${target}/**/*.node`)
+        .dest(output)
+        .exec();
+    }
   }
 
-  shell(command.join(" "), cwd);
+  return shell(command.join(" "), cwd);
 }

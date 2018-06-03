@@ -1,19 +1,17 @@
 import { ContainerMetricMessage, EMetricType, IModuleOptions } from "container.ts";
 import { Metrics } from "container.ts/lib/node/modules";
-import { Validate } from "container.ts/lib/validate";
+import { isPort, isString } from "container.ts/lib/validate";
 import * as StatsdClient from "statsd-client";
 
-export class Statsd extends Metrics {
+export enum EStatsdMetricsEnv {
+  /** StatsD server host (required). */
+  Host = "STATSD_HOST",
+  /** StatsD server port (default 8125). */
+  Port = "STATSD_PORT"
+}
 
+export class StatsdMetrics extends Metrics {
   public static readonly moduleName: string = "Statsd";
-
-  /** Environment variable names. */
-  public static ENV = {
-    /** StatsD server host (required). */
-    HOST: "STATSD_HOST",
-    /** StatsD server port (default 8125). */
-    PORT: "STATSD_PORT",
-  };
 
   protected readonly statsd: any;
 
@@ -21,9 +19,9 @@ export class Statsd extends Metrics {
     super(options);
 
     // Get host and port environment values.
-    const host = Validate.isString(this.environment.get(Statsd.ENV.HOST));
-    const port = Validate.isPort(this.environment.get(Statsd.ENV.PORT) || "8125");
-    this.debug(`${Statsd.ENV.HOST}="${host}" ${Statsd.ENV.PORT}="${port}"`);
+    const host = isString(this.environment.get(EStatsdMetricsEnv.Host));
+    const port = isPort(this.environment.get(EStatsdMetricsEnv.Port) || "8125");
+    this.debug(`${EStatsdMetricsEnv.Host}="${host}" ${EStatsdMetricsEnv.Port}="${port}"`);
 
     // Create statsd client instance.
     this.statsd = new StatsdClient({ prefix: this.container.name, host, port });
@@ -55,5 +53,4 @@ export class Statsd extends Metrics {
       }
     }
   }
-
 }

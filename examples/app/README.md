@@ -1,8 +1,6 @@
 # Application
 
-TODO(H): Update example application.
-
-Example application.
+Example application using `container.ts`.
 
 ## Developer
 
@@ -17,11 +15,19 @@ Clone repository, install dependencies with `yarn install` and run scripts: `yar
 | `start`     | Start application for development.    |
 | `dist`      | Build application for release.        |
 
-| Flag                 | Description               |
-| -------------------- | ------------------------- |
-| `-n`, `--name`       | Package name override.    |
-| `-v`, `--version`    | Package version override. |
-| `-p`, `--production` | Production flag.          |
+| Flag                  | Description                 |
+| --------------------- | --------------------------- |
+| `-n`, `--name`        | Package name override.      |
+| `-v`, `--version`     | Package version override.   |
+| `-p`, `--production`  | Production flag.            |
+| `-e`, `--environment` | Environment name.           |
+| `--pkg`               | `pkg` target host platform. |
+
+To see `debug` output.
+
+```Shell
+export DEBUG="Main*,Worker*"
+```
 
 ## Vagrant
 
@@ -34,9 +40,9 @@ Clone repository, install dependencies with `yarn install` and run scripts: `yar
 
 ### Telegraf, InfluxDB, Chronograf
 
-* <https://docs.influxdata.com/telegraf/v1.4/>
-* <https://docs.influxdata.com/influxdb/v1.3/>
-* <https://docs.influxdata.com/chronograf/v1.3/>
+* <https://docs.influxdata.com/telegraf/v1.6/>
+* <https://docs.influxdata.com/influxdb/v1.5/>
+* <https://docs.influxdata.com/chronograf/v1.5/>
 
 Virtual machine for metrics collection.
 

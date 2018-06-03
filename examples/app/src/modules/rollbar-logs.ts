@@ -1,19 +1,17 @@
 import { ContainerLogMessage, ELogLevel, IModuleDependencies, IModuleOptions } from "container.ts";
 import { Logs, Process } from "container.ts/lib/node/modules";
-import { Validate } from "container.ts/lib/validate";
+import { isString } from "container.ts/lib/validate";
 import * as rollbar from "rollbar";
 
-export class Rollbar extends Logs {
+export enum ERollbarLogsEnv {
+  /** Rollbar access token (required). */
+  AccessToken = "ROLLBAR_ACCESS_TOKEN",
+  /** Rollbar report level (default error). */
+  ReportLevel = "ROLLBAR_REPORT_LEVEL"
+}
 
+export class RollbarLogs extends Logs {
   public static readonly moduleName: string = "Rollbar";
-
-  /** Environment variable names. */
-  public static ENV = Object.assign(Logs.ENV, {
-    /** Rollbar access token (required). */
-    ACCESS_TOKEN: "ROLLBAR_ACCESS_TOKEN",
-    /** Rollbar report level (default error). */
-    REPORT_LEVEL: "ROLLBAR_REPORT_LEVEL",
-  });
 
   protected readonly process!: Process;
   protected readonly rollbar: rollbar;
@@ -23,10 +21,10 @@ export class Rollbar extends Logs {
 
     // Get access token from environment.
     // Get report level from environment or fall back on log level.
-    const accessToken = Validate.isString(this.environment.get(Rollbar.ENV.ACCESS_TOKEN));
-    const rawReportLevel = Validate.isString(this.environment.get(Rollbar.ENV.REPORT_LEVEL) || "error");
+    const accessToken = isString(this.environment.get(ERollbarLogsEnv.AccessToken));
+    const rawReportLevel = isString(this.environment.get(ERollbarLogsEnv.ReportLevel) || "error");
     const reportLevel = this.reportLevel(rawReportLevel);
-    this.debug(`${Rollbar.ENV.REPORT_LEVEL}="${reportLevel}"`);
+    this.debug(`${ERollbarLogsEnv.ReportLevel}="${reportLevel}"`);
 
     // Create Rollbar instance.
     // Report level determined by module log level.
@@ -34,11 +32,11 @@ export class Rollbar extends Logs {
     // Uncaught errors have 'critical' level by default.
     this.rollbar = new rollbar({
       accessToken,
-      version: this.process.version,
+      version: this.process.envVersion,
       reportLevel,
       uncaughtErrorLevel: "critical",
       captureUncaught: true,
-      captureUnhandledRejections: true,
+      captureUnhandledRejections: true
     });
   }
 
@@ -112,5 +110,4 @@ export class Rollbar extends Logs {
       }
     }
   }
-
 }

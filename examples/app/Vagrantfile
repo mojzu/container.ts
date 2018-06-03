@@ -15,12 +15,12 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
 
     # Telegraf, InfluxDB, Chronograf - Install and configure.
-    curl -sL https://repos.influxdata.com/influxdb.key | apt-key add -
+    curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
     source /etc/lsb-release
-    echo "deb https://repos.influxdata.com/${DISTRIB_ID,,} ${DISTRIB_CODENAME} stable" | tee /etc/apt/sources.list.d/influxdb.list
+    echo "deb https://repos.influxdata.com/${DISTRIB_ID,,} ${DISTRIB_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
     apt-get -y update
     apt-get -y install influxdb telegraf
-    wget https://dl.influxdata.com/chronograf/releases/chronograf_1.3.9.0_amd64.deb -q -O /tmp/chronograf.deb
+    wget https://dl.influxdata.com/chronograf/releases/chronograf_1.5.0.0_amd64.deb -q -O /tmp/chronograf.deb
     dpkg -i /tmp/chronograf.deb
     cp /vagrant/vagrant/telegraf_statsd.conf /etc/telegraf/telegraf.d/statsd.conf
     systemctl start influxdb
