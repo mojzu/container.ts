@@ -20,10 +20,10 @@ describe("Process", () => {
     CONTAINER.destroy();
   });
 
-  it("#Process", () => {
+  it("is defined", () => {
     expect(PROCESS).toBeDefined();
     expect(PROCESS.moduleName).toEqual(Process.moduleName);
-    expect(PROCESS.version).toEqual("1.2.3");
-    expect(PROCESS.nodeEnv).toEqual("development");
+    expect(PROCESS.envVersion).toEqual("1.2.3");
+    expect(PROCESS.envNodeEnv).toEqual("development");
   });
 });

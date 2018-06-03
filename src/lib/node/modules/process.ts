@@ -76,11 +76,11 @@ export class Process extends Module {
     return Process.title;
   }
 
-  public get title(): string {
+  public get envTitle(): string {
     return Process.title;
   }
-  public readonly version = isString(this.environment.get(EProcessEnv.Version, "1.0.0"));
-  public readonly nodeEnv = isString(this.environment.get(EProcessEnv.NodeEnv, "production"));
+  public readonly envVersion = isString(this.environment.get(EProcessEnv.Version, "1.0.0"));
+  public readonly envNodeEnv = isString(this.environment.get(EProcessEnv.NodeEnv, "production"));
 
   /** Override in subclass to change metric interval. */
   public get metricInterval(): number {
@@ -91,9 +91,9 @@ export class Process extends Module {
   public get information(): IProcessInformation {
     return {
       name: this.container.name,
-      title: this.title,
-      version: this.version,
-      environment: this.nodeEnv,
+      title: this.envTitle,
+      version: this.envVersion,
+      environment: this.envNodeEnv,
       arch: process.arch,
       platform: process.platform,
       nodeVersion: process.version,
@@ -121,9 +121,9 @@ export class Process extends Module {
     Process.setTitle(isString(this.environment.get(EProcessEnv.Name, "node")));
 
     // Debug environment variables.
-    this.debug(`${EProcessEnv.Name}="${this.title}"`);
-    this.debug(`${EProcessEnv.Version}="${this.version}"`);
-    this.debug(`${EProcessEnv.NodeEnv}="${this.nodeEnv}"`);
+    this.debug(`${EProcessEnv.Name}="${this.envTitle}"`);
+    this.debug(`${EProcessEnv.Version}="${this.envVersion}"`);
+    this.debug(`${EProcessEnv.NodeEnv}="${this.envNodeEnv}"`);
 
     // Process metrics on interval.
     interval(this.metricInterval).subscribe(() => this.processMetrics(this.status));

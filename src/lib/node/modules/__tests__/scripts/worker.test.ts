@@ -1,53 +1,13 @@
-import { Observable, of } from "rxjs";
-import { Container, Environment, IModuleDependencies, IModuleOptions, Module } from "../../../../../container";
-import { ChildProcess } from "../../child-process";
+import { Container, Environment, IModuleDependencies, Module } from "../../../../../container";
+import { Process } from "../../process";
 
 class TestModule extends Module {
   public static readonly moduleName: string = "Test";
 
-  protected readonly childProcess!: ChildProcess;
-
-  public constructor(options: IModuleOptions) {
-    super(options);
-
-    // Responds to ping events from parent process.
-    this.childProcess.listen<number>("ping").subscribe((data) => {
-      this.childProcess.event<number>("pong", { data: data * 2 });
-    });
-  }
+  protected readonly process!: Process;
 
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
-    return super.moduleDependencies(...prev, { childProcess: ChildProcess });
-  }
-
-  // Test method called from parent process.
-  public testCall1(data: number): Observable<number> {
-    return of(data * 2);
-  }
-
-  // Test method to call into parent process.
-  public testCall2(data: string): Observable<number> {
-    return this.childProcess.call("Test", "testCall2", { args: [data] });
-  }
-
-  public testCall3(data: number): Observable<string> {
-    return of("\nHello, world!\n");
-  }
-
-  public testCall4(data: number): Observable<number> {
-    return of(data);
-  }
-
-  public testCall5(data: number): Observable<number> {
-    return this.childProcess.call("Test", "testCall5", { args: [data] });
-  }
-
-  // public testLinkCall(data: number): Observable<string> {
-  //   return this.childProcess.call("Test", "testCall3");
-  // }
-
-  public testData(size: number): Observable<any[]> {
-    return of(new Array(size).fill(Math.random()));
+    return super.moduleDependencies(...prev, { process: Process });
   }
 }
 
@@ -56,7 +16,7 @@ const ENVIRONMENT = new Environment(process.env);
 
 // Create container instance with name and environment.
 // Populate container for dependency injection.
-const CONTAINER = new Container("Worker", ENVIRONMENT).registerModules([ChildProcess, TestModule]);
+const CONTAINER = new Container("Worker", ENVIRONMENT).registerModules([Process, TestModule]);
 
 // Signal operational.
 CONTAINER.up().subscribe({

@@ -1,3 +1,4 @@
+import { asValue } from "awilix";
 import { Subject } from "rxjs";
 import { ErrorChain } from "../../lib/error";
 import { Container, ContainerError } from "../container";
@@ -37,5 +38,14 @@ describe("Container", () => {
     expect(testModule.log instanceof ModuleLog).toEqual(true);
     expect(testModule.metric instanceof ModuleMetric).toEqual(true);
     expect(testModule.debug).toBeDefined();
+  });
+
+  it("scoped containers created and value registered/resolved", () => {
+    const container = new Container("test");
+    const scope = container.createScope();
+    const value = 42;
+    scope.register({ value: asValue(value) });
+    const compareValue = scope.resolve("value");
+    expect(value).toEqual(compareValue);
   });
 });

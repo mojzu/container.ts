@@ -42,7 +42,7 @@ export class Assets extends Module {
   public static readonly moduleName: string = "Assets";
 
   /** Absolute path to assets files directory. */
-  public readonly path = isDirectory(this.environment.get(EAssetsEnv.Path));
+  public readonly envPath = isDirectory(this.environment.get(EAssetsEnv.Path));
 
   /** Internal assets cache. */
   protected readonly assetsCache: IAssetsCache = {};
@@ -51,7 +51,7 @@ export class Assets extends Module {
     super(options);
 
     // Debug environment variables.
-    this.debug(`${EAssetsEnv.Path}="${this.path}"`);
+    this.debug(`${EAssetsEnv.Path}="${this.envPath}"`);
   }
 
   /** Returns true if target file is cached. */
@@ -88,7 +88,7 @@ export class Assets extends Module {
   /** Read contents of assets directory. */
   public async readDirectory(target: string = ""): Promise<string[]> {
     try {
-      const directoryPath = isDirectory(resolve(this.path, target));
+      const directoryPath = isDirectory(resolve(this.envPath, target));
       const fsReaddir = promisify(readdir);
       return await fsReaddir(directoryPath);
     } catch (error) {
@@ -107,7 +107,7 @@ export class Assets extends Module {
 
     try {
       // Check file exists, read file contents asynchronously.
-      const filePath = isFile(resolve(this.path, target));
+      const filePath = isFile(resolve(this.envPath, target));
       const fsReadFile = promisify(readFile);
       const data = await fsReadFile(filePath, options.encoding);
 
