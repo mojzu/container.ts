@@ -1,10 +1,10 @@
-import { BooleanField, OptionalField, SchemaField, StringField } from "../Field";
-import { buildSchema } from "../Schema";
+import { Schema, SchemaField } from "../schema";
+import { BooleanField, StringField } from "../validator";
 
 const booleanField = new BooleanField();
 const stringField = new StringField();
-const optionalBooleanField = new OptionalField(booleanField);
-const optionalStringField = new OptionalField(stringField);
+const optionalBooleanField = booleanField.optional();
+const optionalStringField = stringField.optional();
 
 interface IData {
   booleanField: boolean;
@@ -40,7 +40,7 @@ interface IData {
   wildcardArray?: string[];
 }
 
-const dataSchema = buildSchema({
+const dataSchema = new Schema<IData>({
   // Fields.
   booleanField,
   stringField,
@@ -59,10 +59,10 @@ const dataSchema = buildSchema({
     stringOptionalField: optionalStringField,
   },
   // Schema fields.
-  schemaField: new SchemaField(buildSchema({
+  schemaField: new SchemaField({
     booleanField,
     stringField,
-  })),
+  }),
   // Array of fields.
   arrayOuter: [
     booleanField,
@@ -119,17 +119,17 @@ describe("Schema", () => {
     },
     wildcardArray: ["foo", "bar", "baz"],
   };
-  const validated = dataSchema.validate<IData>(inputData);
-  const formatted = dataSchema.format<IData>(validated);
+  const validated = dataSchema.validate(inputData);
+  const formatted = dataSchema.format(validated) as any;
 
-  it("#Field", () => {
+  it("fields have expected values", () => {
     expect(validated.booleanField).toEqual(true);
     expect(validated.stringField).toEqual("foo");
     expect(formatted.booleanField).toEqual("true");
     expect(formatted.stringField).toEqual("foo");
   });
 
-  it("#Map", () => {
+  it("map fields have expected values", () => {
     expect(validated.mapOuter).toBeDefined();
     expect(validated.mapOuter.booleanMapOuterField).toEqual(false);
     expect(validated.mapOuter.stringMapOuterField).toEqual("bar");
@@ -138,7 +138,7 @@ describe("Schema", () => {
     expect(validated.mapOuter.mapInner.stringMapInnerField).toEqual("baz");
   });
 
-  it("#OptionalField", () => {
+  it("optional fields may be undefined", () => {
     expect(validated.mapOptional).toBeDefined();
     if (validated.mapOptional != null) {
       expect(validated.mapOptional.booleanOptionalField).toEqual(true);
@@ -146,13 +146,13 @@ describe("Schema", () => {
     }
   });
 
-  it("#schemaField", () => {
+  it("schema fields have expected values", () => {
     expect(validated.schemaField).toBeDefined();
     expect(validated.schemaField.booleanField).toEqual(true);
     expect(validated.schemaField.stringField).toEqual("foo");
   });
 
-  it("#Array", () => {
+  it("array fields have expected values", () => {
     expect(validated.arrayOuter).toBeDefined();
     expect(validated.arrayOuter.length).toEqual(3);
     expect(validated.arrayOuter[0]).toEqual(true);
@@ -163,7 +163,7 @@ describe("Schema", () => {
     expect(validated.arrayOuter[2][1]).toEqual("baz");
   });
 
-  it("#WildcardMap", () => {
+  it("wildcard map has expected values", () => {
     expect(validated.wildcardMap).toBeDefined();
     if (validated.wildcardMap != null) {
       expect(validated.wildcardMap.one).toEqual(false);
@@ -174,7 +174,7 @@ describe("Schema", () => {
     expect(formatted.wildcardMap.two).toEqual("true");
   });
 
-  it("#Any", () => {
+  it("wildcard any has expected values", () => {
     expect(validated.any).toBeDefined();
     if (validated.any != null) {
       expect(validated.any.one).toEqual(2);
@@ -186,7 +186,7 @@ describe("Schema", () => {
     expect(formatted.any.two).toEqual(true);
   });
 
-  it("#WildcardArray", () => {
+  it("wildcard array has expected values", () => {
     expect(validated.wildcardArray).toBeDefined();
     if (validated.wildcardArray != null) {
       expect(validated.wildcardArray.length).toEqual(3);
@@ -201,7 +201,7 @@ describe("Schema", () => {
     expect(formatted.wildcardArray[2]).toEqual("baz");
   });
 
-  it("#Mask", () => {
+  it("validation with mask returns expected values", () => {
     const inputMask = {
       booleanField: true,
       mapOuter: {
@@ -209,7 +209,7 @@ describe("Schema", () => {
       },
       schemaField: true,
     };
-    const masked = dataSchema.validate<IData>(inputData, inputMask);
+    const masked = dataSchema.validate(inputData, inputMask);
     expect(masked.booleanField).toEqual(true);
     expect(masked.stringField).toBeUndefined();
     expect(masked.mapOuter).toBeDefined();
@@ -226,11 +226,11 @@ describe("Schema", () => {
     expect(masked.wildcardArray).toBeUndefined();
   });
 
-  it("extended schema works", () => {
+  it("extend method works as expected", () => {
     const extendedSchema = dataSchema.extend({
       booleanField: stringField,
     });
-    const data = extendedSchema.validate<IData>(inputData, { booleanField: true });
+    const data = extendedSchema.validate(inputData, { booleanField: true });
     expect(typeof data.booleanField).toEqual("string");
   });
 });

@@ -1,2 +1,2 @@
-export * from "./ISO639";
-export * from "./ISO3166";
+export * from "./iso639";
+export * from "./iso3166";

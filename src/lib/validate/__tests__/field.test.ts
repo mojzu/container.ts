@@ -1,33 +1,26 @@
-import {
-  EmailField,
-  FieldError,
-  FloatField,
-  IntegerField,
-  OptionalField,
-  PortField,
-  StringField,
-} from "../Field";
+import { FieldError } from "../field";
+import { EmailField, FloatField, IntegerField, PortField, StringField } from "../validator";
 
 describe("Field", () => {
   const integerField = new IntegerField();
-  const optionalIntegerField = new OptionalField(integerField, 1);
+  const optionalIntegerField = integerField.optional(1);
 
-  it("#IntegerField validate", () => {
+  it("validates integer", () => {
     const value = integerField.validate("1");
     expect(value).toEqual(1);
   });
 
-  it("#IntegerField format", () => {
+  it("formats integer", () => {
     const value = integerField.format(1);
     expect(value).toEqual("1");
   });
 
-  it("#OptionalField validate", () => {
+  it("optional validates default value", () => {
     const value = optionalIntegerField.validate();
     expect(value).toEqual(1);
   });
 
-  it("#OptionalField format", () => {
+  it("optional formats default value", () => {
     const value = optionalIntegerField.format();
     expect(value).toEqual("1");
   });
@@ -35,12 +28,12 @@ describe("Field", () => {
   const portField = new PortField();
   const integerAndPortField = integerField.and(portField);
 
-  it("#AndField validate", () => {
+  it("and operator validates integer", () => {
     const value = integerAndPortField.validate("42");
     expect(value).toEqual(42);
   });
 
-  it("#AndField validate fails", (done) => {
+  it("and operator validation fails", (done) => {
     try {
       integerAndPortField.validate("123456789");
       done.fail();
@@ -53,7 +46,7 @@ describe("Field", () => {
   const floatField = new FloatField();
   const integerOrFloatField = integerField.or(floatField);
 
-  it("#OrField validate", () => {
+  it("or operator validates float", () => {
     const value = integerOrFloatField.validate("1.0");
     expect(value).toEqual(1.0);
   });
@@ -62,12 +55,12 @@ describe("Field", () => {
   const emailField = new EmailField();
   const stringNotEmailField = stringField.not(emailField);
 
-  it("#NotField validate", () => {
+  it("not operator validates string", () => {
     const value = stringNotEmailField.validate("foo");
     expect(value).toEqual("foo");
   });
 
-  it("#NotField validate fails", (done) => {
+  it("not operator validation fails", (done) => {
     try {
       stringNotEmailField.validate("foo@example.com");
       done.fail();

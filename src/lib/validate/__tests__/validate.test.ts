@@ -1,6 +1,6 @@
 import { ErrorChain } from "../../error";
+import { EValidateError, ValidateError } from "../validate";
 import {
-  EValidateError,
   isBoolean,
   isCountry,
   isDateTime,
@@ -12,9 +12,8 @@ import {
   isLocale,
   isPort,
   isString,
-  isTimeZone,
-  ValidateError
-} from "../Validate";
+  isTimeZone
+} from "../validator";
 
 describe("Validate", () => {
   const invalidBoolean = EValidateError[EValidateError.InvalidBoolean];
@@ -22,20 +21,20 @@ describe("Validate", () => {
 
   // Error tests.
 
-  it("#ValidateError is instance of Error and ValidateError", () => {
+  it("ValidateError is instance of Error and ValidateError", () => {
     const error = new ValidateError(EValidateError.InvalidString);
     expect(error instanceof ErrorChain).toEqual(true);
     expect(error instanceof ValidateError).toEqual(true);
   });
 
-  it("#ValidateError has expected properties", () => {
+  it("ValidateError has expected properties", () => {
     const error = new ValidateError(EValidateError.InvalidBoolean);
     expect(error.name).toEqual("InvalidBoolean");
     expect(error.stack).toBeDefined();
     expect(error.message).toEqual(invalidBoolean);
   });
 
-  it("#ValidateError passed thrown error has formatting", () => {
+  it("ValidateError passed thrown error has format", () => {
     const error = new ValidateError(EValidateError.InvalidString, "", new Error("Unknown"));
     expect(error.name).toEqual("InvalidString");
     expect(error.stack).toBeDefined();
