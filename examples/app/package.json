@@ -19,7 +19,7 @@
     "assets": "assets/**/*"
   },
   "dependencies": {
-    "container.ts": "^2.0.0-beta.2",
+    "container.ts": "^2.0.0-rc.1",
     "rollbar": "^2.4.1",
     "rxjs": "^6.2.0",
     "statsd-client": "^0.4.2",
