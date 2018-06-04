@@ -110,14 +110,14 @@ export class Schema<T = object> {
 
   /** Validate input data, transform strings to typed values. */
   public validate(data: object, mask?: ISchemaMask, parentKey = "", schema = this.schema): T {
-    const validated = isArray(data) ? [] : {};
+    const validated = isArray(schema) ? [] : {};
     this.map(data, validated, schema, Schema.mapValidateHandlers, mask, parentKey);
     return validated as T;
   }
 
   /** Format input data, transform typed values to object of strings for serialisation. */
   public format(data: T, mask?: ISchemaMask, parentKey = "", schema = this.schema): object {
-    const formatted = isArray(data) ? [] : {};
+    const formatted = isArray(schema) ? [] : {};
     this.map(data, formatted, schema, Schema.mapFormatHandlers, mask, parentKey);
     return formatted as object;
   }

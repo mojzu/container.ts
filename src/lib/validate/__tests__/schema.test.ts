@@ -232,4 +232,12 @@ describe("Schema", () => {
       done();
     }
   });
+
+  it("undefined data for array schema returns empty array", () => {
+    const schema = new Schema(["*", booleanField]);
+    const validateData = schema.validate(undefined as any);
+    expect(validateData).toEqual([]);
+    const formatData = schema.format(undefined as any);
+    expect(formatData).toEqual([]);
+  });
 });
