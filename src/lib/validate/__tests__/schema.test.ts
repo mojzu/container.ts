@@ -214,6 +214,18 @@ describe("Schema", () => {
     expect(typeof data.booleanField).toEqual("string");
   });
 
+  it("extend can be passed Schema instances and definitions", () => {
+    const fooSchema = new Schema({ foo: booleanField });
+    const barSchema = new Schema({ bar: booleanField });
+    const extendedSchema = fooSchema.extend<any>(barSchema, {
+      baz: booleanField
+    });
+    const validateData = extendedSchema.validate({ foo: "true", bar: "false", baz: "0" });
+    expect(validateData.foo).toEqual(true);
+    expect(validateData.bar).toEqual(false);
+    expect(validateData.baz).toEqual(false);
+  });
+
   it("schema error chain value is key path", (done) => {
     const invalidData = {
       mapOuter: {

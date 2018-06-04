@@ -101,11 +101,17 @@ export class Schema<T = object> {
     return schema instanceof Schema;
   }
 
-  public constructor(protected readonly schema: ISchema) {}
+  public constructor(public readonly schema: ISchema) {}
 
-  /** Construct new schema using this as a base. */
-  public extend<K extends T>(...schemas: ISchema[]): Schema<K> {
-    return new Schema(assign({}, this.schema, ...schemas));
+  /**
+   * Construct new schema using this as a base.
+   * Accepts schema definition objects or existing Schema class instances.
+   */
+  public extend<K extends T>(...schemas: Array<Schema<any> | ISchema>): Schema<K> {
+    const schemaDefinitions: ISchema[] = schemas.map((s) => {
+      return Schema.isSchema(s) ? s.schema : (s as ISchema);
+    });
+    return new Schema(assign({}, this.schema, ...schemaDefinitions));
   }
 
   /** Validate input data, transform strings to typed values. */
