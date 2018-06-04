@@ -28,3 +28,4 @@ export * from "./is-string";
 export * from "./is-time-zone";
 export * from "./is-url";
 export * from "./is-uuid";
+// TODO(M): Add new validators when typings updated.
