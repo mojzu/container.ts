@@ -24,9 +24,7 @@
     "lint": "ts-node fuse.ts lint",
     "test": "ts-node fuse.ts test",
     "example": "ts-node fuse.ts example",
-    "dist": "ts-node fuse.ts dist",
-    "docs": "cd docs && gitbook serve",
-    "docs-build": "cd docs && gitbook build"
+    "dist": "ts-node fuse.ts dist"
   },
   "dependencies": {
     "@types/debug": "^0.0.30",

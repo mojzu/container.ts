@@ -14,7 +14,7 @@ Clone repository, install dependencies with `yarn install` and run scripts: `yar
 Publish library to NPM and GitHub.
 
 ```Shell
-$ yarn run dist && npm publish --access=public
+$ yarn run dist && npm publish --access=public [--tag=beta]
 $ git push origin master --tags
 ```
 
