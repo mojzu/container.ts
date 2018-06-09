@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "2.0.0-rc.1",
+  "version": "2.0.0-rc.2",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -45,7 +45,7 @@
   "devDependencies": {
     "@types/del": "^3.0.1",
     "@types/jest": "^23.0.0",
-    "@types/node": "^10.3.0",
+    "@types/node": "^10.3.2",
     "@types/yargs": "^11.0.0",
     "del": "^3.0.0",
     "fuse-box": "^3.2.2",
@@ -61,7 +61,18 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(tsx?)$",
-    "testPathIgnorePatterns": ["Mock.ts", "script.test.ts", "worker.test.ts"],
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+    "testPathIgnorePatterns": [
+      "Mock.ts",
+      "script.test.ts",
+      "worker.test.ts"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   }
 }
