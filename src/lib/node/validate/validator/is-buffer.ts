@@ -9,18 +9,15 @@ export interface IIsBuffer {
 
 /** Validate that value is a valid Node.js Buffer. */
 export function isBuffer(value = "", options: IIsBuffer = {}): Buffer {
-  let buf = null;
-
   try {
-    buf = Buffer.from(value, options.encoding);
+    const buf = Buffer.from(value, options.encoding);
+    if (buf == null) {
+      throw new NodeValidateError(ENodeValidateError.IsBufferError, value);
+    }
+    return buf;
   } catch (error) {
     throw new NodeValidateError(ENodeValidateError.IsBufferError, value, error);
   }
-
-  if (buf == null) {
-    throw new NodeValidateError(ENodeValidateError.IsBufferError, value);
-  }
-  return buf;
 }
 
 export class BufferField extends Field<Buffer> {

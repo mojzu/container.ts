@@ -5,19 +5,15 @@ import { ENodeValidateError, NodeValidateError } from "../validate";
 
 /** Validate that value is a valid path to a directory. */
 export function isDirectory(value = ""): string {
-  let isValid = false;
-
   try {
-    value = resolve(value);
-    isValid = lstatSync(value).isDirectory();
+    const resolveValue = resolve(value);
+    if (lstatSync(resolveValue).isDirectory() !== true) {
+      throw new NodeValidateError(ENodeValidateError.IsDirectoryError, value);
+    }
+    return value;
   } catch (error) {
     throw new NodeValidateError(ENodeValidateError.IsDirectoryError, value, error);
   }
-
-  if (!isValid) {
-    throw new NodeValidateError(ENodeValidateError.IsDirectoryError, value);
-  }
-  return value;
 }
 
 export class DirectoryField extends Field<string> {

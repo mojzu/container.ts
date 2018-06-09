@@ -5,19 +5,15 @@ import { ENodeValidateError, NodeValidateError } from "../validate";
 
 /** Validate that value is a valid path to a file. */
 export function isFile(value = ""): string {
-  let isValid = false;
-
   try {
-    value = resolve(value);
-    isValid = lstatSync(value).isFile();
+    const resolveValue = resolve(value);
+    if (lstatSync(resolveValue).isFile() !== true) {
+      throw new NodeValidateError(ENodeValidateError.IsFileError, value);
+    }
+    return resolveValue;
   } catch (error) {
     throw new NodeValidateError(ENodeValidateError.IsFileError, value, error);
   }
-
-  if (!isValid) {
-    throw new NodeValidateError(ENodeValidateError.IsFileError, value);
-  }
-  return value;
 }
 
 export class FileField extends Field<string> {
