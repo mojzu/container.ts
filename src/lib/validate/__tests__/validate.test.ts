@@ -138,7 +138,7 @@ describe("Validate", () => {
       done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
-      expect(error.message).toEqual(`${invalidString} "foobar"`);
+      expect(error.value).toEqual("foobar");
       done();
     }
   });
@@ -149,7 +149,7 @@ describe("Validate", () => {
       done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
-      expect(error.message).toEqual(`${invalidString} "baz"`);
+      expect(error.value).toEqual("baz");
       done();
     }
   });
@@ -172,7 +172,7 @@ describe("Validate", () => {
 
   it("#isPort throws error for out of range number", (done) => {
     try {
-      isPort("0");
+      isPort("-1");
       done.fail();
     } catch (error) {
       expect(error instanceof ValidateError).toEqual(true);
