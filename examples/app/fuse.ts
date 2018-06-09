@@ -155,26 +155,11 @@ fuseBox.Sparky.task("test", ["clean", "mkdir"], () => {
 // Watch and run main process bundle.
 fuseBox.Sparky.task("start", ["clean", "mkdir"], () => {
   const targets = configureTargets();
-  let previousProc: any;
 
   // Watch all bundles during development.
   targets.worker.bundle.watch();
   // Start the main bundle on rebuild.
-  // Clean up previously started processes on rebuild.
-  // TODO(L): Should it be necessary to kill processes here?
-  targets.main.bundle.watch().completed((proc) => {
-    if (previousProc != null) {
-      previousProc.kill();
-    }
-    previousProc = proc.start();
-  });
-
-  process.on("SIGINT", () => {
-    if (previousProc != null) {
-      previousProc.kill();
-    }
-    process.exit(0);
-  });
+  targets.main.bundle.watch().completed((proc) => proc.start());
 
   return Promise.all([targets.main.fuse.run(), targets.worker.fuse.run()]);
 });
