@@ -12,19 +12,14 @@ export interface IIsAlphanumeric extends IIsString {
 /** Wrapper for validator isAlphanumeric. */
 export function isAlphanumeric(value = "", options: IIsAlphanumeric = {}): string {
   const locale = options.locale || "en-GB";
-  let isValid = false;
-
   try {
-    isValid = validatorIsAlphanumeric(value, locale);
-    value = isString(value, options);
+    if (validatorIsAlphanumeric(value, locale) !== true) {
+      throw new ValidateError(EValidateError.IsAlphanumericError, value);
+    }
+    return isString(value, options);
   } catch (error) {
-    throw new ValidateError(EValidateError.IsAlphanumericError, value);
+    throw new ValidateError(EValidateError.IsAlphanumericError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsAlphanumericError, value);
-  }
-  return value;
 }
 
 export class AlphanumericField extends Field<string> {

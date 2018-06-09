@@ -4,18 +4,14 @@ import { EValidateError, ValidateError } from "../validate";
 
 /** Wrapper for validator isHexColor. */
 export function isHexColour(value = ""): string {
-  let isValid = false;
-
   try {
-    isValid = validatorIsHexColor(value);
+    if (validatorIsHexColor(value) !== true) {
+      throw new ValidateError(EValidateError.IsHexColourError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsHexColourError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsHexColourError, value);
-  }
-  return value;
 }
 
 export class HexColourField extends Field<string> {

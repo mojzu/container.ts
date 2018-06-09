@@ -7,18 +7,14 @@ export interface IIsEmail extends ValidatorJS.IsEmailOptions {}
 
 /** Wrapper for validator isEmail. */
 export function isEmail(value = "", options: IIsEmail = {}): string {
-  let isValid = false;
-
   try {
-    isValid = validatorIsEmail(value, options);
+    if (validatorIsEmail(value, options) !== true) {
+      throw new ValidateError(EValidateError.IsEmailError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsEmailError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsEmailError, value);
-  }
-  return value;
 }
 
 export class EmailField extends Field<string> {

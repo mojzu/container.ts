@@ -4,18 +4,14 @@ import { EValidateError, ValidateError } from "../validate";
 
 /** Wrapper for validator isMACAddress. */
 export function isMacAddress(value = ""): string {
-  let isValid = false;
-
   try {
-    isValid = isMACAddress(value);
+    if (isMACAddress(value) !== true) {
+      throw new ValidateError(EValidateError.IsMacAddressError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsMacAddressError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsMacAddressError, value);
-  }
-  return value;
 }
 
 export class MacAddressField extends Field<string> {

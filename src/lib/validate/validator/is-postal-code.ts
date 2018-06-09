@@ -11,18 +11,14 @@ export interface IIsPostalCode {
 /** Wrapper for validator isPostalCode. */
 export function isPostalCode(value = "", options: IIsPostalCode = {}): string {
   const locale = options.locale || "GB";
-  let isValid = false;
-
   try {
-    isValid = validatorIsPostalCode(value, locale);
+    if (validatorIsPostalCode(value, locale) !== true) {
+      throw new ValidateError(EValidateError.IsPostalCodeError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsPostalCodeError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsPostalCodeError, value);
-  }
-  return value;
 }
 
 export class PostalCodeField extends Field<string> {

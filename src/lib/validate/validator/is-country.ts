@@ -1,12 +1,14 @@
-import { ISO3166 } from "../data";
+import { isISO31661Alpha2 } from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
-import { isString } from "./is-string";
 
-/** Validate that value is a valid ISO3166 country code. */
+/** Validate that value is a valid ISO3166-1 alpha-2 country code. */
 export function isCountry(value = ""): string {
   try {
-    return isString(value.toUpperCase(), { min: 2, max: 2, values: ISO3166 });
+    if (isISO31661Alpha2(value) !== true) {
+      throw new ValidateError(EValidateError.IsCountryError, value);
+    }
+    return value.toUpperCase();
   } catch (error) {
     throw new ValidateError(EValidateError.IsCountryError, value, error);
   }

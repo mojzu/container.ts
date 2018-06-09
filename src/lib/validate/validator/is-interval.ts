@@ -7,18 +7,15 @@ export interface IIsInterval extends DateTimeOptions {}
 
 /** Validate that value is a valid date time interval parsed by 'luxon' library. */
 export function isInterval(value = "", options: IIsInterval = {}): Interval {
-  let interval: Interval;
-
   try {
-    interval = Interval.fromISO(value, options);
+    const interval = Interval.fromISO(value, options);
+    if (interval.isValid !== true) {
+      throw new ValidateError(EValidateError.IsIntervalError, value);
+    }
+    return interval;
   } catch (error) {
     throw new ValidateError(EValidateError.IsIntervalError, value, error);
   }
-
-  if (!interval.isValid) {
-    throw new ValidateError(EValidateError.IsIntervalError, value);
-  }
-  return interval;
 }
 
 export class IntervalField extends Field<Interval> {

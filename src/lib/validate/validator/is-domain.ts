@@ -7,18 +7,14 @@ export interface IIsDomain extends ValidatorJS.IsFQDNOptions {}
 
 /** Wrapper for validator isFQDN. */
 export function isDomain(value = "", options: IIsDomain = {}): string {
-  let isValid = false;
-
   try {
-    isValid = isFQDN(value, options);
+    if (isFQDN(value, options) !== true) {
+      throw new ValidateError(EValidateError.IsDomainError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsDomainError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsDomainError, value);
-  }
-  return value;
 }
 
 export class DomainField extends Field<string> {

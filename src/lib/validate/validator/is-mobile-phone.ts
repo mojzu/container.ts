@@ -3,7 +3,7 @@ import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Validate.isMobilePhone options. */
-export interface IIsMobilePhone {
+export interface IIsMobilePhone extends ValidatorJS.IsMobilePhoneOptions {
   /** Locale used by validator, defaults to en-GB. */
   locale?: ValidatorJS.MobilePhoneLocale;
 }
@@ -11,18 +11,14 @@ export interface IIsMobilePhone {
 /** Wrapper for validator isMobilePhone. */
 export function isMobilePhone(value = "", options: IIsMobilePhone = {}): string {
   const locale = options.locale || "en-GB";
-  let isValid = false;
-
   try {
-    isValid = validatorIsMobilePhone(value, locale);
+    if (validatorIsMobilePhone(value, locale, options) !== true) {
+      throw new ValidateError(EValidateError.IsMobilePhoneError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsMobilePhoneError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsMobilePhoneError, value);
-  }
-  return value;
 }
 
 export class MobilePhoneField extends Field<string> {

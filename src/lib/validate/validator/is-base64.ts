@@ -5,19 +5,14 @@ import { IIsString, isString } from "./is-string";
 
 /** Wrapper for validator isBase64. */
 export function isBase64(value = "", options: IIsString = {}): string {
-  let isValid = false;
-
   try {
-    isValid = validatorIsBase64(value);
-    value = isString(value, options);
+    if (validatorIsBase64(value) !== true) {
+      throw new ValidateError(EValidateError.IsBase64Error, value);
+    }
+    return isString(value, options);
   } catch (error) {
     throw new ValidateError(EValidateError.IsBase64Error, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsBase64Error, value);
-  }
-  return value;
 }
 
 export class Base64Field extends Field<string> {

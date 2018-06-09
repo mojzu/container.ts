@@ -7,18 +7,14 @@ export interface IIsUrl extends ValidatorJS.IsURLOptions {}
 
 /** Wrapper for validator isURL. */
 export function isUrl(value = "", options: IIsUrl = { require_host: true }): string {
-  let isValid = false;
-
   try {
-    isValid = isURL(value, options);
+    if (isURL(value, options) !== true) {
+      throw new ValidateError(EValidateError.IsUrlError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsUrlError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsUrlError, value);
-  }
-  return value;
 }
 
 export class UrlField extends Field<string> {

@@ -4,18 +4,15 @@ import { EValidateError, ValidateError } from "../validate";
 
 /** Validate that value is a valid time zone supported by 'luxon' library. */
 export function isTimeZone(value = ""): string {
-  let datetime: DateTime;
-
   try {
-    datetime = DateTime.local().setZone(value);
+    const datetime = DateTime.local().setZone(value);
+    if (datetime.isValid !== true) {
+      throw new ValidateError(EValidateError.IsTimeZoneError, value);
+    }
+    return datetime.zoneName;
   } catch (error) {
     throw new ValidateError(EValidateError.IsTimeZoneError, value, error);
   }
-
-  if (!datetime.isValid) {
-    throw new ValidateError(EValidateError.IsTimeZoneError, value);
-  }
-  return datetime.zoneName;
 }
 
 export class TimeZoneField extends Field<string> {

@@ -17,8 +17,6 @@ export function isString(value = "", options: IIsString = {}): string {
   const uppercase = !!options.uppercase;
   const lowercase = !!options.lowercase;
   const values = options.values || [];
-  let isValid = false;
-
   // If minimum length is undefined, default to 1.
   // Passing undefined minimum causes empty strings to pass validation.
   if (options.min == null) {
@@ -27,7 +25,7 @@ export function isString(value = "", options: IIsString = {}): string {
 
   try {
     // Validate is string of length.
-    isValid = isLength(value, { min: options.min, max: options.max });
+    let isValid = isLength(value, { min: options.min, max: options.max });
     // Check in values array if provided.
     if (values.length > 0) {
       isValid = isValid && isIn(value, values);
@@ -39,14 +37,13 @@ export function isString(value = "", options: IIsString = {}): string {
     if (lowercase && !isLowercase(value)) {
       isValid = false;
     }
+    if (isValid !== true) {
+      throw new ValidateError(EValidateError.IsStringError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsStringError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsStringError, value);
-  }
-  return value;
 }
 
 export class StringField extends Field<string> {

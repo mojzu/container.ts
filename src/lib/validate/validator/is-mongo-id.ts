@@ -4,18 +4,14 @@ import { EValidateError, ValidateError } from "../validate";
 
 /** Wrapper for validator isMongoId. */
 export function isMongoId(value = ""): string {
-  let isValid = false;
-
   try {
-    isValid = validatorIsMongoId(value);
+    if (validatorIsMongoId(value) !== true) {
+      throw new ValidateError(EValidateError.IsMongoIdError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsMongoIdError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsMongoIdError, value);
-  }
-  return value;
 }
 
 export class MongoIdField extends Field<string> {

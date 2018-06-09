@@ -8,18 +8,15 @@ export interface IIsDateTime extends DateTimeOptions {}
 /** Validate that value is a valid date and time parsed by 'luxon' library. */
 export function isDateTime(value = "", options: IIsDateTime = {}): DateTime {
   options.zone = options.zone || "UTC";
-  let datetime: DateTime;
-
   try {
-    datetime = DateTime.fromISO(value, options);
+    const datetime = DateTime.fromISO(value, options);
+    if (datetime.isValid !== true) {
+      throw new ValidateError(EValidateError.IsDateTimeError, value);
+    }
+    return datetime;
   } catch (error) {
     throw new ValidateError(EValidateError.IsDateTimeError, value, error);
   }
-
-  if (!datetime.isValid) {
-    throw new ValidateError(EValidateError.IsDateTimeError, value);
-  }
-  return datetime;
 }
 
 export class DateTimeField extends Field<DateTime> {

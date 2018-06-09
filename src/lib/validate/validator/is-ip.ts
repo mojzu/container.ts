@@ -11,18 +11,14 @@ export interface IIsIp {
 /** Wrapper for validator isIP. */
 export function isIp(value = "", options: IIsIp = {}): string {
   const version = options.version || 4;
-  let isValid = false;
-
   try {
-    isValid = isIP(value, version);
+    if (isIP(value, version) !== true) {
+      throw new ValidateError(EValidateError.IsIpError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsIpError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsIpError, value);
-  }
-  return value;
 }
 
 export class IpField extends Field<string> {

@@ -5,24 +5,20 @@ import { EValidateError, ValidateError } from "../validate";
 /** Validate.isUuid options. */
 export interface IIsUuid {
   /** UUID version number, defaults to all. */
-  version?: 3 | 4 | 5;
+  version?: 3 | 4 | 5 | "all";
 }
 
 /** Wrapper for validator isUUID. */
 export function isUuid(value = "", options: IIsUuid = {}): string {
   const version = options.version || "all";
-  let isValid = false;
-
   try {
-    isValid = isUUID(value, version);
+    if (isUUID(value, version) !== true) {
+      throw new ValidateError(EValidateError.IsUuidError, value);
+    }
+    return value;
   } catch (error) {
     throw new ValidateError(EValidateError.IsUuidError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsUuidError, value);
-  }
-  return value;
 }
 
 export class UuidField extends Field<string> {

@@ -7,18 +7,14 @@ export interface IIsFloat extends ValidatorJS.IsFloatOptions {}
 
 /** Wrapper for validator isFloat. */
 export function isFloat(value = "", options: IIsFloat = {}): number {
-  let isValid = false;
-
   try {
-    isValid = validatorIsFloat(value, options);
+    if (validatorIsFloat(value, options) !== true) {
+      throw new ValidateError(EValidateError.IsFloatError, value);
+    }
+    return toFloat(value);
   } catch (error) {
     throw new ValidateError(EValidateError.IsFloatError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsFloatError, value);
-  }
-  return toFloat(value);
 }
 
 export class FloatField extends Field<number> {

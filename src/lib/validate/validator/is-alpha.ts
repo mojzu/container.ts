@@ -12,19 +12,14 @@ export interface IIsAlpha extends IIsString {
 /** Wrapper for validator isAlpha. */
 export function isAlpha(value = "", options: IIsAlpha = {}): string {
   const locale = options.locale || "en-GB";
-  let isValid = false;
-
   try {
-    isValid = validatorIsAlpha(value, locale);
-    value = isString(value, options);
+    if (validatorIsAlpha(value, locale) !== true) {
+      throw new ValidateError(EValidateError.IsAlphaError, value);
+    }
+    return isString(value, options);
   } catch (error) {
     throw new ValidateError(EValidateError.IsAlphaError, value, error);
   }
-
-  if (!isValid) {
-    throw new ValidateError(EValidateError.IsAlphaError, value);
-  }
-  return value;
 }
 
 export class AlphaField extends Field<string> {
