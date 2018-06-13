@@ -30,37 +30,38 @@ export class WinstonLogs extends Logs {
     "debug" // Debug
   ];
 
+  /** Logger colour options. */
+  public static readonly syslogColours = {
+    emerg: "red",
+    alert: "red",
+    crit: "red",
+    error: "red",
+    warning: "yellow",
+    notice: "blue",
+    info: "white",
+    debug: "grey"
+  };
+
   /** Winston logger instance. */
-  protected readonly logger = new winston.Logger({
-    ...winston.config.syslog,
+  protected readonly logger = winston.createLogger({
+    levels: WinstonLogs.syslogLevels.reduce((previous, current, index) => ({ ...previous, [current]: index }), {}),
+    format: winston.format.json(),
     transports: [
       new winston.transports.Console({
         level: "debug",
-        colorize: true,
-        prettyPrint: true
+        format: winston.format.combine(winston.format.colorize(WinstonLogs.syslogColours), winston.format.simple())
       })
     ]
   });
 
   /** Winston handler for incoming log messages. */
   protected logsOnMessage(log: ContainerLogMessage): void {
-    let message: string;
-    let args = log.args;
-
-    // Winston only accepts string messages.
-    // If log message is an error instance, use message string and
-    // prepend error object to variable arguments.
-    if (ErrorChain.isError(log.message)) {
-      const error: Error | ErrorChain = log.message;
-      message = error.message || error.name;
-      args = [error].concat(log.args);
-    } else {
-      message = log.message;
-    }
+    // Winston only accepts string messages, use utility method.
+    log = this.logsMessageAsString(log);
 
     // Log message with level.
     const level = get(WinstonLogs.syslogLevels, log.level, "emerg");
-    this.logger.log(level, message, log.metadata, ...args, (error: any) => this.onError(error));
+    this.logger.log(level, log.message as string, log.metadata, ...log.args, (error: any) => this.onError(error));
   }
 
   /**
