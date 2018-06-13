@@ -15,8 +15,7 @@ export async function shell(command: string, cwd: string): Promise<void> {
   } catch (error) {
     // Exit process in case of error.
     // Otherwise FuseBox logs error and returns 0.
-    console.log(error); // tslint:disable-line
-    // // TODO(H): Uncomment when rxjs type issue resolved.
-    // process.exit(1);
+    console.error(error); // tslint:disable-line
+    process.exit(1);
   }
 }
