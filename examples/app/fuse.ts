@@ -4,8 +4,10 @@ import { mkdirSync } from "fs";
 import * as fuseBox from "fuse-box";
 import * as path from "path";
 import { argv } from "yargs";
+import { clean } from "./fuse-tools/clean";
+import { pkg } from "./fuse-tools/pkg";
+import { shell } from "./fuse-tools/shell";
 import { EStatsdMetricsEnv } from "./src/modules/statsd-metrics";
-import * as tools from "./tools";
 const packageJson = require("./package.json");
 
 interface IConf {
@@ -128,19 +130,19 @@ function configureTargets() {
 }
 
 fuseBox.Sparky.task("clean", () => {
-  return tools.clean(CWD, [".fusebox", "coverage", "dist", "*.log", "*.tgz"]);
+  return clean(CWD, [".fusebox", "coverage", "dist", "*.log", "*.tgz"]);
 });
 
 fuseBox.Sparky.task("distclean", ["clean"], () => {
-  return tools.clean(CWD, ["node_modules"]);
+  return clean(CWD, ["node_modules"]);
 });
 
 fuseBox.Sparky.task("lint", () => {
-  return tools.shell("tslint -c tslint.json -p tsconfig.json", CWD);
+  return shell("tslint -c tslint.json -p tsconfig.json", CWD);
 });
 
 fuseBox.Sparky.task("tsc", ["clean"], () => {
-  return tools.shell("tsc", CWD);
+  return shell("tsc", CWD);
 });
 
 // Create required application directories.
@@ -149,7 +151,7 @@ fuseBox.Sparky.task("mkdir", () => {
 });
 
 fuseBox.Sparky.task("test", ["clean", "mkdir"], () => {
-  return tools.shell("jest --coverage", CWD);
+  return shell("jest --coverage", CWD);
 });
 
 // Watch and run main process bundle.
@@ -171,6 +173,6 @@ fuseBox.Sparky.task("dist", ["clean"], () => {
   const targets = configureTargets();
 
   return Promise.all([targets.main.fuse.run(), targets.worker.fuse.run()]).then(() =>
-    tools.pkg(CWD, "dist/bin", targets.main.pkg)
+    pkg(CWD, "dist/bin", { targets: targets.main.pkg })
   );
 });
