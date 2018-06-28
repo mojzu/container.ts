@@ -119,10 +119,10 @@ export class Module {
   }
 
   /** Module operational state hook. */
-  public moduleUp(): void | Observable<void> {}
+  public moduleUp(): void | Observable<void> | Promise<void> {}
 
   /** Module non-operational state hook. */
-  public moduleDown(): void | Observable<void> {}
+  public moduleDown(): void | Observable<void> | Promise<void> {}
 
   /** Module destruction hook. */
   public moduleDestroy(): void {}
