@@ -188,7 +188,7 @@ export class Container {
    * Signal modules to enter operational state.
    * Module hook method `moduleUp` called in order of dependencies.
    */
-  public up(timeout?: number): Observable<void> {
+  public up(timeout?: number): Observable<number> {
     const observables$ = this.modules.map((mod) => {
       return this.containerWhenModulesUp(...this.containerModuleDependencies(mod)).pipe(
         switchMap(() => {
@@ -214,7 +214,7 @@ export class Container {
    * Signal modules to leave operational state.
    * Module hook method `moduleDown` called in order of dependents.
    */
-  public down(timeout?: number): Observable<void> {
+  public down(timeout?: number): Observable<number> {
     const observables$ = this.modules.map((mod) => {
       return this.containerWhenModulesDown(...this.containerModuleDependents(mod)).pipe(
         switchMap(() => {
@@ -318,11 +318,12 @@ export class Container {
   }
 
   /** Internal handler for `up` and `down` methods of class. */
-  protected containerState(observables$: Array<Observable<void>>, state: boolean): Observable<void> {
+  protected containerState(observables$: Array<Observable<void>>, state: boolean): Observable<number> {
     return forkJoin(...observables$).pipe(
       map(() => {
         const message = state ? EContainerLog.Up : EContainerLog.Down;
         this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
+        return this.moduleNames.length;
       })
     );
   }
