@@ -5,6 +5,26 @@ import { Container, ContainerError } from "../container";
 import { Environment } from "../environment";
 import { Module, ModuleLog, ModuleMetric } from "../module";
 
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), ms);
+  });
+}
+
+class UpTimeoutModule extends Module {
+  public static readonly moduleName: string = "UpTimeoutModule";
+  public moduleUp(): Promise<void> {
+    return delay(10000);
+  }
+}
+
+class DownTimeoutModule extends Module {
+  public static readonly moduleName: string = "DownTimeoutModule";
+  public moduleDown(): Promise<void> {
+    return delay(10000);
+  }
+}
+
 describe("Container", () => {
   it("ContainerError is instance of expected classes", () => {
     const error = new ContainerError("unknown");
@@ -47,5 +67,27 @@ describe("Container", () => {
     scope.register({ value: asValue(value) });
     const compareValue = scope.resolve("value");
     expect(value).toEqual(compareValue);
+  });
+
+  it("up throws timeout error", async (done) => {
+    const container = new Container("UpTimeout").registerModule(UpTimeoutModule);
+    container.up(100).subscribe({
+      next: () => done.fail(),
+      error: (error) => {
+        expect(error instanceof ContainerError).toEqual(true);
+        done();
+      }
+    });
+  });
+
+  it("down throws timeout error", (done) => {
+    const container = new Container("DownTimeout").registerModule(DownTimeoutModule);
+    container.down(100).subscribe({
+      next: () => done.fail(),
+      error: (error) => {
+        expect(error instanceof ContainerError).toEqual(true);
+        done();
+      }
+    });
   });
 });

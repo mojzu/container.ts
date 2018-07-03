@@ -1,6 +1,6 @@
-import { from, Observable, of } from "rxjs";
+import { Observable, of } from "rxjs";
 import { Container, ContainerError } from "../container";
-import { IModuleDependencies, Module } from "../module";
+import { IModuleDependencies, Module, ModuleError } from "../module";
 
 // Tests for Module up/down order.
 const moduleUpOrder: number[] = [];
@@ -69,23 +69,10 @@ class Test4 extends Test3 {
   }
 }
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), ms);
-  });
-}
-
-class UpTimeoutModule extends Module {
-  public static readonly moduleName: string = "UpTimeoutModule";
-  public moduleUp(): Promise<void> {
-    return delay(10000);
-  }
-}
-
-class DownTimeoutModule extends Module {
-  public static readonly moduleName: string = "DownTimeoutModule";
-  public moduleDown(): Promise<void> {
-    return delay(10000);
+class DependencyErrorModule extends Module {
+  public static readonly moduleName: string = "DependencyErrorModule";
+  public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
+    return super.moduleDependencies(...prev, { test2: Test2 });
   }
 }
 
@@ -123,25 +110,15 @@ describe("Module", () => {
     expect(t4.test2 instanceof Test2).toEqual(true);
   });
 
-  it("up throws timeout error", async (done) => {
-    const container = new Container("UpTimeout").registerModule(UpTimeoutModule);
-    container.up(100).subscribe({
-      next: () => done.fail(),
-      error: (error) => {
-        expect(error instanceof ContainerError).toEqual(true);
-        done();
-      }
-    });
-  });
-
-  it("down throws timeout error", (done) => {
-    const container = new Container("DownTimeout").registerModule(DownTimeoutModule);
-    container.down(100).subscribe({
-      next: () => done.fail(),
-      error: (error) => {
-        expect(error instanceof ContainerError).toEqual(true);
-        done();
-      }
-    });
+  it("unknown module dependency throws error", (done) => {
+    try {
+      // TODO(H): Improve error handling so module errors caught by observable/promise catch.
+      const container = new Container("test").registerModule(DependencyErrorModule);
+      container.up();
+      done.fail();
+    } catch (error) {
+      expect(error instanceof ModuleError).toEqual(true);
+      done();
+    }
   });
 });
