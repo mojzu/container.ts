@@ -196,13 +196,13 @@ export class Container {
 
           if (up$ == null) {
             // Module up returned void, set state now.
-            return this.containerModuleState(mod.moduleName, true, timeout);
+            return this.containerModuleState(mod.moduleName, true);
           } else if (up$ instanceof Observable) {
             // Observable returned, update state on next.
-            return up$.pipe(switchMap(() => this.containerModuleState(mod.moduleName, true, timeout)));
+            return this.containerModuleState$(up$, mod.moduleName, true, timeout);
           } else {
             // Promise returned, update state on then.
-            return from(up$).pipe(switchMap(() => this.containerModuleState(mod.moduleName, true, timeout)));
+            return this.containerModuleState$(from(up$), mod.moduleName, true, timeout);
           }
         })
       );
@@ -222,13 +222,13 @@ export class Container {
 
           if (down$ == null) {
             // Module down returned void, set state now.
-            return this.containerModuleState(mod.moduleName, false, timeout);
+            return this.containerModuleState(mod.moduleName, false);
           } else if (down$ instanceof Observable) {
             // Observable returned, update state on next.
-            return down$.pipe(switchMap(() => this.containerModuleState(mod.moduleName, false, timeout)));
+            return this.containerModuleState$(down$, mod.moduleName, false, timeout);
           } else {
             // Promise returned, update state on then.
-            return from(down$).pipe(switchMap(() => this.containerModuleState(mod.moduleName, false, timeout)));
+            return this.containerModuleState$(from(down$), mod.moduleName, false, timeout);
           }
         })
       );
@@ -304,17 +304,29 @@ export class Container {
     return this.modules$.value[name] != null;
   }
 
-  /** Update observable modules state for target module. */
-  protected containerModuleState(name: string, state: boolean, timeout = 10000): Observable<void> {
-    const next = { ...this.modules$.value, [name]: state };
-    this.modules$.next(next);
-    return of(undefined).pipe(
+  /** Wrap module hook observable with timeout operator, call containerModuleState on next. */
+  protected containerModuleState$(
+    observable$: Observable<void>,
+    name: string,
+    state: boolean,
+    timeout = 10000
+  ): Observable<void> {
+    return observable$.pipe(
       rxjsTimeout(timeout),
       catchError((error) => {
+        // Catch and wrap timeout errors with ContainerError.
         const errorName = state ? EContainerError.Up : EContainerError.Down;
         return throwError(new ContainerError(errorName, error, name));
-      })
+      }),
+      switchMap(() => this.containerModuleState(name, state))
     );
+  }
+
+  /** Update observable modules state for target module. */
+  protected containerModuleState(name: string, state: boolean): Observable<void> {
+    const next = { ...this.modules$.value, [name]: state };
+    this.modules$.next(next);
+    return of(undefined);
   }
 
   /** Internal handler for `up` and `down` methods of class. */

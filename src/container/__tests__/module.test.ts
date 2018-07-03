@@ -1,3 +1,4 @@
+import { from, Observable, of } from "rxjs";
 import { Container, ContainerError } from "../container";
 import { IModuleDependencies, Module } from "../module";
 
@@ -24,11 +25,13 @@ class Test2 extends Module {
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test1: Test1, test3: Test3 });
   }
-  public moduleUp(): void {
+  public moduleUp(): Observable<void> {
     moduleUpOrder.push(2);
+    return of(undefined);
   }
-  public moduleDown(): void {
+  public moduleDown(): Observable<void> {
     moduleDownOrder.push(2);
+    return of(undefined);
   }
   public moduleDestroy(): void {
     moduleDestroy++;
@@ -41,10 +44,10 @@ class Test3 extends Module {
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test1: Test1 });
   }
-  public moduleUp(): void {
+  public async moduleUp(): Promise<void> {
     moduleUpOrder.push(3);
   }
-  public moduleDown(): void {
+  public async moduleDown(): Promise<void> {
     moduleDownOrder.push(3);
   }
   public moduleDestroy(): void {
@@ -58,11 +61,31 @@ class Test4 extends Test3 {
   public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
     return super.moduleDependencies(...prev, { test2: Test2 });
   }
-  public moduleUp(): void {
+  public async moduleUp(): Promise<void> {
     moduleUpOrder.push(4);
   }
-  public moduleDown(): void {
+  public async moduleDown(): Promise<void> {
     moduleDownOrder.push(4);
+  }
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), ms);
+  });
+}
+
+class UpTimeoutModule extends Module {
+  public static readonly moduleName: string = "UpTimeoutModule";
+  public moduleUp(): Promise<void> {
+    return delay(10000);
+  }
+}
+
+class DownTimeoutModule extends Module {
+  public static readonly moduleName: string = "DownTimeoutModule";
+  public moduleDown(): Promise<void> {
+    return delay(10000);
   }
 }
 
@@ -98,5 +121,27 @@ describe("Module", () => {
     const t4 = CONTAINER.resolve<Test4>(Test4.moduleName);
     expect(t4.test1 instanceof Test1).toEqual(true);
     expect(t4.test2 instanceof Test2).toEqual(true);
+  });
+
+  it("up throws timeout error", async (done) => {
+    const container = new Container("UpTimeout").registerModule(UpTimeoutModule);
+    container.up(100).subscribe({
+      next: () => done.fail(),
+      error: (error) => {
+        expect(error instanceof ContainerError).toEqual(true);
+        done();
+      }
+    });
+  });
+
+  it("down throws timeout error", (done) => {
+    const container = new Container("DownTimeout").registerModule(DownTimeoutModule);
+    container.down(100).subscribe({
+      next: () => done.fail(),
+      error: (error) => {
+        expect(error instanceof ContainerError).toEqual(true);
+        done();
+      }
+    });
   });
 });
