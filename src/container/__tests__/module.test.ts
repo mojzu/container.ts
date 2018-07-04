@@ -111,14 +111,13 @@ describe("Module", () => {
   });
 
   it("unknown module dependency throws error", (done) => {
-    try {
-      // TODO(H): Improve error handling so module errors caught by observable/promise catch.
-      const container = new Container("test").registerModule(DependencyErrorModule);
-      container.up();
-      done.fail();
-    } catch (error) {
-      expect(error instanceof ModuleError).toEqual(true);
-      done();
-    }
+    const container = new Container("test").registerModule(DependencyErrorModule);
+    container.up().subscribe({
+      next: () => done.fail(),
+      error: (error) => {
+        expect(error instanceof ModuleError).toEqual(true);
+        done();
+      }
+    });
   });
 });

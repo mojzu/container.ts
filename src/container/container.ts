@@ -189,25 +189,29 @@ export class Container {
    * Module hook method `moduleUp` called in order of dependencies.
    */
   public up(timeout?: number): Observable<number> {
-    const observables$ = this.modules.map((mod) => {
-      return this.containerWhenModulesUp(...this.containerModuleDependencies(mod)).pipe(
-        switchMap(() => {
-          const up$ = mod.moduleUp();
+    try {
+      const observables$ = this.modules.map((mod) => {
+        return this.containerWhenModulesUp(...this.containerModuleDependencies(mod)).pipe(
+          switchMap(() => {
+            const up$ = mod.moduleUp();
 
-          if (up$ == null) {
-            // Module up returned void, set state now.
-            return this.containerModuleState(mod.moduleName, true);
-          } else if (up$ instanceof Observable) {
-            // Observable returned, update state on next.
-            return this.containerModuleState$(up$, mod.moduleName, true, timeout);
-          } else {
-            // Promise returned, update state on then.
-            return this.containerModuleState$(from(up$), mod.moduleName, true, timeout);
-          }
-        })
-      );
-    });
-    return this.containerState(observables$, true);
+            if (up$ == null) {
+              // Module up returned void, set state now.
+              return this.containerModuleState(mod.moduleName, true);
+            } else if (up$ instanceof Observable) {
+              // Observable returned, update state on next.
+              return this.containerModuleState$(up$, mod.moduleName, true, timeout);
+            } else {
+              // Promise returned, update state on then.
+              return this.containerModuleState$(from(up$), mod.moduleName, true, timeout);
+            }
+          })
+        );
+      });
+      return this.containerState(observables$, true);
+    } catch (error) {
+      return throwError(error);
+    }
   }
 
   /**
@@ -215,25 +219,29 @@ export class Container {
    * Module hook method `moduleDown` called in order of dependents.
    */
   public down(timeout?: number): Observable<number> {
-    const observables$ = this.modules.map((mod) => {
-      return this.containerWhenModulesDown(...this.containerModuleDependents(mod)).pipe(
-        switchMap(() => {
-          const down$ = mod.moduleDown();
+    try {
+      const observables$ = this.modules.map((mod) => {
+        return this.containerWhenModulesDown(...this.containerModuleDependents(mod)).pipe(
+          switchMap(() => {
+            const down$ = mod.moduleDown();
 
-          if (down$ == null) {
-            // Module down returned void, set state now.
-            return this.containerModuleState(mod.moduleName, false);
-          } else if (down$ instanceof Observable) {
-            // Observable returned, update state on next.
-            return this.containerModuleState$(down$, mod.moduleName, false, timeout);
-          } else {
-            // Promise returned, update state on then.
-            return this.containerModuleState$(from(down$), mod.moduleName, false, timeout);
-          }
-        })
-      );
-    });
-    return this.containerState(observables$, false);
+            if (down$ == null) {
+              // Module down returned void, set state now.
+              return this.containerModuleState(mod.moduleName, false);
+            } else if (down$ instanceof Observable) {
+              // Observable returned, update state on next.
+              return this.containerModuleState$(down$, mod.moduleName, false, timeout);
+            } else {
+              // Promise returned, update state on then.
+              return this.containerModuleState$(from(down$), mod.moduleName, false, timeout);
+            }
+          })
+        );
+      });
+      return this.containerState(observables$, false);
+    } catch (error) {
+      return throwError(error);
+    }
   }
 
   /** Call modules destroy hooks before process exit. */
