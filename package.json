@@ -62,6 +62,7 @@
     "testPathIgnorePatterns": [
       "Mock.ts",
       "script.test.ts",
+      "script-error.test.ts",
       "worker.test.ts"
     ],
     "moduleFileExtensions": [

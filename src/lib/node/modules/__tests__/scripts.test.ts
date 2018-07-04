@@ -32,6 +32,12 @@ describe("Scripts", () => {
     expect(code).toEqual(0);
   });
 
+  it("fork runs test script which exits with error code", async () => {
+    const proc = SCRIPTS.fork("script-error.test.js");
+    const code = await proc.exit$.pipe(take(1)).toPromise();
+    expect(code).toEqual(1);
+  });
+
   it("worker started and stopped", async () => {
     const worker = await SCRIPTS.startWorker(WN, "worker.test.js", { restart: false })
       .pipe(take(1))

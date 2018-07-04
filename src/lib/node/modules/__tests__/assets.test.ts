@@ -65,4 +65,15 @@ describe("Assets", () => {
     const data = await ASSETS.readDirectory("");
     expect(data).toEqual(["invalid.json", "test.json", "test.txt"]);
   });
+
+  it("returns read directory error for invalid path", async (done) => {
+    try {
+      await ASSETS.readDirectory("doesnotexist");
+      done.fail();
+    } catch (error) {
+      expect(error instanceof AssetsError).toEqual(true);
+      expect(error.name).toEqual(EAssetsError.ReadDirectory);
+      done();
+    }
+  });
 });

@@ -43,6 +43,7 @@ fuseBox.Sparky.task("test-worker", () => {
     target: "server"
   });
   fuse.bundle("script.test").instructions(" > [lib/node/modules/__tests__/scripts/script.test.ts]");
+  fuse.bundle("script-error.test").instructions(" > [lib/node/modules/__tests__/scripts/script-error.test.ts]");
   fuse.bundle("worker.test").instructions(" > [lib/node/modules/__tests__/scripts/worker.test.ts]");
   return fuse.run();
 });

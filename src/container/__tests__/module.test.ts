@@ -110,9 +110,20 @@ describe("Module", () => {
     expect(t4.test2 instanceof Test2).toEqual(true);
   });
 
-  it("unknown module dependency throws error", (done) => {
+  it("unknown module dependency throws error during container.up", (done) => {
     const container = new Container("test").registerModule(DependencyErrorModule);
     container.up().subscribe({
+      next: () => done.fail(),
+      error: (error) => {
+        expect(error instanceof ModuleError).toEqual(true);
+        done();
+      }
+    });
+  });
+
+  it("unknown module dependency throws error during container.down", (done) => {
+    const container = new Container("test").registerModule(DependencyErrorModule);
+    container.down().subscribe({
       next: () => done.fail(),
       error: (error) => {
         expect(error instanceof ModuleError).toEqual(true);
