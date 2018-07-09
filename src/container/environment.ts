@@ -1,8 +1,16 @@
 import { assign } from "lodash";
+import { ErrorChain } from "../lib/error";
 
 /** Environment variables object. */
 export interface IEnvironmentVariables {
   [key: string]: string | undefined;
+}
+
+/** Environment error class. */
+export class EnvironmentError extends ErrorChain {
+  public constructor(name: string, cause?: Error) {
+    super({ name: "EnvironmentError", value: name }, cause);
+  }
 }
 
 /** Environment variables class. */
@@ -18,9 +26,18 @@ export class Environment {
     return new Environment(assign({}, this.variables, ...variables));
   }
 
-  /** Get an environment variable value, or default value or undefined. */
-  public get(name: string, orDefault?: string): string | undefined {
-    return this.variables[name] || orDefault;
+  /**
+   * Get an environment variable value, or default value.
+   * Throws EnvironmentError if value is undefined and no default value provided.
+   */
+  public get(name: string, orDefault?: string): string {
+    if (this.variables[name] != null) {
+      return this.variables[name] as string;
+    } else if (orDefault != null) {
+      return orDefault;
+    } else {
+      throw new EnvironmentError(name);
+    }
   }
 
   /** Set an environment variable value. */

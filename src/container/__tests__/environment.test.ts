@@ -1,4 +1,4 @@
-import { Environment } from "../environment";
+import { Environment, EnvironmentError } from "../environment";
 
 describe("Environment", () => {
   it("has expected properties", () => {
@@ -32,5 +32,16 @@ describe("Environment", () => {
     const environment = new Environment();
     expect(environment.set("value", value) instanceof Environment).toEqual(true);
     expect(environment.get("value")).toEqual(value);
+  });
+
+  it("throws error for undefined environment variable", (done) => {
+    try {
+      const environment = new Environment();
+      environment.get("UNDEFINED_VALUE");
+    } catch (error) {
+      expect(error instanceof EnvironmentError).toEqual(true);
+      expect(error.value).toEqual("UNDEFINED_VALUE");
+      done();
+    }
   });
 });
