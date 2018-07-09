@@ -43,7 +43,7 @@
   "devDependencies": {
     "@types/del": "^3.0.1",
     "@types/jest": "^23.1.4",
-    "@types/node": "^10.5.1",
+    "@types/node": "^10.5.2",
     "@types/yargs": "^11.0.0",
     "del": "^3.0.0",
     "fuse-box": "^3.3.0",
