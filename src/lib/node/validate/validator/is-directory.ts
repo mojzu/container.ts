@@ -10,7 +10,7 @@ export function isDirectory(value = ""): string {
     if (lstatSync(resolveValue).isDirectory() !== true) {
       throw new NodeValidateError(ENodeValidateError.IsDirectoryError, value);
     }
-    return value;
+    return resolveValue;
   } catch (error) {
     throw new NodeValidateError(ENodeValidateError.IsDirectoryError, value, error);
   }
