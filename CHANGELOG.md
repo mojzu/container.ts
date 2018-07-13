@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.0.8 (2018-07-13)
+
+### Features
+
+- Add `has` method to `Environment` class.
+
+---
+
 ## 2.0.7 (2018-07-10)
 
 ### Fixes

@@ -1,4 +1,4 @@
-import { assign } from "lodash";
+import { assign, has } from "lodash";
 import { ErrorChain } from "../lib/error";
 
 /** Environment variables object. */
@@ -24,6 +24,11 @@ export class Environment {
   /** Returns a copy of environment. */
   public copy(...variables: IEnvironmentVariables[]): Environment {
     return new Environment(assign({}, this.variables, ...variables));
+  }
+
+  /** Returns true if environment variable name is set. */
+  public has(name: string): boolean {
+    return has(this.variables, name);
   }
 
   /**

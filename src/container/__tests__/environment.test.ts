@@ -44,4 +44,10 @@ describe("Environment", () => {
       done();
     }
   });
+
+  it("has returns true for defined variable, false for undefined", () => {
+    const environment = new Environment().set("IS_DEFINED", "1");
+    expect(environment.has("IS_DEFINED")).toEqual(true);
+    expect(environment.has("IS_NOT_DEFINED")).toEqual(false);
+  });
 });
