@@ -2,16 +2,11 @@ import { assign, get, isArray, isObject, keys } from "lodash";
 import { ErrorChain } from "../error";
 import { Field } from "./field";
 
-/** Schema error codes. */
-export enum ESchemaError {
-  SchemaValueError,
-  SchemaFieldError
-}
-
 /** Schema error class. */
 export class SchemaError extends ErrorChain {
-  public constructor(code: ESchemaError, path: string, cause?: Error) {
-    super({ name: ESchemaError[code], value: path }, cause);
+  protected readonly isSchemaError = true;
+  public constructor(path: string, cause?: Error) {
+    super({ name: "SchemaError", value: path }, cause);
   }
 }
 
@@ -98,8 +93,20 @@ export class Schema<T = object> {
 
   /** Returns true if input instance of Schema. */
   public static isSchema<X>(schema: any): schema is Schema<X> {
-    return schema instanceof Schema;
+    const instanceOf = schema instanceof Schema;
+    const hasProperty = !!schema.isSchema;
+    return instanceOf || hasProperty;
   }
+
+  /** Returns true if input instance of SchemaError. */
+  public static isSchemaError(error: any): error is SchemaError {
+    const instanceOf = error instanceof SchemaError;
+    const hasProperty = !!error.isSchemaError;
+    return instanceOf || hasProperty;
+  }
+
+  /** Used for isSchema static method. */
+  protected readonly isSchema = true;
 
   public constructor(public readonly schema: ISchema) {}
 
@@ -200,14 +207,14 @@ export class Schema<T = object> {
         output[key] = input[key];
       } else {
         // Invalid schema field value.
-        throw new SchemaError(ESchemaError.SchemaFieldError, keyPath, value);
+        throw new SchemaError(keyPath, value);
       }
     } catch (error) {
       // Schema error wrapper.
-      if (error instanceof SchemaError) {
+      if (Schema.isSchemaError(error)) {
         throw error;
       } else {
-        throw new SchemaError(ESchemaError.SchemaValueError, keyPath, error);
+        throw new SchemaError(keyPath, error);
       }
     }
   }

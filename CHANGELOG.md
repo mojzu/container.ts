@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.0.11 (2018-07-28)
+
+### Fixed
+
+- Reduce usage of `instanceof` for class instance detection, use instance properties as secondary test.
+
+---
+
 ## 2.0.10 (2018-07-28)
 
 ### Changed

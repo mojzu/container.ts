@@ -239,7 +239,7 @@ describe("Schema", () => {
       done.fail();
     } catch (error) {
       expect(ErrorChain.isErrorChain(error)).toEqual(true);
-      expect(ErrorChain.errorName(error)).toEqual("SchemaValueError.IsStringError.TypeError");
+      expect(ErrorChain.errorName(error)).toEqual("SchemaError.IsStringError.TypeError");
       expect(error.value).toEqual(".mapOuter.mapInner.stringMapInnerField");
       done();
     }

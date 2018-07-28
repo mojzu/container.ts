@@ -32,12 +32,14 @@ export enum EErrorChainError {
 export class ErrorChain {
   /** Returns true if error instance of ErrorChain. */
   public static isErrorChain(error: any): error is ErrorChain {
-    return error instanceof ErrorChain;
+    const instanceOf = error instanceof ErrorChain;
+    const hasProperty = !!error.isErrorChain;
+    return instanceOf || hasProperty;
   }
 
   /** Returns true if error instance of Error or ErrorChain */
   public static isError(error: any): error is Error | ErrorChain {
-    return error instanceof Error || error instanceof ErrorChain;
+    return error instanceof Error || ErrorChain.isErrorChain(error);
   }
 
   /** Returns name representation of error argument. */
@@ -111,6 +113,9 @@ export class ErrorChain {
   public readonly value?: any;
   public readonly cause?: ErrorChain | Error;
 
+  /** Used for isErrorChain static method. */
+  protected readonly isErrorChain = true;
+
   public constructor(data: IErrorChain, cause?: ErrorChain | Error) {
     const error = new Error(ErrorChain.messageConstructor(data, cause));
     this.name = error.name = data.name;
@@ -131,7 +136,7 @@ export class ErrorChain {
     if (this.cause != null) {
       if (ErrorChain.isErrorChain(this.cause)) {
         names.push(this.cause.joinNames(separator));
-      } else if (this.cause instanceof Error) {
+      } else if (ErrorChain.isError(this.cause)) {
         if (this.cause.name != null) {
           names.push(this.cause.name);
         }
