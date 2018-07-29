@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "2.0.11",
+  "version": "2.1.0",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -48,7 +48,7 @@
     "del": "^3.0.0",
     "fuse-box": "^3.4.0",
     "jest": "^23.4.2",
-    "ts-jest": "^23.0.0",
+    "ts-jest": "^23.0.1",
     "ts-node": "^7.0.0",
     "tslint": "^5.11.0",
     "typescript": "^2.9.2",
@@ -72,6 +72,7 @@
       "jsx",
       "json",
       "node"
-    ]
+    ],
+    "testURL": "http://localhost"
   }
 }
