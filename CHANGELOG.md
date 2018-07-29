@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.1.0 (2018-07-29)
+
+### Added
+
+- Added `extend` as static method on `Schema` class, helps with exporting schemas via a library.
+
+---
+
 ## 2.0.11 (2018-07-28)
 
 ### Fixed

@@ -105,6 +105,17 @@ export class Schema<T = object> {
     return instanceOf || hasProperty;
   }
 
+  /**
+   * Construct new schema by merging existing schemas.
+   * Accepts schema definition objects or existing Schema class instances.
+   */
+  public static extend<E>(...schemas: Array<Schema<any> | ISchema>): Schema<E> {
+    const schemaDefinitions: ISchema[] = schemas.map((s) => {
+      return Schema.isSchema(s) ? s.schema : (s as ISchema);
+    });
+    return new Schema(assign({}, ...schemaDefinitions));
+  }
+
   /** Used for isSchema static method. */
   protected readonly isSchema = true;
 
@@ -115,10 +126,7 @@ export class Schema<T = object> {
    * Accepts schema definition objects or existing Schema class instances.
    */
   public extend<K extends T>(...schemas: Array<Schema<any> | ISchema>): Schema<K> {
-    const schemaDefinitions: ISchema[] = schemas.map((s) => {
-      return Schema.isSchema(s) ? s.schema : (s as ISchema);
-    });
-    return new Schema(assign({}, this.schema, ...schemaDefinitions));
+    return Schema.extend<K>(this.schema, ...schemas);
   }
 
   /** Validate input data, transform strings to typed values. */
