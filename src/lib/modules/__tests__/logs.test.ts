@@ -41,7 +41,7 @@ describe("Logs", () => {
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
-      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLogs.moduleName}`);
+      expect(log.metadata.moduleNamespace).toEqual(`${NAME}.${TestLogs.moduleName}`);
       done();
     });
   });
@@ -54,7 +54,7 @@ describe("Logs", () => {
       expect(log.message).toEqual(error);
       expect(log.metadata).toBeDefined();
       expect(log.metadata.value).toEqual(metadata.value);
-      expect(log.metadata.moduleName).toEqual(`${NAME}.${TestLogs.moduleName}`);
+      expect(log.metadata.moduleNamespace).toEqual(`${NAME}.${TestLogs.moduleName}`);
       done();
     });
   });

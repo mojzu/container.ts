@@ -240,7 +240,7 @@ describe("Schema", () => {
     } catch (error) {
       expect(ErrorChain.isErrorChain(error)).toEqual(true);
       expect(ErrorChain.errorName(error)).toEqual("SchemaError.IsStringError.TypeError");
-      expect(error.value).toEqual(".mapOuter.mapInner.stringMapInnerField");
+      expect(error.value).toEqual({ code: 0, path: ".mapOuter.mapInner.stringMapInnerField" });
       done();
     }
   });

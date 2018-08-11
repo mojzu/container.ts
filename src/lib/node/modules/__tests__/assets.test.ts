@@ -45,7 +45,8 @@ describe("Assets", () => {
       done.fail();
     } catch (error) {
       expect(error instanceof AssetsError).toEqual(true);
-      expect(error.name).toEqual(EAssetsError.JsonParse);
+      expect(error.name).toEqual("AssetsError");
+      expect(error.value.code).toEqual(EAssetsError.JsonParse);
       done();
     }
   });
@@ -56,7 +57,8 @@ describe("Assets", () => {
       done.fail();
     } catch (error) {
       expect(error instanceof AssetsError).toEqual(true);
-      expect(error.name).toEqual(EAssetsError.ReadFile);
+      expect(error.name).toEqual("AssetsError");
+      expect(error.value.code).toEqual(EAssetsError.ReadFile);
       done();
     }
   });
@@ -72,7 +74,8 @@ describe("Assets", () => {
       done.fail();
     } catch (error) {
       expect(error instanceof AssetsError).toEqual(true);
-      expect(error.name).toEqual(EAssetsError.ReadDirectory);
+      expect(error.name).toEqual("AssetsError");
+      expect(error.value.code).toEqual(EAssetsError.ReadDirectory);
       done();
     }
   });

@@ -42,7 +42,7 @@ describe("Metric", () => {
       expect(metric.name).toEqual(name);
       expect(metric.value).toEqual(value);
       expect(metric.tags).toEqual(tags);
-      expect(metric.tags.moduleName).toEqual(`${NAME}.${TestMetrics.moduleName}`);
+      expect(metric.tags.moduleNamespace).toEqual(`${NAME}.${TestMetrics.moduleName}`);
       done();
     });
   });
