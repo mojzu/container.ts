@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 3.0.0 (?)
+
+### Changed
+
+- `Container` class `up`, `down` methods now return promises instead of observables.
+- Rewrote `Module` class hooks, all signatures now based on `moduleDependencies` method, rewrite all `moduleUp`, `moduleDown` and `moduleDestroy` hooks.
+
+---
+
 ## 2.2.0 (2018-08-11)
 
 ### Added

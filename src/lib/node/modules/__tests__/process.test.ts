@@ -12,11 +12,11 @@ describe("Process", () => {
   const PROCESS = CONTAINER.resolve<Process>(Process.moduleName);
 
   beforeAll(async () => {
-    await CONTAINER.up().toPromise();
+    await CONTAINER.up();
   });
 
   afterAll(async () => {
-    await CONTAINER.down().toPromise();
+    await CONTAINER.down();
     CONTAINER.destroy();
   });
 

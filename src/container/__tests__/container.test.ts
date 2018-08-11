@@ -3,7 +3,7 @@ import { Subject } from "rxjs";
 import { ErrorChain } from "../../lib/error";
 import { Container, ContainerError, EContainerError } from "../container";
 import { Environment } from "../environment";
-import { Module, ModuleLog, ModuleMetric } from "../module";
+import { IModuleHook, Module, ModuleLog, ModuleMetric } from "../module";
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -13,15 +13,15 @@ function delay(ms: number): Promise<void> {
 
 class UpTimeoutModule extends Module {
   public static readonly moduleName: string = "UpTimeoutModule";
-  public moduleUp(): Promise<void> {
-    return delay(10000);
+  public moduleUp(...args: IModuleHook[]) {
+    return super.moduleUp(...args, () => delay(10000));
   }
 }
 
 class DownTimeoutModule extends Module {
   public static readonly moduleName: string = "DownTimeoutModule";
-  public moduleDown(): Promise<void> {
-    return delay(10000);
+  public moduleDown(...args: IModuleHook[]) {
+    return super.moduleDown(...args, () => delay(10000));
   }
 }
 
@@ -71,23 +71,23 @@ describe("Container", () => {
 
   it("up throws timeout error", async (done) => {
     const container = new Container("UpTimeout").registerModule(UpTimeoutModule);
-    container.up(100).subscribe({
-      next: () => done.fail(),
-      error: (error) => {
-        expect(error instanceof ContainerError).toEqual(true);
-        done();
-      }
-    });
+    try {
+      await container.up(100);
+      done.fail();
+    } catch (error) {
+      expect(error instanceof ContainerError).toEqual(true);
+      done();
+    }
   });
 
-  it("down throws timeout error", (done) => {
+  it("down throws timeout error", async (done) => {
     const container = new Container("DownTimeout").registerModule(DownTimeoutModule);
-    container.down(100).subscribe({
-      next: () => done.fail(),
-      error: (error) => {
-        expect(error instanceof ContainerError).toEqual(true);
-        done();
-      }
-    });
+    try {
+      await container.down(100);
+      done.fail();
+    } catch (error) {
+      expect(error instanceof ContainerError).toEqual(true);
+      done();
+    }
   });
 });

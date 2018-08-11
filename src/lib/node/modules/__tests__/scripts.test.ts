@@ -13,11 +13,11 @@ describe("Scripts", () => {
   const SCRIPTS = CONTAINER.resolve<Scripts>(Scripts.moduleName);
 
   beforeAll(async () => {
-    await CONTAINER.up().toPromise();
+    await CONTAINER.up();
   });
 
   afterAll(async () => {
-    await CONTAINER.down().toPromise();
+    await CONTAINER.down();
     CONTAINER.destroy();
   });
 

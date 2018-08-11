@@ -6,8 +6,8 @@ class TestModule extends Module {
 
   protected readonly process!: Process;
 
-  public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
-    return super.moduleDependencies(...prev, { process: Process });
+  public moduleDependencies(...args: IModuleDependencies[]) {
+    return super.moduleDependencies(...args, { process: Process });
   }
 }
 
@@ -19,9 +19,7 @@ const ENVIRONMENT = new Environment(process.env);
 const CONTAINER = new Container("Worker", ENVIRONMENT).registerModules([Process, TestModule]);
 
 // Signal operational.
-CONTAINER.up().subscribe({
-  error: (error) => {
-    process.stderr.write(`${error}\n`);
-    process.exit(1);
-  }
+CONTAINER.up().catch((error) => {
+  process.stderr.write(`${error}\n`);
+  process.exit(1);
 });

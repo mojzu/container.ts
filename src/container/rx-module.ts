@@ -1,6 +1,6 @@
 import { Observable, Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { Module } from "./module";
+import { IModuleDestroy, IModuleHook, Module } from "./module";
 
 /** Module class with RxJS unsubscribe subject embedded for usability. */
 export class RxModule extends Module {
@@ -8,18 +8,22 @@ export class RxModule extends Module {
   public static readonly moduleName: string = "RxModule";
 
   /** Internal observable management subject. */
-  protected readonly unsubscribe$ = new Subject<void>();
+  private readonly rxUnsubscribe$ = new Subject<void>();
 
-  public moduleDown(): void {
-    this.unsubscribe$.next();
+  public moduleDown(...args: IModuleHook[]) {
+    return super.moduleDown(...args, async () => {
+      this.rxUnsubscribe$.next();
+    });
   }
 
-  public moduleDestroy(): void {
-    this.unsubscribe$.complete();
+  public moduleDestroy(...args: IModuleDestroy[]) {
+    return super.moduleDestroy(...args, () => {
+      this.rxUnsubscribe$.complete();
+    });
   }
 
   /** Utility function for piping observable through takeUntil. */
-  public takeUntilDown<T>(observable$: Observable<T>): Observable<T> {
-    return observable$.pipe(takeUntil(this.unsubscribe$));
+  public rxTakeUntilModuleDown<T>(observable$: Observable<T>): Observable<T> {
+    return observable$.pipe(takeUntil(this.rxUnsubscribe$));
   }
 }

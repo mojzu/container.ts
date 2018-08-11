@@ -1,7 +1,7 @@
 import * as os from "os";
 import * as process from "process";
 import { interval } from "rxjs";
-import { IModuleOptions, Module } from "../../../container";
+import { IModuleHook, IModuleOptions, Module } from "../../../container";
 import { ErrorChain } from "../../error";
 import { isString } from "../validate";
 
@@ -135,31 +135,31 @@ export class Process extends Module {
   }
 
   /** Try to read process information asset file, handle process events. */
-  public moduleUp(): void {
-    // Log process information.
-    this.log.info(EProcessLog.Information, this.information);
+  public moduleUp(...args: IModuleHook[]) {
+    return super.moduleUp(...args, async () => {
+      // Log process information.
+      this.log.info(EProcessLog.Information, this.information);
 
-    // Process end signal handlers.
-    process.on("SIGTERM", () => this.processOnSignal("SIGTERM"));
-    process.on("SIGINT", () => this.processOnSignal("SIGINT"));
+      // Process end signal handlers.
+      process.on("SIGTERM", () => this.processOnSignal("SIGTERM"));
+      process.on("SIGINT", () => this.processOnSignal("SIGINT"));
+    });
   }
 
   /** Container down when process termination signal received. */
-  protected processOnSignal(signal: string): void {
-    this.log.info(EProcessLog.Signal, { signal });
-    this.container.down().subscribe({
-      next: () => {
-        this.container.destroy();
-        process.exit(0);
-      },
-      error: (error) => {
-        // Write error to stderr and exit with error code.
-        error = new ProcessError(EProcessError.Signal, error, { signal });
-        process.stderr.write(`${error}\n`);
-        this.container.destroy();
-        process.exit(1);
-      }
-    });
+  protected async processOnSignal(signal: string): Promise<void> {
+    try {
+      this.log.info(EProcessLog.Signal, { signal });
+      await this.container.down();
+      this.container.destroy();
+      process.exit(0);
+    } catch (error) {
+      // Write error to stderr and exit with error code.
+      error = new ProcessError(EProcessError.Signal, error, { signal });
+      process.stderr.write(`${error}\n`);
+      this.container.destroy();
+      process.exit(1);
+    }
   }
 
   protected processMetrics(status: IProcessStatus): void {

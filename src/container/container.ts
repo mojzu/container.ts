@@ -1,8 +1,8 @@
 import { asFunction, asValue, AwilixContainer, createContainer, InjectionMode } from "awilix";
 import * as Debug from "debug";
 import { keys } from "lodash";
-import { BehaviorSubject, forkJoin, from, Observable, of, Subject, throwError } from "rxjs";
-import { catchError, filter, map, switchMap, take, timeout as rxjsTimeout } from "rxjs/operators";
+import { BehaviorSubject, from, Observable, Subject, throwError } from "rxjs";
+import { catchError, filter, map, take, timeout as rxjsTimeout } from "rxjs/operators";
 import { ErrorChain } from "../lib/error";
 import { Environment } from "./environment";
 import { ELogLevel, ILogMessage, ILogMetadata } from "./log";
@@ -188,60 +188,26 @@ export class Container {
    * Signal modules to enter operational state.
    * Module hook method `moduleUp` called in order of dependencies.
    */
-  public up(timeout?: number): Observable<number> {
-    try {
-      const observables$ = this.modules.map((mod) => {
-        return this.containerWhenModulesUp(...this.containerModuleDependencies(mod)).pipe(
-          switchMap(() => {
-            const up$ = mod.moduleUp();
-
-            if (up$ == null) {
-              // Module up returned void, set state now.
-              return this.containerModuleState(mod.moduleName, true);
-            } else if (up$ instanceof Observable) {
-              // Observable returned, update state on next.
-              return this.containerModuleState$(up$, mod.moduleName, true, timeout);
-            } else {
-              // Promise returned, update state on then.
-              return this.containerModuleState$(from(up$), mod.moduleName, true, timeout);
-            }
-          })
-        );
-      });
-      return this.containerState(observables$, true);
-    } catch (error) {
-      return throwError(error);
-    }
+  public async up(timeout?: number): Promise<number> {
+    const hooks = this.modules.map(async (mod) => {
+      // Wait for module dependencies and then call module up hooks.
+      await this.containerWhenModulesUp(...this.containerModuleDependencies(mod));
+      return this.containerModuleStateTimeout(mod.moduleUp(), mod.moduleName, true, timeout);
+    });
+    return this.containerState(hooks, true);
   }
 
   /**
    * Signal modules to leave operational state.
    * Module hook method `moduleDown` called in order of dependents.
    */
-  public down(timeout?: number): Observable<number> {
-    try {
-      const observables$ = this.modules.map((mod) => {
-        return this.containerWhenModulesDown(...this.containerModuleDependents(mod)).pipe(
-          switchMap(() => {
-            const down$ = mod.moduleDown();
-
-            if (down$ == null) {
-              // Module down returned void, set state now.
-              return this.containerModuleState(mod.moduleName, false);
-            } else if (down$ instanceof Observable) {
-              // Observable returned, update state on next.
-              return this.containerModuleState$(down$, mod.moduleName, false, timeout);
-            } else {
-              // Promise returned, update state on then.
-              return this.containerModuleState$(from(down$), mod.moduleName, false, timeout);
-            }
-          })
-        );
-      });
-      return this.containerState(observables$, false);
-    } catch (error) {
-      return throwError(error);
-    }
+  public async down(timeout?: number): Promise<number> {
+    const hooks = this.modules.map(async (mod) => {
+      // Wait for module dependents and then call module down hooks.
+      await this.containerWhenModulesDown(...this.containerModuleDependents(mod));
+      return this.containerModuleStateTimeout(mod.moduleDown(), mod.moduleName, false, timeout);
+    });
+    return this.containerState(hooks, false);
   }
 
   /** Call modules destroy hooks before process exit. */
@@ -255,29 +221,33 @@ export class Container {
   }
 
   /** Wait for modules to enter operational state before calling next. */
-  protected containerWhenModulesUp(...modules: string[]): Observable<void> {
-    return this.modules$.pipe(
-      filter((states) => {
-        return modules.reduce((previous, current) => {
-          return previous && states[current];
-        }, true);
-      }),
-      map(() => undefined),
-      take(1)
-    );
+  protected containerWhenModulesUp(...modules: string[]): Promise<void> {
+    return this.modules$
+      .pipe(
+        filter((states) => {
+          return modules.reduce((previous, current) => {
+            return previous && states[current];
+          }, true);
+        }),
+        map(() => undefined),
+        take(1)
+      )
+      .toPromise();
   }
 
   /** Wait for modules to leave operational state before calling next. */
-  protected containerWhenModulesDown(...modules: string[]): Observable<void> {
-    return this.modules$.pipe(
-      filter((states) => {
-        return !modules.reduce((previous, current) => {
-          return previous || states[current];
-        }, false);
-      }),
-      map(() => undefined),
-      take(1)
-    );
+  protected containerWhenModulesDown(...modules: string[]): Promise<void> {
+    return this.modules$
+      .pipe(
+        filter((states) => {
+          return !modules.reduce((previous, current) => {
+            return previous || states[current];
+          }, false);
+        }),
+        map(() => undefined),
+        take(1)
+      )
+      .toPromise();
   }
 
   /** Create a new instance of module class. */
@@ -312,39 +282,42 @@ export class Container {
     return this.modules$.value[name] != null;
   }
 
-  /** Wrap module hook observable with timeout operator, call containerModuleState on next. */
-  protected containerModuleState$(
-    observable$: Observable<void>,
+  /** Wrap module hook promise with timeout operator, call containerModuleState on next. */
+  protected containerModuleStateTimeout(
+    hook: Promise<void>,
     moduleName: string,
     state: boolean,
     timeout = 10000
-  ): Observable<void> {
-    return observable$.pipe(
-      rxjsTimeout(timeout),
-      catchError((error) => {
-        // Catch and wrap timeout errors with ContainerError.
-        const errorName = state ? EContainerError.Up : EContainerError.Down;
-        return throwError(new ContainerError(errorName, error, { moduleName }));
-      }),
-      switchMap(() => this.containerModuleState(moduleName, state))
-    );
+  ): Promise<void> {
+    return from(hook)
+      .pipe(
+        rxjsTimeout(timeout),
+        catchError((error) => {
+          // Catch and wrap timeout errors with ContainerError.
+          const errorName = state ? EContainerError.Up : EContainerError.Down;
+          return throwError(new ContainerError(errorName, error, { moduleName }));
+        }),
+        map(() => this.containerModuleState(moduleName, state))
+      )
+      .toPromise();
   }
 
   /** Update observable modules state for target module. */
-  protected containerModuleState(name: string, state: boolean): Observable<void> {
+  protected containerModuleState(name: string, state: boolean): void {
     const next = { ...this.modules$.value, [name]: state };
     this.modules$.next(next);
-    return of(undefined);
   }
 
   /** Internal handler for `up` and `down` methods of class. */
-  protected containerState(observables$: Array<Observable<void>>, state: boolean): Observable<number> {
-    return forkJoin(...observables$).pipe(
-      map(() => {
-        const message = state ? EContainerLog.Up : EContainerLog.Down;
-        this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
-        return this.moduleNames.length;
-      })
-    );
+  protected containerState(hooks: Array<Promise<void>>, state: boolean): Promise<number> {
+    return from(Promise.all(hooks))
+      .pipe(
+        map(() => {
+          const message = state ? EContainerLog.Up : EContainerLog.Down;
+          this.sendLog(ELogLevel.Informational, message, { name: this.name }, []);
+          return this.moduleNames.length;
+        })
+      )
+      .toPromise();
   }
 }

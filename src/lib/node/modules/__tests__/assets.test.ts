@@ -8,11 +8,11 @@ describe("Assets", () => {
   const ASSETS = CONTAINER.resolve<Assets>(Assets.moduleName);
 
   beforeAll(async () => {
-    await CONTAINER.up().toPromise();
+    await CONTAINER.up();
   });
 
   afterAll(async () => {
-    await CONTAINER.down().toPromise();
+    await CONTAINER.down();
     CONTAINER.destroy();
   });
 

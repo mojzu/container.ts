@@ -3,7 +3,15 @@ import { keys } from "lodash";
 import { resolve } from "path";
 import { BehaviorSubject, Observable, of, Subject } from "rxjs";
 import { filter, map, take, takeUntil } from "rxjs/operators";
-import { IEnvironmentVariables, ILogMetadata, IModuleDependencies, IModuleOptions, RxModule } from "../../../container";
+import {
+  IEnvironmentVariables,
+  ILogMetadata,
+  IModuleDependencies,
+  IModuleDestroy,
+  IModuleHook,
+  IModuleOptions,
+  RxModule
+} from "../../../container";
 import { ErrorChain } from "../../error/error-chain";
 import { isDirectory, isFile } from "../validate";
 import { Process } from "./process";
@@ -74,7 +82,7 @@ export class ScriptsProcess {
     });
 
     // Create exit observable, reduce code/signal argument.
-    this.exit$ = this.scripts.takeUntilDown(this.scripts.processExit$).pipe(
+    this.exit$ = this.scripts.rxTakeUntilModuleDown(this.scripts.processExit$).pipe(
       filter((exit) => exit.pid === this.process.pid),
       take(1),
       map((exit) => {
@@ -93,7 +101,7 @@ export class ScriptsProcess {
 
     // Subscribe to error observable to forward to scripts logger.
     this.scripts
-      .takeUntilDown(this.scripts.processError$)
+      .rxTakeUntilModuleDown(this.scripts.processError$)
       .pipe(
         takeUntil(this.exit$),
         filter((exit) => exit.pid === this.process.pid)
@@ -151,26 +159,25 @@ export class Scripts extends RxModule {
     this.debug(`${EScriptsEnv.Path}="${this.envPath}"`);
   }
 
-  /** Scripts module depends on Process. */
-  public moduleDependencies(...previous: IModuleDependencies[]): IModuleDependencies {
-    return super.moduleDependencies(...previous, {
-      process: Process
+  public moduleDependencies(...previous: IModuleDependencies[]) {
+    return super.moduleDependencies(...previous, { process: Process });
+  }
+
+  public moduleDown(...args: IModuleHook[]) {
+    // Wait for worker processes to exit.
+    return super.moduleDown(...args, async () => {
+      const promises = keys(this.scriptsWorkers).map((name) => {
+        return this.stopWorker(name).toPromise();
+      });
+      await Promise.all(promises);
     });
   }
 
-  /** Wait for worker processes to exit. */
-  public async moduleDown(): Promise<void> {
-    const promises = keys(this.scriptsWorkers).map((name) => {
-      return this.stopWorker(name).toPromise();
+  public moduleDestroy(...args: IModuleDestroy[]) {
+    return super.moduleDestroy(...args, () => {
+      this.processExit$.complete();
+      this.processError$.complete();
     });
-    await Promise.all(promises);
-    super.moduleDown();
-  }
-
-  public moduleDestroy(): void {
-    this.processExit$.complete();
-    this.processError$.complete();
-    super.moduleDestroy();
   }
 
   /** Spawn new Node.js process using script file. */

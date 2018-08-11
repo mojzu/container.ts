@@ -1,6 +1,6 @@
 import * as Debug from "debug";
 import { assign, keys } from "lodash";
-import { Observable } from "rxjs";
+import { reverse } from "lodash";
 import { ErrorChain } from "../lib/error";
 import { Container, EContainerScope } from "./container";
 import { Environment } from "./environment";
@@ -17,6 +17,12 @@ export interface IModuleOptions {
 export interface IModuleDependencies {
   [key: string]: typeof Module;
 }
+
+/** Module up/down hooks. */
+export type IModuleHook = () => Promise<void>;
+
+/** Module destroy hook. */
+export type IModuleDestroy = () => void;
 
 /** Module error codes. */
 export enum EModuleError {
@@ -114,16 +120,26 @@ export class Module {
   }
 
   /** Module dependencies hook. */
-  public moduleDependencies(...previous: IModuleDependencies[]): IModuleDependencies {
-    return assign({}, ...previous);
+  public moduleDependencies(...args: IModuleDependencies[]): IModuleDependencies {
+    return assign({}, ...args);
   }
 
   /** Module operational state hook. */
-  public moduleUp(): void | Observable<void> | Promise<void> {}
+  public async moduleUp(...args: IModuleHook[]): Promise<void> {
+    for (const hook of reverse(args.slice())) {
+      await hook();
+    }
+  }
 
   /** Module non-operational state hook. */
-  public moduleDown(): void | Observable<void> | Promise<void> {}
+  public async moduleDown(...args: IModuleHook[]): Promise<void> {
+    for (const hook of args) {
+      await hook();
+    }
+  }
 
   /** Module destruction hook. */
-  public moduleDestroy(): void {}
+  public moduleDestroy(...args: IModuleDestroy[]): void {
+    args.map((hook) => hook());
+  }
 }
