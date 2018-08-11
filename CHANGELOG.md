@@ -2,6 +2,10 @@
 
 ## 2.2.0 (2018-08-11)
 
+### Added
+
+- Add `RxModule` class, has internal unsubscribe subject and `takeUntilDown` method.
+
 ### Changed
 
 - Inheritors of `ErrorChain` have more consistent constructors, error codes.

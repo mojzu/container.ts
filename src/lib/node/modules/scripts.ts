@@ -60,6 +60,7 @@ export class ScriptsProcess {
     const accumulator: () => IProcessExit = (...args: any[]) => args as any;
 
     // Listen for process exit, reduce code/signal for next argument.
+    // TODO(M): Clean up fromEvent usage, replace with subjects.
     this.exit$ = fromEvent<IProcessExit>(process as any, "exit", accumulator).pipe(
       take(1),
       map((args) => {

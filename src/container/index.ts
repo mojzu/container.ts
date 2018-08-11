@@ -3,3 +3,4 @@ export * from "./environment";
 export * from "./log";
 export * from "./metric";
 export * from "./module";
+export * from "./rx-module";
