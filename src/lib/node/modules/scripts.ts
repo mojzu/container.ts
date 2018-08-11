@@ -1,9 +1,9 @@
 import { ChildProcess as NodeChildProcess, fork } from "child_process";
 import { keys } from "lodash";
 import { resolve } from "path";
-import { BehaviorSubject, forkJoin, fromEvent, Observable, of, Subject } from "rxjs";
-import { map, take, takeUntil } from "rxjs/operators";
-import { IEnvironmentVariables, ILogMetadata, IModuleDependencies, IModuleOptions, Module } from "../../../container";
+import { BehaviorSubject, Observable, of, Subject } from "rxjs";
+import { filter, map, take, takeUntil } from "rxjs/operators";
+import { IEnvironmentVariables, ILogMetadata, IModuleDependencies, IModuleOptions, RxModule } from "../../../container";
 import { ErrorChain } from "../../error/error-chain";
 import { isDirectory, isFile } from "../validate";
 import { Process } from "./process";
@@ -30,6 +30,19 @@ export interface IScriptsWorker {
   restarts: number;
 }
 
+/** Scripts process exit event. */
+export interface IScriptsProcessExit {
+  pid: number;
+  code?: number;
+  signal?: string;
+}
+
+/** Scripts process error event. */
+export interface IScriptsProcessError {
+  pid: number;
+  error: any;
+}
+
 /** ScriptsProcess error codes. */
 export enum EScriptsProcessError {
   Exit,
@@ -43,32 +56,34 @@ export class ScriptsProcessError extends ErrorChain {
   }
 }
 
-/** Process accumulated exit callback return value(s). */
-type IProcessExit = [number | null, string | null];
-
 /** Spawned scripts process. */
 export class ScriptsProcess {
   public readonly exit$: Observable<number | string>;
-  public readonly error$: Observable<Error>;
 
   public constructor(
     public readonly scripts: Scripts,
     public readonly fileName: string,
     public readonly process: NodeChildProcess
   ) {
-    // Accumulate multiple callback arguments into array.
-    const accumulator: () => IProcessExit = (...args: any[]) => args as any;
+    // Connect process events to subjects.
+    this.process.on("exit", (code?: number, signal?: string) => {
+      this.scripts.processExit$.next({ pid: this.process.pid, code, signal });
+    });
+    this.process.on("error", (error: any) => {
+      this.scripts.processError$.next({ pid: this.process.pid, error });
+    });
 
-    // Listen for process exit, reduce code/signal for next argument.
-    // TODO(M): Clean up fromEvent usage, replace with subjects.
-    this.exit$ = fromEvent<IProcessExit>(process as any, "exit", accumulator).pipe(
+    // Create exit observable, reduce code/signal argument.
+    this.exit$ = this.scripts.takeUntilDown(this.scripts.processExit$).pipe(
+      filter((exit) => exit.pid === this.process.pid),
       take(1),
-      map((args) => {
-        const [code, signal] = args;
-        const value = typeof code === "number" ? code : signal;
-        return value != null ? value : 1;
+      map((exit) => {
+        const code = exit.code != null ? exit.code : exit.signal;
+        return code != null ? code : 1;
       })
     );
+
+    // Subscribe to exit observable to log errors.
     this.exit$.subscribe((code) => {
       if (code !== 0) {
         const error = new ScriptsProcessError(EScriptsProcessError.Exit, undefined, { code, fileName: this.fileName });
@@ -76,12 +91,17 @@ export class ScriptsProcess {
       }
     });
 
-    // Listen for process error, forward to scripts logger.
-    this.error$ = fromEvent<Error>(process as any, "error").pipe(takeUntil(this.exit$));
-    this.error$.subscribe((error) => {
-      const chained = new ScriptsProcessError(EScriptsProcessError.Error, error, { fileName: this.fileName });
-      this.scripts.log.error(chained);
-    });
+    // Subscribe to error observable to forward to scripts logger.
+    this.scripts
+      .takeUntilDown(this.scripts.processError$)
+      .pipe(
+        takeUntil(this.exit$),
+        filter((exit) => exit.pid === this.process.pid)
+      )
+      .subscribe((error) => {
+        const chained = new ScriptsProcessError(EScriptsProcessError.Error, error.error, { fileName: this.fileName });
+        this.scripts.log.error(chained);
+      });
   }
 
   /** End child process with signal. */
@@ -107,12 +127,18 @@ export enum EScriptsLog {
 }
 
 /** Node.js scripts module. */
-export class Scripts extends Module {
+export class Scripts extends RxModule {
   /** Default module name. */
   public static readonly moduleName: string = "Scripts";
 
   /** Absolute path to script files directory. */
   public readonly envPath = isDirectory(this.environment.get(EScriptsEnv.Path));
+
+  /** Observable stream of process exit events. */
+  public readonly processExit$ = new Subject<IScriptsProcessExit>();
+
+  /** Observable stream of process error events. */
+  public readonly processError$ = new Subject<IScriptsProcessError>();
 
   /** Workers state. */
   protected readonly scriptsWorkers: { [name: string]: IScriptsWorker } = {};
@@ -122,8 +148,6 @@ export class Scripts extends Module {
 
   public constructor(options: IModuleOptions) {
     super(options);
-
-    // Debug environment variables.
     this.debug(`${EScriptsEnv.Path}="${this.envPath}"`);
   }
 
@@ -135,13 +159,18 @@ export class Scripts extends Module {
   }
 
   /** Wait for worker processes to exit. */
-  public moduleDown(): void | Observable<void> {
-    const observables$ = keys(this.scriptsWorkers).map((name) => {
-      return this.stopWorker(name);
+  public async moduleDown(): Promise<void> {
+    const promises = keys(this.scriptsWorkers).map((name) => {
+      return this.stopWorker(name).toPromise();
     });
-    if (observables$.length > 0) {
-      return forkJoin(...observables$).pipe(map(() => undefined));
-    }
+    await Promise.all(promises);
+    super.moduleDown();
+  }
+
+  public moduleDestroy(): void {
+    this.processExit$.complete();
+    this.processError$.complete();
+    super.moduleDestroy();
   }
 
   /** Spawn new Node.js process using script file. */

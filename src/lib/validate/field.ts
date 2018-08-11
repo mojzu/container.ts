@@ -1,7 +1,7 @@
 import { toString } from "validator";
 import { ErrorChain } from "../error";
 
-// TODO(H): Improve operator field documentation/testing/code readability.
+// TODO(M): Improve operator field documentation/testing/code readability.
 
 /** Field error codes. */
 export enum EFieldError {

@@ -8,6 +8,7 @@
 
 ### Changed
 
+- Refactor `Scripts` module to use `RxModule` base class, inheritors must call `super.moduleDown` and `super.moduleDestroy` methods in their module hooks.
 - Inheritors of `ErrorChain` have more consistent constructors, error codes.
 - Updated package dependencies.
 
