@@ -2,11 +2,17 @@ import { assign, get, isArray, isObject, keys } from "lodash";
 import { ErrorChain } from "../error";
 import { Field } from "./field";
 
+/** Schema error codes. */
+export enum ESchemaError {
+  Field,
+  Value
+}
+
 /** Schema error class. */
 export class SchemaError extends ErrorChain {
   protected readonly isSchemaError = true;
-  public constructor(path: string, cause?: Error) {
-    super({ name: "SchemaError", value: path }, cause);
+  public constructor(code: ESchemaError, cause?: Error, context?: object) {
+    super({ name: "SchemaError", value: { code, ...context } }, cause);
   }
 }
 
@@ -183,7 +189,7 @@ export class Schema<T = object> {
     key: number | string
   ): void {
     // Key path construction for error messages.
-    const keyPath = `${parentKey}.${key}`;
+    const path = `${parentKey}.${key}`;
 
     // Handle masked fields if defined.
     let mapMask: ISchemaMask | undefined;
@@ -201,28 +207,28 @@ export class Schema<T = object> {
       if (value instanceof Field) {
         // Value is field class instance.
         const field = value as Field<any>;
-        handlers.isField(input, output, field, key, mapMask, keyPath);
+        handlers.isField(input, output, field, key, mapMask, path);
       } else if (isArray(value)) {
         // Value is a schema array object.
         const schemaArray = value as ISchemaArray;
-        handlers.isSchemaArray(input, output, this, schemaArray, key, mapMask, keyPath);
+        handlers.isSchemaArray(input, output, this, schemaArray, key, mapMask, path);
       } else if (isObject(value)) {
         // Value is schema map object.
         const schemaMap = value as ISchemaMap;
-        handlers.isSchemaMap(input, output, this, schemaMap, key, mapMask, keyPath);
+        handlers.isSchemaMap(input, output, this, schemaMap, key, mapMask, path);
       } else if (value === "*") {
         // Wildcard asterisk, accept all data.
         output[key] = input[key];
       } else {
         // Invalid schema field value.
-        throw new SchemaError(keyPath, value);
+        throw new SchemaError(ESchemaError.Value, value, { path });
       }
     } catch (error) {
       // Schema error wrapper.
       if (Schema.isSchemaError(error)) {
         throw error;
       } else {
-        throw new SchemaError(keyPath, error);
+        throw new SchemaError(ESchemaError.Field, error, { path });
       }
     }
   }

@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Inheritors of `ErrorChain` have more consistent constructors, error codes.
 - Updated package dependencies.
 
 ---

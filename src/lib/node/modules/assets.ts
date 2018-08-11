@@ -10,10 +10,17 @@ export interface IAssetsCache {
   [key: string]: Buffer | string;
 }
 
+/** Assets error codes. */
+export enum EAssetsError {
+  ReadFile,
+  JsonParse,
+  ReadDirectory
+}
+
 /** Assets error class. */
 export class AssetsError extends ErrorChain {
-  public constructor(name: string, value: string, cause?: Error) {
-    super({ name, value }, cause);
+  public constructor(code: EAssetsError, cause?: Error, context?: object) {
+    super({ name: "AssetsError", value: { code, ...context } }, cause);
   }
 }
 
@@ -27,13 +34,6 @@ export interface IAssetsReadOptions {
 export enum EAssetsEnv {
   /** Assets directory path (required). */
   Path = "ASSETS_PATH"
-}
-
-/** Assets error names. */
-export enum EAssetsError {
-  ReadFile = "AssetsError.ReadFile",
-  JsonParse = "AssetsError.JsonParse",
-  ReadDirectory = "AssetsError.ReadDirectory"
 }
 
 /** Assets read only files module. */
@@ -81,7 +81,7 @@ export class Assets extends Module {
     try {
       return JSON.parse(data);
     } catch (error) {
-      throw new AssetsError(EAssetsError.JsonParse, target, error);
+      throw new AssetsError(EAssetsError.JsonParse, error, { target });
     }
   }
 
@@ -92,7 +92,7 @@ export class Assets extends Module {
       const fsReaddir = promisify(readdir);
       return await fsReaddir(directoryPath);
     } catch (error) {
-      throw new AssetsError(EAssetsError.ReadDirectory, target, error);
+      throw new AssetsError(EAssetsError.ReadDirectory, error, { target });
     }
   }
 
@@ -117,7 +117,7 @@ export class Assets extends Module {
       }
       return data;
     } catch (error) {
-      throw new AssetsError(EAssetsError.ReadFile, target, error);
+      throw new AssetsError(EAssetsError.ReadFile, error, { target });
     }
   }
 }

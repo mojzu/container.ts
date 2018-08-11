@@ -28,10 +28,15 @@ export interface IProcessStatus {
   memoryUsage: NodeJS.MemoryUsage;
 }
 
+/** Process error codes. */
+export enum EProcessError {
+  Signal
+}
+
 /** Process error class. */
 export class ProcessError extends ErrorChain {
-  public constructor(cause?: Error) {
-    super({ name: "ProcessError" }, cause);
+  public constructor(code: EProcessError, cause?: Error, context?: object) {
+    super({ name: "ProcessError", value: { code, ...context } }, cause);
   }
 }
 
@@ -149,7 +154,7 @@ export class Process extends Module {
       },
       error: (error) => {
         // Write error to stderr and exit with error code.
-        error = new ProcessError(error);
+        error = new ProcessError(EProcessError.Signal, error, { signal });
         process.stderr.write(`${error}\n`);
         this.container.destroy();
         process.exit(1);

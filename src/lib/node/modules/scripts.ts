@@ -30,17 +30,16 @@ export interface IScriptsWorker {
   restarts: number;
 }
 
-/** Scripts error class. */
-export class ScriptsError extends ErrorChain {
-  public constructor(cause?: Error) {
-    super({ name: "ScriptsError" }, cause);
-  }
+/** ScriptsProcess error codes. */
+export enum EScriptsProcessError {
+  Exit,
+  Error
 }
 
 /** ScriptsProcess error class. */
 export class ScriptsProcessError extends ErrorChain {
-  public constructor(fileName: string, cause?: Error) {
-    super({ name: "ScriptsProcessError", value: fileName }, cause);
+  public constructor(code: EScriptsProcessError, cause?: Error, context?: object) {
+    super({ name: "ScriptsProcessError", value: { code, ...context } }, cause);
   }
 }
 
@@ -71,7 +70,7 @@ export class ScriptsProcess {
     );
     this.exit$.subscribe((code) => {
       if (code !== 0) {
-        const error = new ScriptsProcessError(this.fileName);
+        const error = new ScriptsProcessError(EScriptsProcessError.Exit, undefined, { code, fileName: this.fileName });
         this.scripts.log.error(error, { code });
       }
     });
@@ -79,7 +78,7 @@ export class ScriptsProcess {
     // Listen for process error, forward to scripts logger.
     this.error$ = fromEvent<Error>(process as any, "error").pipe(takeUntil(this.exit$));
     this.error$.subscribe((error) => {
-      const chained = new ScriptsProcessError(this.fileName, error);
+      const chained = new ScriptsProcessError(EScriptsProcessError.Error, error, { fileName: this.fileName });
       this.scripts.log.error(chained);
     });
   }

@@ -6,10 +6,15 @@ export interface IEnvironmentVariables {
   [key: string]: string | undefined;
 }
 
+/** Environment error codes. */
+export enum EEnvironmentError {
+  Get
+}
+
 /** Environment error class. */
 export class EnvironmentError extends ErrorChain {
-  public constructor(name: string, cause?: Error) {
-    super({ name: "EnvironmentError", value: name }, cause);
+  public constructor(code: EEnvironmentError, cause?: Error, context?: object) {
+    super({ name: "EnvironmentError", value: { code, ...context } }, cause);
   }
 }
 
@@ -26,28 +31,28 @@ export class Environment {
     return new Environment(assign({}, this.variables, ...variables));
   }
 
-  /** Returns true if environment variable name is set. */
-  public has(name: string): boolean {
-    return has(this.variables, name);
+  /** Returns true if environment variable key is set. */
+  public has(key: string): boolean {
+    return has(this.variables, key);
   }
 
   /**
    * Get an environment variable value, or default value.
    * Throws EnvironmentError if value is undefined and no default value provided.
    */
-  public get(name: string, orDefault?: string): string {
-    if (this.variables[name] != null) {
-      return this.variables[name] as string;
+  public get(key: string, orDefault?: string): string {
+    if (this.variables[key] != null) {
+      return this.variables[key] as string;
     } else if (orDefault != null) {
       return orDefault;
     } else {
-      throw new EnvironmentError(name);
+      throw new EnvironmentError(EEnvironmentError.Get, undefined, { key });
     }
   }
 
   /** Set an environment variable value. */
-  public set(name: string, value: string): Environment {
-    this.variables[name] = value;
+  public set(key: string, value: string): Environment {
+    this.variables[key] = value;
     return this;
   }
 }

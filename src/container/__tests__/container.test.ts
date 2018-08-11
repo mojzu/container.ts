@@ -1,7 +1,7 @@
 import { asValue } from "awilix";
 import { Subject } from "rxjs";
 import { ErrorChain } from "../../lib/error";
-import { Container, ContainerError } from "../container";
+import { Container, ContainerError, EContainerError } from "../container";
 import { Environment } from "../environment";
 import { Module, ModuleLog, ModuleMetric } from "../module";
 
@@ -27,7 +27,7 @@ class DownTimeoutModule extends Module {
 
 describe("Container", () => {
   it("ContainerError is instance of expected classes", () => {
-    const error = new ContainerError("unknown");
+    const error = new ContainerError(EContainerError.Down);
     expect(error instanceof Error).toEqual(false);
     expect(ErrorChain.isError(error)).toEqual(true);
     expect(error instanceof ErrorChain).toEqual(true);

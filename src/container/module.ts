@@ -18,48 +18,48 @@ export interface IModuleDependencies {
   [key: string]: typeof Module;
 }
 
+/** Module error codes. */
+export enum EModuleError {
+  Dependency
+}
+
 /** Module error class. */
 export class ModuleError extends ErrorChain {
-  public constructor(name: string, cause?: Error) {
-    super({ name }, cause);
+  public constructor(code: EModuleError, cause?: Error, context?: object) {
+    super({ name: "ModuleError", value: { code, ...context } }, cause);
   }
 }
 
 /** Container module log class. */
 export class ModuleLog extends Log {
-  public constructor(protected readonly container: Container, protected readonly name: string) {
+  public constructor(protected readonly container: Container, protected readonly namespace: string) {
     super();
   }
 
   /**
    * Sends log message to container bus for consumption by modules.
-   * Adds module name to metadata object by default.
+   * Adds module namespace to metadata object by default.
    */
   protected log(level: ELogLevel, message: ILogMessage, metadata: ILogMetadata, ...args: any[]): void {
-    metadata.moduleName = this.name;
+    metadata.moduleNamespace = this.namespace;
     this.container.sendLog(level, message, metadata, args);
   }
 }
 
 /** Container module metric class. */
 export class ModuleMetric extends Metric {
-  public constructor(protected readonly container: Container, protected readonly name: string) {
+  public constructor(protected readonly container: Container, protected readonly namespace: string) {
     super();
   }
 
   /**
    * Sends metric message to container bus for consumption by modules.
-   * Adds module name to tags object by default.
+   * Adds module namespace to tags object by default.
    */
   protected metric(type: EMetricType, name: string, value: any, tags: IMetricTags, ...args: any[]): void {
-    tags.moduleName = this.name;
+    tags.moduleNamespace = this.namespace;
     this.container.sendMetric(type, name, value, tags, args);
   }
-}
-
-/** Module error names. */
-export enum EModuleError {
-  Dependency = "ModuleError.Dependency"
 }
 
 /** Base class for container class modules with dependency injection. */

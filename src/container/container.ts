@@ -19,10 +19,17 @@ export interface IContainerArguments {
   [argName: string]: any;
 }
 
+/** Container error codes. */
+export enum EContainerError {
+  Up,
+  Down,
+  ModuleRegistered
+}
+
 /** Container error class. */
 export class ContainerError extends ErrorChain {
-  public constructor(name: string, cause?: Error, moduleName?: string) {
-    super({ name, value: moduleName }, cause);
+  public constructor(code: EContainerError, cause?: Error, context?: object) {
+    super({ name: "ContainerError", value: { code, ...context } }, cause);
   }
 }
 
@@ -62,13 +69,6 @@ export class ContainerMetricMessage implements IContainerMetricMessage {
     public readonly tags: IMetricTags,
     public readonly args: any[]
   ) {}
-}
-
-/** Container error names. */
-export enum EContainerError {
-  Up = "ContainerError.Up",
-  Down = "ContainerError.Down",
-  ModuleRegistered = "ContainerError.ModuleRegistered"
 }
 
 /** Container log names. */
@@ -315,7 +315,7 @@ export class Container {
   /** Wrap module hook observable with timeout operator, call containerModuleState on next. */
   protected containerModuleState$(
     observable$: Observable<void>,
-    name: string,
+    moduleName: string,
     state: boolean,
     timeout = 10000
   ): Observable<void> {
@@ -324,9 +324,9 @@ export class Container {
       catchError((error) => {
         // Catch and wrap timeout errors with ContainerError.
         const errorName = state ? EContainerError.Up : EContainerError.Down;
-        return throwError(new ContainerError(errorName, error, name));
+        return throwError(new ContainerError(errorName, error, { moduleName }));
       }),
-      switchMap(() => this.containerModuleState(name, state))
+      switchMap(() => this.containerModuleState(moduleName, state))
     );
   }
 
