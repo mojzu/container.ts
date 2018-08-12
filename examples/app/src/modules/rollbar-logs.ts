@@ -40,7 +40,7 @@ export class RollbarLogs extends Logs {
     });
   }
 
-  public moduleDependencies(...prev: IModuleDependencies[]): IModuleDependencies {
+  public moduleDependencies(...prev: IModuleDependencies[]) {
     return super.moduleDependencies(...prev, { process: Process });
   }
 

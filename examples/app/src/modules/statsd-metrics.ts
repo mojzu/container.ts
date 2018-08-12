@@ -20,7 +20,7 @@ export class StatsdMetrics extends Metrics {
 
     // Get host and port environment values.
     const host = isString(this.environment.get(EStatsdMetricsEnv.Host));
-    const port = isPort(this.environment.get(EStatsdMetricsEnv.Port) || "8125");
+    const port = isPort(this.environment.get(EStatsdMetricsEnv.Port, "8125"));
     this.debug(`${EStatsdMetricsEnv.Host}="${host}" ${EStatsdMetricsEnv.Port}="${port}"`);
 
     // Create statsd client instance.

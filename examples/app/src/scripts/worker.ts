@@ -11,18 +11,17 @@ const ENVIRONMENT = new Environment(process.env);
 const CONTAINER = new Container("Worker", ENVIRONMENT, argv).registerModules([Process, StatsdMetrics, WinstonLogs]);
 
 // Register additional modules based on environment definitions.
-if (!!ENVIRONMENT.get(ERollbarLogsEnv.AccessToken)) {
+if (ENVIRONMENT.has(ERollbarLogsEnv.AccessToken)) {
   CONTAINER.registerModule(RollbarLogs);
 }
 
 // Signal operational.
-CONTAINER.up().subscribe({
-  next: () => {
+CONTAINER.up()
+  .then((count) => {
     // Modules counter.
-    CONTAINER.debug(`${CONTAINER.moduleNames.length} modules started`);
-  },
-  error: (error) => {
+    CONTAINER.debug(`${count} modules started`);
+  })
+  .catch((error) => {
     process.stderr.write(`${error}\n`);
     process.exit(1);
-  }
-});
+  });

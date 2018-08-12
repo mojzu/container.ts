@@ -6,6 +6,7 @@
 
 - `Container` class `up`, `down` methods now return promises instead of observables.
 - Rewrote `Module` class hooks, all signatures now based on `moduleDependencies` method, rewrite all `moduleUp`, `moduleDown` and `moduleDestroy` hooks.
+- Updated container and application examples.
 
 ---
 
