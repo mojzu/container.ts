@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 3.0.2 (2018-08-30)
+
+### Changed
+
+- Updated package dependencies.
+
+---
+
 ## 3.0.1 (2018-08-27)
 
 ### Changed
