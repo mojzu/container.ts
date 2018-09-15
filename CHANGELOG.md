@@ -2,6 +2,10 @@
 
 ## 3.0.4 (?)
 
+### Added
+
+- Added `Process.kill` method.
+
 ### Changed
 
 - Updated package dependencies.

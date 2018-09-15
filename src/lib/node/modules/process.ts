@@ -146,6 +146,11 @@ export class Process extends Module {
     });
   }
 
+  /** Kill this process with "SIGINT" signal. */
+  public kill(): void {
+    process.kill(process.pid, "SIGINT");
+  }
+
   /** Container down when process termination signal received. */
   protected async processOnSignal(signal: string): Promise<void> {
     try {
