@@ -1,3 +1,5 @@
+import { isPlainObject } from "lodash";
+
 /** Error chain data type. */
 export interface IErrorChain {
   name: string;
@@ -52,11 +54,18 @@ export class ErrorChain {
     return String(error);
   }
 
-  /** Construct error message from data and optional cause. */
+  /**
+   * Construct error message from name, data and optional cause.
+   * If data is a plain object it will be serialised into a JSON string.
+   */
   public static messageConstructor(data: IErrorChain, cause?: ErrorChain | Error): string {
     let message = data.name;
     if (data.value != null) {
-      message += ` "${data.value}"`;
+      if (isPlainObject(data.value)) {
+        message += ` "${JSON.stringify(data.value)}"`;
+      } else {
+        message += ` "${data.value}"`;
+      }
     }
     if (cause != null) {
       message += `: ${cause}`;
@@ -71,10 +80,6 @@ export class ErrorChain {
       stack: String(error.stack || ""),
       message: String(error.stack || "")
     };
-    // Remove duplicate stack/message properties.
-    if (serialised.stack === serialised.message) {
-      delete serialised.message;
-    }
     if (error.errno != null) {
       serialised.errno = Number(error.errno);
     }
@@ -125,11 +130,12 @@ export class ErrorChain {
     this.cause = cause;
   }
 
+  // TODO(L): Pretty print function for readability.
   public toString(): string {
     return this.message || "";
   }
 
-  /** Join chained error names. */
+  /** Join chained error names with a separator. */
   public joinNames(separator = "."): string {
     const names = [this.name];
 
@@ -167,8 +173,9 @@ export class ErrorChain {
           chained = chained.concat(serialised.ErrorChain);
         } else if (ErrorChain.isError(this.cause)) {
           chained.push(ErrorChain.serialiseError(this.cause));
+        } else if (isPlainObject(this.cause)) {
+          chained.push(this.cause);
         }
-        // TODO(L): Serialise other objects if not ErrorChain/Error?
       }
 
       return { ErrorChain: chained };
@@ -176,6 +183,4 @@ export class ErrorChain {
       throw new ErrorChain({ name: EErrorChainError.Serialise }, error);
     }
   }
-
-  // TODO(L): Pretty print function for readability.
 }

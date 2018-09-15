@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 3.0.4 (?)
+
+### Changed
+
+- Updated package dependencies.
+- `ErrorChain.serialise` includes plain objects in output as checked by `lodash.isPlainObject`.
+- `ErrorChain.messageConstructor` serialises data into JSON string for display (plain objects only).
+
+---
+
 ## 3.0.3 (2018-09-03)
 
 ### Changed
