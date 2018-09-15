@@ -125,11 +125,6 @@ export class Process extends Module {
     // Set process title.
     Process.setTitle(isString(this.environment.get(EProcessEnv.Name, "node")));
 
-    // Debug environment variables.
-    this.debug(`${EProcessEnv.Name}="${this.envTitle}"`);
-    this.debug(`${EProcessEnv.Version}="${this.envVersion}"`);
-    this.debug(`${EProcessEnv.NodeEnv}="${this.envNodeEnv}"`);
-
     // Process metrics on interval.
     interval(this.metricInterval).subscribe(() => this.processMetrics(this.status));
   }
@@ -138,7 +133,7 @@ export class Process extends Module {
   public moduleUp(...args: IModuleHook[]) {
     return super.moduleUp(...args, async () => {
       // Log process information.
-      this.log.info(EProcessLog.Information, this.information);
+      this.log.debug(EProcessLog.Information, this.information);
 
       // Process end signal handlers.
       process.on("SIGTERM", () => this.processOnSignal("SIGTERM"));
@@ -154,7 +149,7 @@ export class Process extends Module {
   /** Container down when process termination signal received. */
   protected async processOnSignal(signal: string): Promise<void> {
     try {
-      this.log.info(EProcessLog.Signal, { signal });
+      this.log.notice(EProcessLog.Signal, { signal });
       await this.container.down();
       this.container.destroy();
       process.exit(0);

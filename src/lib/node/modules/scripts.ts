@@ -9,7 +9,6 @@ import {
   IModuleDependencies,
   IModuleDestroy,
   IModuleHook,
-  IModuleOptions,
   RxModule
 } from "../../../container";
 import { ErrorChain } from "../../error/error-chain";
@@ -30,7 +29,7 @@ export interface IScriptsWorkerOptions extends IScriptsForkOptions {
   restart?: boolean;
   /** Worker process restarts maximum number of times. */
   restartLimit?: number;
-  // TODO(M): Reimplement uptime limit support (ISO8601 duration).
+  // TODO(L): Reimplement uptime limit support (ISO8601 duration).
 }
 
 /** Scripts worker. */
@@ -51,6 +50,11 @@ export interface IScriptsProcessExit {
 export interface IScriptsProcessError {
   pid: number;
   error: any;
+}
+
+/** Scripts log names. */
+export enum EScriptsLog {
+  Information = "Scripts.Information"
 }
 
 /** ScriptsProcess error codes. */
@@ -156,13 +160,14 @@ export class Scripts extends RxModule {
   /** Process module dependency. */
   protected readonly process!: Process;
 
-  public constructor(options: IModuleOptions) {
-    super(options);
-    this.debug(`${EScriptsEnv.Path}="${this.envPath}"`);
-  }
-
   public moduleDependencies(...previous: IModuleDependencies[]) {
     return super.moduleDependencies(...previous, { process: Process });
+  }
+
+  public moduleUp(...args: IModuleHook[]) {
+    return super.moduleUp(...args, async () => {
+      this.log.debug(EScriptsLog.Information, { path: this.envPath });
+    });
   }
 
   public moduleDown(...args: IModuleHook[]) {
@@ -215,6 +220,7 @@ export class Scripts extends RxModule {
     // Handle worker restarts.
     process.exit$.pipe(takeUntil(worker.unsubscribe$)).subscribe((code) => {
       // Log worker exit.
+      // TODO(L): Better use of log.notice/error here?
       const metadata = this.scriptsWorkerLogMetadata({ name, worker, code });
       this.log.info(EScriptsLog.WorkerExit, metadata);
 

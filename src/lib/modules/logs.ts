@@ -22,9 +22,6 @@ export abstract class Logs extends Module {
   public constructor(options: IModuleOptions) {
     super(options);
 
-    // Debug environment variables.
-    this.debug(`${ELogsEnv.Level}="${ELogLevel[this.envLogsLevel]}"`);
-
     // Subscribe to container log messages filtered by level.
     this.container.filterLogs(this.envLogsLevel).subscribe((log) => this.logsOnMessage(log));
   }

@@ -9,10 +9,11 @@
 
 ### Changed
 
-- Updated package dependencies.
 - `ErrorChain.serialise` includes plain objects in output as checked by `lodash.isPlainObject`.
 - `ErrorChain.messageConstructor` serialises data into JSON string for display (plain objects only).
 - All error codes enums now have string values.
+- Replace internal uses of module debug with log calls.
+- Updated package dependencies.
 
 ---
 

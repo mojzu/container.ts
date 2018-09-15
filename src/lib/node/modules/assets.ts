@@ -1,13 +1,18 @@
 import { readdir, readFile } from "fs";
 import { resolve } from "path";
 import { promisify } from "util";
-import { IModuleOptions, Module } from "../../../container";
+import { IModuleHook, Module } from "../../../container";
 import { ErrorChain } from "../../error";
 import { isDirectory, isFile } from "../validate";
 
 /** Assets files may be cached when read. */
 export interface IAssetsCache {
   [key: string]: Buffer | string;
+}
+
+/** Assets log names. */
+export enum EAssetsLog {
+  Information = "Assets.Information"
 }
 
 /** Assets error codes. */
@@ -47,11 +52,10 @@ export class Assets extends Module {
   /** Internal assets cache. */
   protected readonly assetsCache: IAssetsCache = {};
 
-  public constructor(options: IModuleOptions) {
-    super(options);
-
-    // Debug environment variables.
-    this.debug(`${EAssetsEnv.Path}="${this.envPath}"`);
+  public moduleUp(...args: IModuleHook[]) {
+    return super.moduleUp(...args, async () => {
+      this.log.debug(EAssetsLog.Information, { path: this.envPath });
+    });
   }
 
   /** Returns true if target file is cached. */

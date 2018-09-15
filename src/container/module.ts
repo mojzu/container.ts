@@ -19,7 +19,9 @@ export interface IModuleDependencies {
 }
 
 /** Module up/down hooks. */
-export type IModuleHook = () => Promise<void>;
+export type IModuleUp = () => Promise<void>;
+export type IModuleDown = () => Promise<void>;
+export type IModuleHook = IModuleUp | IModuleDown;
 
 /** Module destroy hook. */
 export type IModuleDestroy = () => void;
@@ -125,14 +127,14 @@ export class Module {
   }
 
   /** Module operational state hook. */
-  public async moduleUp(...args: IModuleHook[]): Promise<void> {
+  public async moduleUp(...args: IModuleUp[]): Promise<void> {
     for (const hook of reverse(args.slice())) {
       await hook();
     }
   }
 
   /** Module non-operational state hook. */
-  public async moduleDown(...args: IModuleHook[]): Promise<void> {
+  public async moduleDown(...args: IModuleDown[]): Promise<void> {
     for (const hook of args) {
       await hook();
     }
