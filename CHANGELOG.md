@@ -1,10 +1,11 @@
 # CHANGELOG
 
-## 3.0.4 (?)
+## 3.1.0 (2018-09-15)
 
 ### Added
 
 - Added `Process.kill` method.
+- Added state behaviour subject and `rxState$` property to `RxModule`.
 
 ### Changed
 
