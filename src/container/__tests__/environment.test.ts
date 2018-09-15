@@ -40,7 +40,7 @@ describe("Environment", () => {
       environment.get("UNDEFINED_VALUE");
     } catch (error) {
       expect(error instanceof EnvironmentError).toEqual(true);
-      expect(error.value).toEqual({ code: 0, key: "UNDEFINED_VALUE" });
+      expect(error.value).toEqual({ code: "EnvironmentError.Get", key: "UNDEFINED_VALUE" });
       done();
     }
   });
