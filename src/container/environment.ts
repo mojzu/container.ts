@@ -8,7 +8,7 @@ export interface IEnvironmentVariables {
 
 /** Environment error codes. */
 export enum EEnvironmentError {
-  Get
+  Get = "EnvironmentError.Get"
 }
 
 /** Environment error class. */

@@ -12,9 +12,9 @@ export interface IAssetsCache {
 
 /** Assets error codes. */
 export enum EAssetsError {
-  ReadFile,
-  JsonParse,
-  ReadDirectory
+  ReadFile = "AssetsError.ReadFile",
+  JsonParse = "AssetsError.JsonParse",
+  ReadDirectory = "AssetsError.ReadDirectory"
 }
 
 /** Assets error class. */

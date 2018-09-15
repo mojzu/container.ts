@@ -4,8 +4,8 @@ import { Field } from "./field";
 
 /** Schema error codes. */
 export enum ESchemaError {
-  Field,
-  Value
+  Field = "SchemaError.Field",
+  Value = "SchemaError.Value"
 }
 
 /** Schema error class. */

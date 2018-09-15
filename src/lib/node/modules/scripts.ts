@@ -16,6 +16,8 @@ import { ErrorChain } from "../../error/error-chain";
 import { isDirectory, isFile } from "../validate";
 import { Process } from "./process";
 
+// TODO(L): Run script/command method?
+
 /** Scripts process options. */
 export interface IScriptsForkOptions {
   args?: string[];
@@ -53,8 +55,8 @@ export interface IScriptsProcessError {
 
 /** ScriptsProcess error codes. */
 export enum EScriptsProcessError {
-  Exit,
-  Error
+  Exit = "ScriptsProcessError.Exit",
+  Error = "ScriptsProcessError.Error"
 }
 
 /** ScriptsProcess error class. */

@@ -30,7 +30,7 @@ export interface IProcessStatus {
 
 /** Process error codes. */
 export enum EProcessError {
-  Signal
+  Signal = "ProcessError.Signal"
 }
 
 /** Process error class. */

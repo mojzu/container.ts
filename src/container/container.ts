@@ -21,9 +21,9 @@ export interface IContainerArguments {
 
 /** Container error codes. */
 export enum EContainerError {
-  Up,
-  Down,
-  ModuleRegistered
+  Up = "ContainerError.Up",
+  Down = "ContainerError.Down",
+  ModuleRegistered = "ContainerError.ModuleRegistered"
 }
 
 /** Container error class. */

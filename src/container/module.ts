@@ -26,7 +26,7 @@ export type IModuleDestroy = () => void;
 
 /** Module error codes. */
 export enum EModuleError {
-  Dependency
+  Dependency = "ModuleError.Dependency"
 }
 
 /** Module error class. */
