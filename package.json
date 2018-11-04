@@ -37,13 +37,13 @@
   "optionalDependencies": {
     "@types/luxon": "^1.4.0",
     "@types/validator": "^9.4.2",
-    "luxon": "^1.4.4",
+    "luxon": "^1.5.0",
     "validator": "^10.8.0"
   },
   "devDependencies": {
     "@types/del": "^3.0.1",
     "@types/jest": "^23.3.9",
-    "@types/node": "^10.12.1",
+    "@types/node": "^10.12.2",
     "@types/yargs": "^12.0.1",
     "del": "^3.0.0",
     "fuse-box": "^3.6.0",
@@ -51,7 +51,7 @@
     "ts-jest": "^23.10.4",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
-    "typescript": "^3.1.4",
+    "typescript": "^3.1.6",
     "yargs": "^12.0.2"
   },
   "jest": {
