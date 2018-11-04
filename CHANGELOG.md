@@ -1,9 +1,10 @@
 # CHANGELOG
 
-## 3.1.5 (?)
+## 3.2.0 (2018-11-04)
 
 ### Changed
 
+- Changed `IContainerArguments` interface to be more generic.
 - Updated package dependencies.
 
 ---

@@ -9,14 +9,12 @@ import { ELogLevel, ILogMessage, ILogMetadata } from "./log";
 import { EMetricType, IMetricTags } from "./metric";
 import { Module } from "./module";
 
-/** Command line arguments interface matching `yargs` package. */
+/** Command line arguments interface. */
 export interface IContainerArguments {
   /** Non-option arguments. */
-  _: string[];
-  /** The script name or node command. */
-  $0: string;
+  arguments: string[];
   /** All remaining options. */
-  [argName: string]: any;
+  options: object;
 }
 
 /** Container error codes. */
@@ -120,7 +118,7 @@ export class Container {
     /** Optional container environment. */
     public readonly environment = new Environment(),
     /** Optional command line arguments. */
-    public readonly argv: IContainerArguments = { _: [], $0: "" }
+    public readonly argv: IContainerArguments = { arguments: [], options: {} }
   ) {
     this.debug = Debug(this.name);
     this.container = createContainer({ injectionMode: InjectionMode.PROXY });
