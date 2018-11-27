@@ -3,7 +3,7 @@ import { filter, takeUntil } from "rxjs/operators";
 import { IModuleDestroy, IModuleHook, IModuleOptions, Module } from "./module";
 
 /** Module class with RxJS unsubscribe and state for usability. */
-export class RxModule<S = void> extends Module {
+export class RxModule<S = object> extends Module {
   /** Default module name. */
   public static readonly moduleName: string = "RxModule";
 
@@ -34,8 +34,15 @@ export class RxModule<S = void> extends Module {
     });
   }
 
-  /** Utility function for piping observable through takeUntil. */
+  /** Utility method for piping observable through takeUntil. */
   public rxTakeUntilModuleDown<T>(observable$: Observable<T>): Observable<T> {
     return observable$.pipe(takeUntil(this.rxUnsubscribe$));
+  }
+
+  /** Utility method for updating internal observable state. */
+  public rxStateUpdate(value: Partial<S>): Observable<S> {
+    const nextState = { ...(this.rxStateRaw$.value as any), ...(value as any) };
+    this.rxStateRaw$.next(nextState);
+    return this.rxState$;
   }
 }

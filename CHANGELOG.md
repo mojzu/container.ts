@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 3.2.5 (2018-11-27)
+
+### Added
+
+- Added `RxModule.rxStateUpdate` method.
+
+### Changed
+
+- Updated package dependencies.
+
+---
+
 ## 3.2.4 (2018-11-24)
 
 ### Changed

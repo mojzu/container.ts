@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "3.2.4",
+  "version": "3.2.5",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -37,7 +37,7 @@
   "optionalDependencies": {
     "@types/luxon": "^1.4.1",
     "@types/validator": "^9.4.3",
-    "luxon": "^1.8.0",
+    "luxon": "^1.8.1",
     "validator": "^10.9.0"
   },
   "devDependencies": {
