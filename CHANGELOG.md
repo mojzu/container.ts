@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Added `moduleName` to context of module registered container error.
 - Updated package dependencies.
 
 ---

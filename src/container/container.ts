@@ -136,7 +136,7 @@ export class Container {
    */
   public registerModule<T extends typeof Module>(moduleClass: T): Container {
     if (this.containerModuleRegistered(moduleClass.moduleName)) {
-      throw new ContainerError(EContainerError.ModuleRegistered);
+      throw new ContainerError(EContainerError.ModuleRegistered, undefined, { moduleName: moduleClass.moduleName });
     }
 
     const factoryFunction = (opts: any) => this.containerModuleFactory(moduleClass, opts);

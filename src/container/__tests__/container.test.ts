@@ -25,6 +25,10 @@ class DownTimeoutModule extends Module {
   }
 }
 
+class RegisteredModule extends Module {
+  public static readonly moduleName: string = "RegisteredModule";
+}
+
 describe("Container", () => {
   it("ContainerError is instance of expected classes", () => {
     const error = new ContainerError(EContainerError.Down);
@@ -87,6 +91,17 @@ describe("Container", () => {
       done.fail();
     } catch (error) {
       expect(error instanceof ContainerError).toEqual(true);
+      done();
+    }
+  });
+
+  it("duplicate module names cause error", async (done) => {
+    try {
+      new Container("ModuleRegistered").registerModules([RegisteredModule, RegisteredModule]);
+      done.fail();
+    } catch (error) {
+      expect(error instanceof ContainerError).toEqual(true);
+      expect(error.value.moduleName).toEqual(RegisteredModule.moduleName);
       done();
     }
   });
