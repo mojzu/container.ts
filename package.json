@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "3.2.11",
+  "version": "3.2.12",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -35,7 +35,7 @@
     "rxjs": "^6.3.3"
   },
   "optionalDependencies": {
-    "@types/luxon": "^1.4.2",
+    "@types/luxon": "^1.10.2",
     "@types/validator": "^10.9.0",
     "luxon": "^1.10.0",
     "validator": "^10.11.0"
@@ -44,12 +44,12 @@
     "@types/del": "^3.0.1",
     "@types/jest": "^23.3.13",
     "@types/node": "^10.12.18",
-    "@types/yargs": "^12.0.5",
+    "@types/yargs": "^12.0.6",
     "del": "^3.0.0",
     "fuse-box": "^3.6.0",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
-    "ts-node": "^7.0.1",
+    "ts-node": "^8.0.1",
     "tslint": "^5.12.1",
     "typescript": "^3.2.4",
     "yargs": "^12.0.5"
@@ -73,6 +73,6 @@
       "json",
       "node"
     ],
-    "testURL": "http://localhost"
+    "testEnvironment": "node"
   }
 }
