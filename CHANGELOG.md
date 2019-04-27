@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Updated package dependencies.
 - Removed yarn in favour of npm.
 
 ---
