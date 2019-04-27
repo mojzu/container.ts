@@ -1,6 +1,6 @@
 # Developer
 
-Clone repository, install dependencies with `yarn install` and run scripts: `yarn run ...`
+Clone repository, install dependencies with `npm install` and run scripts: `npm run ...`
 
 | Script      | Description                                    |
 | ----------- | ---------------------------------------------- |
@@ -8,13 +8,13 @@ Clone repository, install dependencies with `yarn install` and run scripts: `yar
 | `distclean` | Remove Node modules.                           |
 | `lint`      | Run TSLint on project.                         |
 | `test`      | Run tests using Jest.                          |
-| `example`   | Run example script, `yarn run example schema`. |
+| `example`   | Run example script, `npm run example schema`. |
 | `dist`      | Build library for release.                     |
 
 Publish library to NPM and GitHub.
 
 ```Shell
-$ yarn run dist && npm publish --access=public [--tag=beta]
+$ npm run dist && npm publish --access=public [--tag=beta]
 $ git push origin master --tags
 ```
 
@@ -30,5 +30,4 @@ $ git push origin master --tags
 * [README](https://help.github.com/articles/about-readmes/)
 * [tsconfig.json](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
 * [TSLint](https://palantir.github.io/tslint/)
-* [Yarn](https://yarnpkg.com/en/docs/cli/)
 * [Jest](https://facebook.github.io/jest/)
