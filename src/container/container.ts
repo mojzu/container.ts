@@ -223,7 +223,7 @@ export class Container {
     return this.modules$
       .pipe(
         filter((states) => {
-          return modules.reduce((previous, current) => {
+          return modules.reduce((previous: boolean, current) => {
             return previous && states[current];
           }, true);
         }),

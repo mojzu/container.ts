@@ -4,7 +4,7 @@ import { ENodeValidateError, NodeValidateError } from "../validate";
 /** NodeValidate.isBuffer options. */
 export interface IIsBuffer {
   /** Optional encoding for buffer. */
-  encoding?: string;
+  encoding?: BufferEncoding;
 }
 
 /** Validate that value is a valid Node.js Buffer. */
