@@ -11,6 +11,12 @@ Clone repository, install dependencies with `npm install` and run scripts: `npm 
 | `example`   | Run example script, `npm run example schema`. |
 | `dist`      | Build library for release.                     |
 
+Update package dependencies.
+
+```Shell
+$ ncu --upgrade
+```
+
 Publish library to NPM and GitHub.
 
 ```Shell
