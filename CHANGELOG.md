@@ -6,6 +6,10 @@
 
 - Updated package dependencies.
 
+### Fixed
+
+- Replace `validator.toString` use with `lodash.toString` method.
+
 ---
 
 ## 3.2.22 (2019-05-16)

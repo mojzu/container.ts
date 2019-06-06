@@ -1,4 +1,4 @@
-import { toString } from "validator";
+import { toString } from "lodash";
 import { ErrorChain } from "../error";
 
 // TODO(M): Improve operator field documentation/testing/code readability.
@@ -8,7 +8,7 @@ export enum EFieldError {
   AndFieldError,
   OrFieldError,
   NotFieldError,
-  OptionalFieldError
+  OptionalFieldError,
 }
 
 /** Field error chain class. */
@@ -195,7 +195,7 @@ export class NotField<T, C = object> extends OperatorField<T, C> {
     if (validated != null) {
       throw new FieldError(EFieldError.NotFieldError, validated);
     }
-    return validated;
+    return validated as null;
   }
 
   public format(value: T, context?: C): null {

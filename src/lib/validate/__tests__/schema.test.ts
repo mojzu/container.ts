@@ -44,29 +44,29 @@ const dataSchema = new Schema<IData>({
     stringMapOuterField: stringField,
     mapInner: {
       booleanMapInnerField: booleanField,
-      stringMapInnerField: stringField
-    }
+      stringMapInnerField: stringField,
+    },
   },
   // Optional mapped fields.
   mapOptional: {
     booleanOptionalField: optionalBooleanField,
-    stringOptionalField: optionalStringField
+    stringOptionalField: optionalStringField,
   },
   // Schema fields.
   schemaField: new SchemaField({
     booleanField,
-    stringField
+    stringField,
   }),
   // Array of fields.
   arrayOuter: [booleanField, stringField, [booleanField, stringField]],
   // Wildcard mapped fields.
   wildcardMap: {
-    "*": booleanField
+    "*": booleanField,
   },
   // Wildcard any field.
   any: "*",
   // Wildcard array fields.
-  wildcardArray: ["*", stringField]
+  wildcardArray: ["*", stringField],
 });
 
 describe("Schema", () => {
@@ -78,26 +78,26 @@ describe("Schema", () => {
       stringMapOuterField: "bar",
       mapInner: {
         booleanMapInnerField: "1",
-        stringMapInnerField: "baz"
-      }
+        stringMapInnerField: "baz",
+      },
     },
     mapOptional: {
-      booleanOptionalField: "10"
+      booleanOptionalField: "10",
     },
     schemaField: {
       booleanField: "1",
-      stringField: "foo"
+      stringField: "foo",
     },
     arrayOuter: ["true", "bar", ["false", "baz"]],
     wildcardMap: {
       one: "0",
-      two: "1"
+      two: "1",
     },
     any: {
       one: 2,
-      two: true
+      two: true,
     },
-    wildcardArray: ["foo", "bar", "baz"]
+    wildcardArray: ["foo", "bar", "baz"],
   };
   const validated = dataSchema.validate(inputData);
   const formatted = dataSchema.format(validated) as any;
@@ -185,9 +185,9 @@ describe("Schema", () => {
     const inputMask = {
       booleanField: true,
       mapOuter: {
-        booleanMapOuterField: true
+        booleanMapOuterField: true,
       },
-      schemaField: true
+      schemaField: true,
     };
     const masked = dataSchema.validate(inputData, inputMask);
     expect(masked.booleanField).toEqual(true);
@@ -208,7 +208,7 @@ describe("Schema", () => {
 
   it("extend method works as expected", () => {
     const extendedSchema = dataSchema.extend({
-      booleanField: stringField
+      booleanField: stringField,
     });
     const data = extendedSchema.validate(inputData, { booleanField: true });
     expect(typeof data.booleanField).toEqual("string");
@@ -218,7 +218,7 @@ describe("Schema", () => {
     const fooSchema = new Schema({ foo: booleanField });
     const barSchema = new Schema({ bar: booleanField });
     const extendedSchema = fooSchema.extend<any>(barSchema, {
-      baz: booleanField
+      baz: booleanField,
     });
     const validateData = extendedSchema.validate({ foo: "true", bar: "false", baz: "0" });
     expect(validateData.foo).toEqual(true);
@@ -230,9 +230,9 @@ describe("Schema", () => {
     const invalidData = {
       mapOuter: {
         mapInner: {
-          stringMapInnerField: 42
-        }
-      }
+          stringMapInnerField: 42,
+        },
+      },
     };
     try {
       dataSchema.validate(invalidData, { mapOuter: { mapInner: { stringMapInnerField: true } } });
