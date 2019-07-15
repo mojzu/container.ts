@@ -15,6 +15,7 @@ Update package dependencies.
 
 ```Shell
 $ ncu --upgrade
+$ npm install
 ```
 
 Publish library to NPM and GitHub.
