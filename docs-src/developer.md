@@ -14,6 +14,7 @@ Clone repository, install dependencies with `npm install` and run scripts: `npm 
 Update package dependencies.
 
 ```Shell
+$ sudo npm install -g npm-check-updates
 $ ncu --upgrade
 $ npm install
 ```
