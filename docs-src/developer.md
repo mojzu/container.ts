@@ -13,17 +13,17 @@ Clone repository, install dependencies with `npm install` and run scripts: `npm 
 
 Update package dependencies.
 
-```Shell
-$ sudo npm install -g npm-check-updates
-$ ncu --upgrade
-$ npm install
+```shell
+sudo npm install -g npm-check-updates
+ncu --upgrade
+npm install
 ```
 
 Publish library to NPM and GitHub.
 
-```Shell
-$ npm run dist && npm publish --access=public [--tag=beta]
-$ git push origin master --tags
+```shell
+npm run dist && npm publish --access=public [--tag=beta]
+git push origin master --tags
 ```
 
 ## Links
