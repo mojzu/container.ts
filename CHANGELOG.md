@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 3.2.29 (2019-10-20)
+
+### Changed
+
+- Updated package dependencies.
+
+---
+
 ## 3.2.28 (2019-10-05)
 
 ### Changed
