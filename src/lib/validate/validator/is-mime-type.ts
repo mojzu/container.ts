@@ -1,11 +1,11 @@
-import { isMimeType as validatorIsMimeType } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Wrapper for validator isMimeType. */
 export function isMimeType(value = ""): string {
   try {
-    if (validatorIsMimeType(value) !== true) {
+    if (validator.isMimeType(value) !== true) {
       throw new ValidateError(EValidateError.IsMimeTypeError, value);
     }
     return value;

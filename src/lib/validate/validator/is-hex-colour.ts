@@ -1,11 +1,11 @@
-import { isHexColor as validatorIsHexColor } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Wrapper for validator isHexColor. */
 export function isHexColour(value = ""): string {
   try {
-    if (validatorIsHexColor(value) !== true) {
+    if (validator.isHexColor(value) !== true) {
       throw new ValidateError(EValidateError.IsHexColourError, value);
     }
     return value;

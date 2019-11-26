@@ -1,4 +1,4 @@
-import { isAlpha as validatorIsAlpha } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 import { IIsString, isString } from "./is-string";
@@ -6,14 +6,14 @@ import { IIsString, isString } from "./is-string";
 /** Validate.isAlpha options. */
 export interface IIsAlpha extends IIsString {
   /** Locale used by validator, defaults to en-GB. */
-  locale?: ValidatorJS.AlphaLocale;
+  locale?: validator.AlphaLocale;
 }
 
 /** Wrapper for validator isAlpha. */
 export function isAlpha(value = "", options: IIsAlpha = {}): string {
   const locale = options.locale || "en-GB";
   try {
-    if (validatorIsAlpha(value, locale) !== true) {
+    if (validator.isAlpha(value, locale) !== true) {
       throw new ValidateError(EValidateError.IsAlphaError, value);
     }
     return isString(value, options);

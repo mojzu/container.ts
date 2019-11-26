@@ -120,7 +120,7 @@ export class ScriptsProcess {
 
   /** End child process with signal. */
   public kill(signal?: string): Observable<number | string> {
-    this.process.kill(signal);
+    this.process.kill(signal as any);
     return this.exit$;
   }
 }

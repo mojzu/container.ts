@@ -1,14 +1,14 @@
-import { isEmail as validatorIsEmail } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Validate.isEmail options. */
-export interface IIsEmail extends ValidatorJS.IsEmailOptions {}
+export interface IIsEmail extends validator.IsEmailOptions {}
 
 /** Wrapper for validator isEmail. */
 export function isEmail(value = "", options: IIsEmail = {}): string {
   try {
-    if (validatorIsEmail(value, options) !== true) {
+    if (validator.isEmail(value, options) !== true) {
       throw new ValidateError(EValidateError.IsEmailError, value);
     }
     return value;

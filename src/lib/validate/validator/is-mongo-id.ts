@@ -1,11 +1,11 @@
-import { isMongoId as validatorIsMongoId } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Wrapper for validator isMongoId. */
 export function isMongoId(value = ""): string {
   try {
-    if (validatorIsMongoId(value) !== true) {
+    if (validator.isMongoId(value) !== true) {
       throw new ValidateError(EValidateError.IsMongoIdError, value);
     }
     return value;

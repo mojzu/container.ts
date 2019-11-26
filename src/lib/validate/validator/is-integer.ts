@@ -1,17 +1,17 @@
-import { isInt, toInt } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Validate.isInteger options. */
-export interface IIsInteger extends ValidatorJS.IsIntOptions {}
+export interface IIsInteger extends validator.IsIntOptions {}
 
 /** Wrapper for validator isInt. */
 export function isInteger(value = "", options: IIsInteger = {}): number {
   try {
-    if (isInt(value, options) !== true) {
+    if (validator.isInt(value, options) !== true) {
       throw new ValidateError(EValidateError.IsIntegerError, value);
     }
-    return toInt(value, 10);
+    return validator.toInt(value, 10);
   } catch (error) {
     throw new ValidateError(EValidateError.IsIntegerError, value, error);
   }

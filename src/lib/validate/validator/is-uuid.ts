@@ -1,4 +1,4 @@
-import { isUUID } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
@@ -12,7 +12,7 @@ export interface IIsUuid {
 export function isUuid(value = "", options: IIsUuid = {}): string {
   const version = options.version || "all";
   try {
-    if (isUUID(value, version) !== true) {
+    if (validator.isUUID(value, version) !== true) {
       throw new ValidateError(EValidateError.IsUuidError, value);
     }
     return value;

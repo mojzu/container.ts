@@ -1,14 +1,14 @@
-import { isURL } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Validate.isUrl options. */
-export interface IIsUrl extends ValidatorJS.IsURLOptions {}
+export interface IIsUrl extends validator.IsURLOptions {}
 
 /** Wrapper for validator isURL. */
 export function isUrl(value = "", options: IIsUrl = { require_host: true }): string {
   try {
-    if (isURL(value, options) !== true) {
+    if (validator.isURL(value, options) !== true) {
       throw new ValidateError(EValidateError.IsUrlError, value);
     }
     return value;

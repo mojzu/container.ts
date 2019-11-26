@@ -1,11 +1,11 @@
-import { isCreditCard as validatorIsCreditCard } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Wrapper for validator isCreditCard. */
 export function isCreditCard(value = ""): string {
   try {
-    if (validatorIsCreditCard(value) !== true) {
+    if (validator.isCreditCard(value) !== true) {
       throw new ValidateError(EValidateError.IsCreditCardError, value);
     }
     return value;

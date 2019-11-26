@@ -1,11 +1,11 @@
-import { isJSON } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Wrapper for validator isJSON. */
 export function isJson<T>(value = ""): T {
   try {
-    if (isJSON(value) !== true) {
+    if (validator.isJSON(value) !== true) {
       throw new ValidateError(EValidateError.IsJsonError, value);
     }
     return JSON.parse(value);

@@ -1,9 +1,9 @@
-import { isIn, isLength, isLowercase, isUppercase } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Validate.isString options. */
-export interface IIsString extends ValidatorJS.IsLengthOptions {
+export interface IIsString extends validator.IsLengthOptions {
   /** Require lower case characters. */
   lowercase?: boolean;
   /** Require upper case characters. */
@@ -25,16 +25,16 @@ export function isString(value = "", options: IIsString = {}): string {
 
   try {
     // Validate is string of length.
-    let isValid = isLength(value, { min: options.min, max: options.max });
+    let isValid = validator.isLength(value, { min: options.min, max: options.max });
     // Check in values array if provided.
     if (values.length > 0) {
-      isValid = isValid && isIn(value, values);
+      isValid = isValid && validator.isIn(value, values);
     }
     // Check if uppercase/lowercase if required.
-    if (uppercase && !isUppercase(value)) {
+    if (uppercase && !validator.isUppercase(value)) {
       isValid = false;
     }
-    if (lowercase && !isLowercase(value)) {
+    if (lowercase && !validator.isLowercase(value)) {
       isValid = false;
     }
     if (isValid !== true) {

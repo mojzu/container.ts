@@ -1,14 +1,14 @@
-import { isPort as validatorIsPort, toInt } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Validate that value is a valid port number. */
 export function isPort(value = ""): number {
   try {
-    if (validatorIsPort(value) !== true) {
+    if (validator.isPort(value) !== true) {
       throw new ValidateError(EValidateError.IsPortError, value);
     }
-    return toInt(value, 10);
+    return validator.toInt(value, 10);
   } catch (error) {
     throw new ValidateError(EValidateError.IsPortError, value, error);
   }

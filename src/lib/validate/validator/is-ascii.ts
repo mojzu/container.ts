@@ -1,4 +1,4 @@
-import { isAscii as validatorIsAscii } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 import { IIsString, isString } from "./is-string";
@@ -6,7 +6,7 @@ import { IIsString, isString } from "./is-string";
 /** Wrapper for validator isAscii. */
 export function isAscii(value = "", options: IIsString = {}): string {
   try {
-    if (validatorIsAscii(value) !== true) {
+    if (validator.isAscii(value) !== true) {
       throw new ValidateError(EValidateError.IsAsciiError, value);
     }
     return isString(value, options);

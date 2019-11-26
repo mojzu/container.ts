@@ -1,18 +1,18 @@
-import { isPostalCode as validatorIsPostalCode } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Validate.isPostalCode options. */
 export interface IIsPostalCode {
   /** Locale used by validator, defaults to GB. */
-  locale?: ValidatorJS.PostalCodeLocale;
+  locale?: validator.PostalCodeLocale;
 }
 
 /** Wrapper for validator isPostalCode. */
 export function isPostalCode(value = "", options: IIsPostalCode = {}): string {
   const locale = options.locale || "GB";
   try {
-    if (validatorIsPostalCode(value, locale) !== true) {
+    if (validator.isPostalCode(value, locale) !== true) {
       throw new ValidateError(EValidateError.IsPostalCodeError, value);
     }
     return value;

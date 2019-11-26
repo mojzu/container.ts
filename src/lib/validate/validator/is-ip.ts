@@ -1,18 +1,18 @@
-import { isIP } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Validate.isIp options. */
 export interface IIsIp {
   /** IP version number, defaults to 4. */
-  version?: 4 | 6;
+  version?: "4" | "6";
 }
 
 /** Wrapper for validator isIP. */
 export function isIp(value = "", options: IIsIp = {}): string {
-  const version = options.version || 4;
+  const version = options.version || "4";
   try {
-    if (isIP(value, version) !== true) {
+    if (validator.isIP(value, version) !== true) {
       throw new ValidateError(EValidateError.IsIpError, value);
     }
     return value;

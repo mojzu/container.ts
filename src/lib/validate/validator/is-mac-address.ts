@@ -1,11 +1,11 @@
-import { isMACAddress } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Wrapper for validator isMACAddress. */
 export function isMacAddress(value = ""): string {
   try {
-    if (isMACAddress(value) !== true) {
+    if (validator.isMACAddress(value) !== true) {
       throw new ValidateError(EValidateError.IsMacAddressError, value);
     }
     return value;

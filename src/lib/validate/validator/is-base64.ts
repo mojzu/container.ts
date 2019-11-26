@@ -1,4 +1,4 @@
-import { isBase64 as validatorIsBase64 } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 import { IIsString, isString } from "./is-string";
@@ -6,7 +6,7 @@ import { IIsString, isString } from "./is-string";
 /** Wrapper for validator isBase64. */
 export function isBase64(value = "", options: IIsString = {}): string {
   try {
-    if (validatorIsBase64(value) !== true) {
+    if (validator.isBase64(value) !== true) {
       throw new ValidateError(EValidateError.IsBase64Error, value);
     }
     return isString(value, options);

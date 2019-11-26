@@ -1,4 +1,4 @@
-import { toBoolean } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
@@ -12,7 +12,7 @@ export interface IIsBoolean {
 export function isBoolean(value = "", options: IIsBoolean = {}): boolean {
   const strict = !!options.strict;
   try {
-    return toBoolean(value, strict);
+    return validator.toBoolean(value, strict);
   } catch (error) {
     throw new ValidateError(EValidateError.IsBooleanError, value, error);
   }

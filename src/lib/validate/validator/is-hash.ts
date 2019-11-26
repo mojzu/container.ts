@@ -1,18 +1,18 @@
-import { isHash as validatorIsHash } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 
 /** Validate.isHash options. */
 export interface IIsHash {
   /** Hash algorithm to identifty, defaults to md5. */
-  algorithm?: ValidatorJS.HashAlgorithm;
+  algorithm?: validator.HashAlgorithm;
 }
 
 /** Wrapper for validator isHash. */
 export function isHash(value = "", options: IIsHash = {}): string {
   const algorithm = options.algorithm || "md5";
   try {
-    if (validatorIsHash(value, algorithm) !== true) {
+    if (validator.isHash(value, algorithm) !== true) {
       throw new ValidateError(EValidateError.IsHashError, value);
     }
     return value;

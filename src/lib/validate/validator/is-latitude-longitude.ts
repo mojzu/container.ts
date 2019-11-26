@@ -1,4 +1,4 @@
-import { isLatLong } from "validator";
+import validator from "validator";
 import { Field } from "../field";
 import { EValidateError, ValidateError } from "../validate";
 import { isFloat } from "./is-float";
@@ -11,7 +11,7 @@ export interface ILatitudeLongitude {
 /** Wrapper for validator isLatLong. */
 export function isLatitudeLongitude(value = ""): ILatitudeLongitude {
   try {
-    if (isLatLong(value) !== true) {
+    if (validator.isLatLong(value) !== true) {
       throw new ValidateError(EValidateError.IsLatitudeLongitudeError, value);
     }
     // Split string and trim for parsing as floats.
