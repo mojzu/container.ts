@@ -1,6 +1,6 @@
 {
   "name": "container.ts",
-  "version": "3.2.40",
+  "version": "3.2.41",
   "description": "Modular application framework",
   "main": "./index.js",
   "typings": "./index.d.ts",
@@ -52,7 +52,7 @@
     "ts-jest": "^24.2.0",
     "ts-node": "^8.5.4",
     "tslint": "^5.20.1",
-    "typescript": "^3.7.4",
+    "typescript": "3.5.3",
     "yargs": "^15.0.2"
   },
   "jest": {

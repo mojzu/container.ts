@@ -1,10 +1,18 @@
 # CHANGELOG
 
-## 3.2.40 (2019-12-29)
+## 3.2.41 (2019-12-29)
 
 ### Changed
 
 - Updated package dependencies.
+
+---
+
+## 3.2.31 (2019-11-19)
+
+### Changed
+
+- Downgrade TypeScript version for compatability.
 
 ---
 
