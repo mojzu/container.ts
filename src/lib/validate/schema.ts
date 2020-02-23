@@ -115,7 +115,7 @@ export class Schema<T = object> {
    * Construct new schema by merging existing schemas.
    * Accepts schema definition objects or existing Schema class instances.
    */
-  public static extend<E>(...schemas: Array<Schema<any> | ISchema>): Schema<E> {
+  public static extend<E>(...schemas: (Schema<any> | ISchema)[]): Schema<E> {
     const schemaDefinitions: ISchema[] = schemas.map((s) => {
       return Schema.isSchema(s) ? s.schema : (s as ISchema);
     });
@@ -131,7 +131,7 @@ export class Schema<T = object> {
    * Construct new schema using this as a base.
    * Accepts schema definition objects or existing Schema class instances.
    */
-  public extend<K extends T>(...schemas: Array<Schema<any> | ISchema>): Schema<K> {
+  public extend<K extends T>(...schemas: (Schema<any> | ISchema)[]): Schema<K> {
     return Schema.extend<K>(this.schema, ...schemas);
   }
 

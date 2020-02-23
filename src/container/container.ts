@@ -307,7 +307,7 @@ export class Container {
   }
 
   /** Internal handler for `up` and `down` methods of class. */
-  protected containerState(hooks: Array<Promise<void>>, state: boolean): Promise<number> {
+  protected containerState(hooks: Promise<void>[], state: boolean): Promise<number> {
     return from(Promise.all(hooks))
       .pipe(
         map(() => {

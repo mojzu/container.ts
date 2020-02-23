@@ -34,17 +34,17 @@ export abstract class Field<T, C = object> {
   }
 
   /** And operator chaining. */
-  public and(...fields: Array<Field<T, C>>): Field<T, C> {
+  public and(...fields: Field<T, C>[]): Field<T, C> {
     return new AndField<T, C>(this, ...fields);
   }
 
   /** Or operator chaining. */
-  public or(...fields: Array<Field<T, C>>): Field<T, C> {
+  public or(...fields: Field<T, C>[]): Field<T, C> {
     return new OrField<T, C>(this, ...fields);
   }
 
   /** Not operator chaining. */
-  public not(...fields: Array<Field<T, C>>): Field<T, C> {
+  public not(...fields: Field<T, C>[]): Field<T, C> {
     return this.and(this, new NotField<T, C>(...fields));
   }
 }
@@ -52,9 +52,9 @@ export abstract class Field<T, C = object> {
 /** Field operator abstract base class. */
 export abstract class OperatorField<T, C = object> extends Field<T, C> {
   /** Chained fields for use by operator methods. */
-  protected readonly fields: Array<Field<T, C>>;
+  protected readonly fields: Field<T, C>[];
 
-  public constructor(...fields: Array<Field<T, C>>) {
+  public constructor(...fields: Field<T, C>[]) {
     super();
     this.fields = fields;
   }
