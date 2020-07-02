@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 3.2.46 (2020-07-02)
+
+### Changed
+
+- Updated package dependencies.
+
+---
+
 ## 3.2.45 (2020-06-02)
 
 ### Changed
