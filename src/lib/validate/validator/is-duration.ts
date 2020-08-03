@@ -25,7 +25,7 @@ export class DurationField extends Field<Duration> {
   public validate(value: string): Duration {
     return isDuration(value, this.options);
   }
-  public format(value: Duration): string {
+  public format(value: Duration): string | null {
     return value.toISO();
   }
 }

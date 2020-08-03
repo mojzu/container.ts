@@ -26,7 +26,7 @@ export class DateTimeField extends Field<DateTime> {
   public validate(value: string): DateTime {
     return isDateTime(value, this.options);
   }
-  public format(value: DateTime): string {
+  public format(value: DateTime): string | null {
     return value.toISO();
   }
 }
